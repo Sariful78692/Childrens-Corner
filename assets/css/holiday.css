@@ -1,0 +1,170 @@
+body {
+  background-color: #f8f9fa;
+  color: #343a40; /* Darker gray for better readability */
+}
+
+.container {
+  max-width: 1200px;
+}
+
+/* Modern Hero Section */
+.hero-modern-section {
+  background: url("../../assets/image/childrenscorner.jpg") center/cover no-repeat;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 4rem 2rem;
+  color: #fff;
+  text-align: center;
+  border-radius: 0 0 25px 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.hero-modern-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.hero-modern-subtitle {
+  font-size: 1.2rem;
+  font-weight: 300;
+  margin-bottom: 2rem;
+}
+
+.holiday-search-bar {
+  display: flex;
+  justify-content: center;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+}
+
+.holiday-search-input {
+  border: none;
+  outline: none;
+  flex-grow: 1;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background: transparent;
+}
+
+.holiday-search-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.holiday-search-button:hover {
+  background-color: #0056b3; /* Slightly darker shade for hover */
+}
+
+/* Section Title */
+h2.text-center {
+  font-weight: 700;
+  color: #007bff; /* Theme color for titles */
+  margin-bottom: 3rem !important;
+}
+
+/* Modern Holiday List */
+.holiday-list-modern {
+  background-color: #fff;
+  padding: 5rem 0;
+  border-radius: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-top: -50px;
+  position: relative;
+  z-index: 10;
+}
+
+.holiday-card {
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.holiday-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3); /* Vibrant theme color on hover */
+}
+
+.holiday-icon {
+  font-size: 2rem;
+  color: #007bff;
+  margin-right: 1.5rem;
+  flex-shrink: 0;
+}
+
+.holiday-details {
+  flex-grow: 1;
+}
+
+.holiday-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.holiday-date {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 0;
+}
+
+/* Holiday Activities Section */
+.holiday-activities-section {
+  background-color: #f8f9fa;
+}
+
+.activity-card {
+  background-color: #fff;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.activity-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3); /* Vibrant theme color on hover */
+}
+
+.activity-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.activity-content {
+  padding: 1.5rem;
+}
+
+.activity-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #007bff; /* Theme color for activity titles */
+  margin-bottom: 0.5rem;
+}
+
+.activity-description {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 0;
+}

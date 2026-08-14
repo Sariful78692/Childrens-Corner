@@ -1,0 +1,196 @@
+/* Scroll Animation Styles */
+
+/* Base hidden state for all animated elements */
+.animate-on-scroll {
+  opacity: 0;
+  transition: all 1s ease-out; /* Default transition */
+}
+
+/* Visibility state */
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: none; /* Reset any transforms */
+  filter: none; /* Reset any filters */
+}
+
+/* --- Fade Animations --- */
+.fade-in {
+  opacity: 0;
+}
+
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+.fade-in-down {
+  opacity: 0;
+  transform: translateY(-50px);
+}
+
+.fade-in-left {
+  opacity: 0;
+  transform: translateX(-50px);
+}
+
+.fade-in-right {
+  opacity: 0;
+  transform: translateX(50px);
+}
+
+/* --- Slide Animations --- */
+.slide-in-up {
+  opacity: 0;
+  transform: translateY(100px);
+}
+
+.slide-in-down {
+  opacity: 0;
+  transform: translateY(-100px);
+}
+
+.slide-in-left {
+  opacity: 0;
+  transform: translateX(-100px);
+}
+
+.slide-in-right {
+  opacity: 0;
+  transform: translateX(100px);
+}
+
+.slide-in-diagonal {
+  opacity: 0;
+  transform: translate(-100px, 100px); /* Example: from bottom-left */
+}
+
+/* --- Zoom Animations --- */
+.zoom-in {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.zoom-in-up {
+  opacity: 0;
+  transform: translateY(50px) scale(0.8);
+}
+
+.zoom-in-down {
+  opacity: 0;
+  transform: translateY(-50px) scale(0.8);
+}
+
+.zoom-in-left {
+  opacity: 0;
+  transform: translateX(-50px) scale(0.8);
+}
+
+.zoom-in-right {
+  opacity: 0;
+  transform: translateX(50px) scale(0.8);
+}
+
+/* --- Scale Animations --- */
+.scale-in {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.scale-up {
+  opacity: 0;
+  transform: scale(1.2); /* Appears larger and scales down */
+}
+
+.scale-fade-in {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* --- Rotate Animations --- */
+.rotate-in {
+  opacity: 0;
+  transform: rotate(-90deg);
+}
+
+.rotate-in-left {
+  opacity: 0;
+  transform: translateX(-100px) rotate(-90deg);
+}
+
+.rotate-in-right {
+  opacity: 0;
+  transform: translateX(100px) rotate(90deg);
+}
+
+/* --- Special / Creative Appear Effects --- */
+.flip-in-x {
+  opacity: 0;
+  transform: rotateX(90deg);
+}
+
+.flip-in-y {
+  opacity: 0;
+  transform: rotateY(90deg);
+}
+
+.bounce-in {
+  opacity: 0;
+  transform: scale(0.3);
+  animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); /* Ease-out-back like */
+}
+
+.blur-in {
+  opacity: 0;
+  filter: blur(20px);
+}
+
+/* New Page Transition Animations */
+.page-transition-curtain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0077b6;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+@keyframes curtain-reveal { /* This is for page entry */
+    from { clip-path: circle(150% at top right); }
+    to { clip-path: circle(0% at top right); }
+}
+
+@keyframes curtain-cover { /* This is for page exit */
+    from { clip-path: circle(0% at top right); }
+    to { clip-path: circle(150% at top right); }
+}
+
+.curtain-anim-in {
+  animation: 0.8s cubic-bezier(.25, 1, .30, 1) curtain-reveal both;
+}
+
+.curtain-anim-out {
+  animation: 0.8s cubic-bezier(.25, 1, .30, 1) curtain-cover both;
+}
+
+/* Staggered animation delays */
+.animate-on-scroll.delay-1.visible {
+  transition-delay: 0.2s;
+}
+
+.animate-on-scroll.delay-2.visible {
+  transition-delay: 0.4s;
+}
+.animate-on-scroll.delay-3.visible {
+  transition-delay: 0.6s;
+}
+.animate-on-scroll.delay-4.visible {
+  transition-delay: 0.8s;
+}
+.animate-on-scroll.delay-5.visible {
+  transition-delay: 1.0s;
+}
+.animate-on-scroll.delay-6.visible {
+  transition-delay: 1.2s;
+}

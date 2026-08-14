@@ -1,0 +1,3913 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box; /* Add box-sizing for easier layout control */
+  font-family: "Poppins", sans-serif;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 1020; /* Ensure header stays above other content */
+  background-color: white; /* Ensure consistent background when sticky */
+}
+
+/* Top Bar Styling */
+.top-bar {
+  background-color: #0077b6; /* Dark blue from sample */
+  color: white;
+  display: flex;
+  justify-content: center; /* Center align the content */
+  align-items: center;
+  padding: 8px 20px;
+  font-size: 0.9em;
+  transition:
+    opacity 0.3s ease-in-out,
+    visibility 0.3s ease-in-out,
+    height 0.3s ease-in-out,
+    padding 0.3s ease-in-out; /* Add transition for smooth hiding */
+  height: 28px; /* Explicit height for smooth transition */
+}
+
+.top-bar.hide-top-bar {
+  opacity: 0;
+  visibility: hidden;
+  height: 0; /* Collapse height to prevent reserving space */
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: hidden; /* Hide content when collapsed */
+}
+
+.top-bar .contact-info {
+  margin-right: 50px; /* Add margin to separate from social icons */
+}
+
+.top-bar .contact-info span {
+  margin-right: 25px; /* Spacing between contact items */
+}
+
+.top-bar .contact-info i {
+  margin-right: 8px; /* Spacing between icon and text */
+}
+
+.top-bar .social-icons a {
+  color: white;
+  margin-left: 18px; /* Spacing between social icons */
+  font-size: 1.1em;
+  text-decoration: none;
+}
+
+.top-bar .social-icons a:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 576px) {
+  .top-bar {
+    display: none;
+  }
+}
+
+/* Main Navigation Styling */
+.main-nav {
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  width: 100%; /* Important for fixed elements */
+  transition: box-shadow 0.3s ease;
+}
+
+.main-nav:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.main-nav .nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1300px; /* Increased max-width for better spacing */
+  margin: 0 auto; /* Center the content */
+  padding: 0 20px; /* Add some padding */
+}
+
+.main-nav .logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none; /* Ensure logo area is not underlined */
+}
+
+.main-nav .logo img {
+  height: 60px; /* Adjust logo height */
+  margin-right: 15px;
+}
+
+@media (max-width: 576px) {
+  .main-nav .logo img {
+    height: 50px;
+    margin-right: 10px;
+  }
+}
+
+.main-nav .logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.main-nav .logo-text .school-name {
+  font-weight: bold;
+  color: #0077b6; /* Dark blue for school name */
+  font-size: 1.4em; /* Increased font size */
+  margin-bottom: 2px;
+}
+
+.main-nav .logo-text .school-address,
+.main-nav .logo-text .school-website {
+  font-size: 0.8em; /* Increased font size */
+  color: #575656; /* Gray for address and website */
+  line-height: 1.4;
+}
+
+.main-nav .nav-links {
+  list-style: none;
+  display: flex;
+  flex-wrap: nowrap; /* Prevent nav links from wrapping */
+  margin-top: 12px;
+}
+
+.main-nav .nav-links li {
+  margin-left: 35px; /* Increased spacing between navigation items */
+}
+
+.main-nav .nav-links li:last-child {
+  margin-right: 0;
+}
+
+.main-nav .nav-links li a {
+  position: relative;
+  text-decoration: none;
+  color: #575656; /* Dark gray for links */
+  /* font-weight: bold; */
+  padding-bottom: 10px; /* Increased padding */
+  display: flex; /* Use flex to align text and icon */
+  align-items: center;
+  transition: color 0.3s;
+}
+
+.main-nav .nav-links li a i {
+  margin-left: 8px; /* Spacing for the caret icon */
+  font-size: 0.8em; /* Increased font size */
+  vertical-align: middle;
+}
+
+.main-nav .nav-links li a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #0077b6; /* Blue underline on hover */
+  transition: width 0.4s ease;
+}
+
+.main-nav .nav-links li a:hover,
+.main-nav .nav-links li a.active-link {
+  color: #0077b6; /* Lighter blue on hover */
+  /* transform: translateY(-2px); Subtle lift effect */
+  /* box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); Subtle shadow on hover */
+}
+
+.main-nav .nav-links li a:hover::after,
+.main-nav .nav-links li a.active-link::after {
+  width: 100%;
+}
+
+/* Remove old nav-bar styles */
+.nav-bar {
+  display: none; /* Hide the old nav-bar as it's replaced by main-nav */
+}
+
+/* Carousel Section Styling (Bootstrap Carousel specific overrides) */
+.carousel-section {
+  padding: 0; /* Remove padding from section if not needed */
+  background-color: #f8f8f8; /* Background color for the section */
+}
+
+.carousel-item {
+  transition: transform 1.5s ease-in-out !important; /* Make carousel slide transition smoother */
+}
+
+.carousel-item img {
+  height: 500px; /* Set a fixed height for carousel images */
+  width: 100%;
+  object-fit: cover; /* Ensure images cover the area without distortion */
+  filter: brightness(
+    70%
+  ); /* Slightly dim the image for better text readability */
+  transform: scale(1); /* Initial scale */
+  animation: continuous-zoom 10s infinite alternate ease-in-out; /* Continuous zoom animation */
+  transform-origin: center center; /* Ensure zooming from the center */
+}
+
+@keyframes continuous-zoom {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.08); /* Zoom in slightly */
+  }
+}
+
+.carousel-button {
+  background: #5f86a9 !important;
+  height: 35px !important;
+  width: 35px !important;
+  position: absolute !important;
+  top: 190px !important;
+  left: 20px !important;
+}
+
+.carousel-caption {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.3); /* Subtle overlay for caption */
+  color: white;
+  padding: 20px;
+}
+
+.carousel-caption h3 {
+  font-size: 2.5em;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.carousel-caption p {
+  font-size: 1.2em;
+  line-height: 1.5;
+  margin-bottom: 25px;
+  max-width: 80%; /* Limit paragraph width */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.carousel-caption .carousel-btn {
+  background-color: #0077b6; /* Consistent with hero button */
+  border-color: #0077b6;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.carousel-caption .carousel-btn:hover {
+  background-color: #0077b6;
+  border-color: #0077b6;
+}
+
+@media (max-width: 576px) {
+  .carousel-caption .carousel-btn {
+    background-color: #0077b6; /* Consistent with hero button */
+    border-color: #0077b6;
+    padding: 10px 10px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 2px;
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease;
+  }
+}
+
+/* Carousel controls and indicators */
+.alumnus-section .carousel-control-prev,
+.alumnus-section .carousel-control-next {
+  width: 50px; /* Adjust as needed */
+  height: 50px; /* Adjust as needed */
+  background-color: #0077b6; /* Blue background for buttons */
+  border-radius: 50%; /* Make them circular */
+  opacity: 1; /* Override Bootstrap's default opacity */
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Adjust for perfect centering */
+}
+
+.alumnus-section .carousel-control-prev-icon,
+.alumnus-section .carousel-control-next-icon {
+  background-image: none; /* Remove default Bootstrap icon background */
+  font-size: 1.5rem; /* Adjust icon size */
+  color: #ffffff; /* White icon color */
+}
+
+.alumnus-section .carousel-control-prev-icon::before {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  content: "\f053"; /* fa-chevron-left */
+}
+
+.alumnus-section .carousel-control-next-icon::before {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  content: "\f054"; /* fa-chevron-right */
+}
+
+.alumnus-section .carousel-indicators {
+  position: relative; /* Changed from absolute to relative to keep it in normal flow initially */
+  bottom: -60px; /* Move indicators further down from their default position */
+  margin-top: 20px; /* Add some margin from the content above */
+  justify-content: center; /* Ensure indicators are centered */
+}
+
+.alumnus-section .carousel-indicators button {
+  background-color: #0077b6; /* Blue for indicators */
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin: 0 5px;
+}
+
+/* Hero Section Styles */
+.hero-section {
+  position: relative;
+  background-image: url("../../assets/image/IMG_6018.JPG"); /* Using a suitable image from assets */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 70vh; /* Adjust height as needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white; /* Default text color for hero content */
+  text-align: center;
+}
+
+/* Hero About Us Section Styles */
+.hero-about-us {
+  position: relative; /* Needed for absolute positioning of pseudo-element */
+  overflow: hidden; /* Ensures blur doesn't spill out */
+  height: 450px; /* Increased height for more visual impact */
+  display: flex; /* For centering content vertically */
+  align-items: center; /* Center content vertically */
+  justify-content: center; /* Center content horizontally */
+}
+
+/* New styling for H1 in hero-about-us */
+.hero-about-us h2 {
+  font-size: 3.8em; /* Significantly larger font size */
+  font-weight: 700; /* Bolder */
+  color: #fff; /* White color */
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* More pronounced shadow */
+  position: relative;
+  display: inline-block;
+  padding-bottom: 15px; /* Space for underline */
+  z-index: 2; /* Ensure it's above the overlay */
+}
+
+.hero-about-us h1::after {
+  /* content: ""; */
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 0%; /* Start with no width */
+  height: 5px; /* Thicker underline */
+  background-color: #f2b200; /* Yellow underline */
+  border-radius: 2px;
+  transition: width 0.6s ease-out; /* Animation for width */
+}
+
+/* Animate underline on .visible class */
+.hero-about-us h1.visible::after {
+  width: 100%; /* Expand to full width when visible */
+}
+
+.hero-about-us::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
+  z-index: 0; /* Above the ::before image, below content */
+}
+
+.hero-about-us::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../image/headmaster/IMG_7345.JPG"); /* Corrected path relative to CSS file */
+  background-size: cover;
+  background-position: center;
+  /* filter: blur(1px); Reduced blur */
+  z-index: -1; /* Place behind content */
+  transform: scale(1.02); /* Scale a bit to hide blur edges if any */
+}
+
+.hero-about-us h1 {
+  position: relative; /* Ensure h1 is above the pseudo-element if z-index is an issue */
+  z-index: 1; /* Explicitly place above pseudo-element */
+  color: white; /* Ensure text color */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Keep text shadow */
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 20px;
+  max-width: 900px; /* Limit content width */
+}
+
+.hero-content h1,
+.hero-content h2 {
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.hero-content p {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.hero-read-more {
+  background-color: #0077b6; /* Darker blue for button */
+  border-color: #0077b6;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.hero-read-more:hover {
+  background-color: #0077b6;
+  border-color: #0077b6;
+}
+
+.hero-content .d-flex .fs-5 {
+  color: #007bff; /* Phone number color */
+}
+
+.hero-content .d-flex .fas.fa-phone-alt {
+  color: #007bff; /* Phone icon color */
+}
+
+/* Info Cards Section Styles */
+.info-cards-section {
+  background-color: #f8f9fa; /* Light gray background */
+  padding: 50px 0;
+}
+
+.angled-banner {
+  background-color: #0077b6; /* Dark blue */
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden; /* Ensure skewed children don't overflow */
+  z-index: 1; /* For stacking context with pseudo-elements */
+  max-width: 900px; /* Adjust width as needed */
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 8px; /* Slightly rounded corners for the whole banner */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.angled-item {
+  color: white;
+  padding: 20px 15px;
+  flex-grow: 1;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1em;
+  position: relative; /* For z-index and pseudo-elements */
+  z-index: 2; /* Content above dividers */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.angled-item i {
+  margin-bottom: 10px;
+}
+
+/* Angling effect using pseudo-elements as dividers */
+.angled-banner .angled-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 2px; /* Thickness of the divider */
+  background-color: rgba(255, 255, 255, 0.3); /* Lighter divider color */
+  transform: skewX(-20deg); /* Angle the divider */
+  transform-origin: top right;
+  z-index: 1;
+}
+
+/* Info Card Styling */
+.info-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+}
+
+.info-card-title {
+  color: #0077b6; /* Dark blue for titles */
+  font-weight: bold;
+  font-size: 1.4em;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee; /* Separator line */
+  padding-bottom: 10px;
+}
+
+.info-card-title i {
+  color: #f2b200; /* Yellow for icons */
+  margin-right: 10px;
+}
+
+.info-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.info-card ul li {
+  margin-bottom: 10px;
+  color: #575656;
+  text-align: left; /* Align list items to left */
+}
+
+.info-card ul li i.fa-play {
+  color: #0077b6; /* Blue for play icons */
+  margin-right: 8px;
+  font-size: 0.8em;
+  vertical-align: middle;
+}
+
+.info-card p {
+  color: #575656;
+  line-height: 1.6;
+}
+
+.info-card strong {
+  color: #0077b6; /* Darker color for strong text */
+}
+
+.info-card .badge {
+  font-size: 0.75em;
+  vertical-align: middle;
+}
+
+/* About School Section Styles */
+.about-school-section {
+  background-color: #f8f9fa; /* Light gray background */
+  padding: 80px 0;
+  position: relative;
+  overflow: hidden; /* For background pattern */
+  z-index: 1; /* For stacking context with images */
+}
+
+/* Background pattern from sample - a subtle geometric pattern */
+.about-school-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g fill="%23e8e8e8" fill-opacity="0.5"><path d="M100 0L0 100V0H100zM0 0l100 100H0V0z"></path></g></svg>'); /* Subtle light geometric pattern */
+  z-index: 0;
+  opacity: 0.3;
+}
+
+.about-school-title {
+  color: #333; /* Dark gray */
+  font-weight: bold;
+  position: relative;
+  display: inline-block; /* To make ::after work correctly */
+  padding-bottom: 12px; /* Adjusted padding */
+  font-size: 2.5em; /* Larger title */
+}
+
+.about-school-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 80px; /* Wider underline */
+  height: 4px; /* Thicker underline */
+  background-color: #f2b200; /* Yellow underline */
+  border-radius: 2px;
+  transition: width 0.6s ease-out; /* Added transition for smooth animation */
+}
+
+.about-school-section h3 {
+  color: #0077b6; /* Dark blue for heading */
+  line-height: 1.4; /* Slightly increased for better readability */
+  font-size: 2.2em; /* Adjusted size */
+}
+
+.about-school-section p {
+  color: #575656;
+  line-height: 1.6;
+  margin-bottom: 1em; /* Add space between paragraphs */
+}
+
+.about-read-more {
+  background-color: #0077b6; /* Consistent button style */
+  border-color: #0077b6;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease; /* Added box-shadow transition */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Added initial shadow */
+}
+
+.about-read-more:hover {
+  background-color: #0077b6;
+  border-color: #0077b6;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+
+/* Image Grid Positioning and Styling */
+.image-grid {
+  position: relative;
+  width: 100%; /* Take full width of its column */
+  height: auto; /* Fixed height for the grid container */
+  margin-top: 0; /* Adjust vertical positioning */
+}
+
+.image-grid img {
+  border-radius: 8px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3); /* Softer, more diffused shadow */
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  object-fit: cover;
+  object-position: center;
+}
+
+.image-grid img:hover {
+  transform: translateY(-8px) scale(1.02); /* Slight lift and scale on hover */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+img.img-fluid.rounded.shadow-sm {
+  transition:
+    transform 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+img.img-fluid.rounded.shadow-sm:hover {
+  transform: scale(1.03); /* Subtle zoom on hover */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Slightly increased shadow */
+}
+
+.image-grid .large-image {
+  width: 100%; /* Adjusted width */
+  height: auto; /* Adjusted height */
+  z-index: 3; /* Ensure it's above small images */
+  border: 5px solid white; /* White border as in sample */
+}
+
+.image-grid .small-image-top {
+  width: 50%;
+  height: auto;
+  border: 5px solid white;
+}
+
+.image-grid .small-image-bottom {
+  width: 50%;
+  height: auto;
+  border: 5px solid white;
+}
+
+/* About The Head Master Section Styles */
+.headmaster-section {
+  position: relative; /* Needed for pseudo-element positioning */
+  z-index: 1; /* Ensure content is above pseudo-element */
+  background: linear-gradient(
+    to bottom,
+    #f0f4f8,
+    #e7ebee
+  ); /* Slightly more vibrant gradient */
+  padding: 100px 0; /* More vertical padding */
+  overflow: hidden; /* Ensure pattern doesn't bleed */
+}
+
+.headmaster-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g fill="%23d0d6db" fill-opacity="0.2"><path d="M100 0L0 100V0H100zM0 0l100 100H0V0z"></path></g></svg>'); /* Light geometric pattern */
+  z-index: -1; /* Place behind content */
+  opacity: 0.5; /* Subtle opacity */
+}
+
+.headmaster-section .about-school-title {
+  color: #333; /* Dark gray */
+  font-weight: bold;
+  position: relative;
+  display: inline-block; /* To make ::after work correctly */
+  padding-bottom: 12px; /* Adjusted padding */
+  font-size: 2.5em; /* Larger title */
+}
+
+.headmaster-section .about-school-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 80px; /* Wider underline */
+  height: 4px; /* Thicker underline */
+  background-color: #f2b200; /* Yellow underline */
+  border-radius: 2px;
+  transition: width 0.6s ease-out; /* Added transition for smooth animation */
+}
+
+.management-title {
+  color: #333; /* Dark gray */
+  font-weight: 800; /* Bolder */
+  position: relative;
+  display: inline-block; /* To make ::after work correctly */
+  padding-bottom: 15px; /* More padding */
+  font-size: 2.8em; /* Even larger title */
+  letter-spacing: -0.02em; /* Slightly tighter for modern feel */
+}
+
+.management-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 80px; /* Wider underline */
+  height: 4px; /* Thicker underline */
+  background-color: #f2b200; /* Yellow underline */
+  border-radius: 2px;
+  transition: width 0.6s ease-out; /* Added transition for smooth animation */
+}
+
+/* Statistics Section */
+.statistics-section {
+  background-color: #e0f2f7; /* Light blue background as seen in sample.png */
+}
+
+.statistic-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.statistic-icon {
+  background-color: #1a568a; /* Darker blue for the circle */
+  border-radius: 50%;
+  width: 100px; /* Diameter of the circle */
+  height: 100px; /* Diameter of the circle */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  /* Removed transform: translateY here */
+}
+
+.statistic-icon i {
+  color: #ffffff; /* White icon */
+  transition: transform 0.3s ease-in-out; /* Smooth transition for the icon */
+}
+
+.statistic-icon:hover i {
+  /* Zoom in icon when hovering over the statistic-icon container */
+  transform: scale(1.2); /* Zoom in icon on hover */
+}
+
+.statistic-number {
+  font-size: 2.5em; /* Large font size for the number */
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 5px;
+}
+
+.statistic-label {
+  font-size: 1.1em;
+  color: #555555;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Labs Section */
+.labs-section {
+  background-color: #ffffff; /* White background */
+  padding: 80px 0;
+}
+
+.labs-title {
+  color: #333;
+  font-weight: bold;
+  font-size: 2.5em;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.labs-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 150px; /* Underline length */
+  height: 3px;
+  background-color: #0077b6; /* Blue underline */
+  border-radius: 2px;
+}
+
+.labs-description {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.1em;
+  color: #555;
+  line-height: 1.6;
+}
+
+.lab-card {
+  text-align: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.lab-card:hover {
+  transform: translateY(-5px);
+}
+
+.lab-card img {
+  width: 100%;
+  height: 200px; /* Fixed height for images */
+  object-fit: cover;
+  border: 1px solid #ddd;
+  padding: 5px;
+  display: block; /* Ensure image behaves as a block element */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.lab-label {
+  margin-top: 15px;
+  font-weight: bold;
+  color: #0077b6; /* Dark blue for labels */
+  font-size: 1.1em;
+}
+
+/* Future Plans Section */
+.future-plans-section {
+  background-color: #e0f2f7; /* Light blue background as seen in sample.png */
+  padding: 80px 0;
+}
+
+.future-plans-title {
+  color: #333;
+  font-weight: bold;
+  font-size: 2.5em;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.future-plans-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 150px; /* Underline length */
+  height: 3px;
+  background-color: #0077b6; /* Blue underline */
+  border-radius: 2px;
+}
+
+.future-plans-description {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.1em;
+  color: #555;
+  line-height: 1.6;
+}
+
+.future-plan-item {
+  text-align: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.future-plan-item:hover {
+  transform: translateY(-5px);
+}
+
+.future-plan-item img {
+  width: 100%;
+  height: 250px; /* Fixed height for images */
+  object-fit: cover;
+  border: 1px solid #ddd;
+  padding: 5px;
+}
+
+/* Scrolling Images Container Styling (now a box inside Future Plans) */
+.future-plans-section .scrolling-images-container {
+  /* background-color: #ffffff; */ /* White background for the box */
+  /* border: 1px solid #e0e0e0; */ /* Light border */
+  /* border-radius: 10px; */ /* Rounded corners */
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); */ /* Subtle shadow */
+  padding: 20px; /* Inner padding */
+  margin-top: 40px; /* Space from content above */
+  overflow: hidden; /* Ensure images are clipped within the container */
+  display: flex;
+  justify-content: center;
+}
+
+.scrolling-container {
+  /* No width: 100%; needed as it's wrapped in a padded container */
+  white-space: nowrap;
+  /* Keep images in a single line */
+}
+
+.image-track {
+  display: inline-block; /* Allows items to flow horizontally */
+  animation: scroll-left 30s linear infinite; /* Animation definition */
+}
+
+.scrolling-image {
+  height: 180px; /* Fixed height for consistency */
+  width: auto; /* Maintain aspect ratio */
+  margin: 0 10px; /* Spacing between images */
+  /* border-radius: 8px; */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: inline-block; /* Ensure images are in a row */
+  transition: transform 0.5s ease-in-out; /* Increased duration for smoother zoom */
+}
+
+.scrolling-image:hover {
+  transform: scale(1.15); /* More pronounced zoom in on hover */
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(
+      -50%
+    ); /* Scroll exactly half of the duplicated content */
+  }
+}
+
+/* Photo Gallery Section */
+.photo-gallery-section {
+  background-color: #f8f9fa; /* Light gray background */
+}
+
+.photo-gallery-section .gallery-title {
+  color: #333;
+  font-weight: bold;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 12px;
+  font-size: 2.5em;
+}
+
+.photo-gallery-section .gallery-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background-color: #f2b200; /* Yellow underline */
+  border-radius: 2px;
+}
+
+.gallery-grid .gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Slightly increased initial shadow */
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease; /* Increased transition duration */
+  cursor: pointer; /* Indicate interactivity */
+}
+
+.gallery-grid .gallery-item:hover {
+  transform: translateY(-8px) scale(1.02); /* More pronounced lift and scale */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
+}
+
+.gallery-grid .gallery-item img {
+  width: 100%;
+  height: 200px; /* Fixed height for consistency */
+  object-fit: cover; /* Cover the area, cropping if necessary */
+  transition: transform 0.4s ease; /* Match parent transition duration */
+  display: block; /* Ensure image behaves as a block element */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.gallery-grid .gallery-item a {
+  display: block; /* Make the anchor tag block-level */
+  position: relative; /* Establish positioning context for pseudo-elements */
+  overflow: hidden; /* Hide overflowing parts of the image on hover */
+  border-radius: 8px; /* Match parent border-radius */
+}
+
+.gallery-grid .gallery-item:hover img {
+  transform: scale(1.1); /* More pronounced zoom in image on hover */
+}
+
+/* Overlay for professional look on anchor tag */
+.gallery-grid .gallery-item a::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 119, 182, 0); /* Transparent blue overlay */
+  transition: background-color 0.4s ease;
+  z-index: 1; /* Above image */
+  border-radius: 8px; /* Match item border-radius */
+}
+
+.gallery-grid .gallery-item a:hover::before {
+  background-color: rgba(0, 119, 182, 0.4); /* Darker blue overlay on hover */
+}
+
+/* Optional icon on hover for anchor tag */
+.gallery-grid .gallery-item a::after {
+  content: "\f002"; /* Font Awesome magnifying glass icon */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 2em;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 2; /* Above overlay */
+}
+
+.gallery-grid .gallery-item a:hover::after {
+  opacity: 1; /* Show icon on hover */
+}
+
+/* Footer Section */
+.footer-section {
+  background-color: #0d1f36; /* Dark blue from sample */
+  color: #ccc;
+  padding: 30px 0;
+}
+
+.footer-widget {
+  color: #ccc;
+  height: 100%;
+}
+
+.footer-widget .widget-title {
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #444;
+  padding-bottom: 15px;
+  position: relative;
+}
+
+.footer-widget .widget-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 50px;
+  height: 2px;
+  background-color: #f2b200;
+}
+
+.footer-widget p {
+  font-size: 0.9em;
+  line-height: 1.8;
+}
+
+.footer-widget ul {
+  padding: 0;
+  list-style: none;
+}
+
+.footer-widget ul li {
+  margin-bottom: 12px;
+}
+
+.footer-widget ul li a {
+  color: #ccc;
+  text-decoration: none;
+  transition:
+    color 0.3s ease,
+    padding-left 0.3s ease;
+  position: relative;
+  font-size: 1em; /* Slightly increased font size */
+}
+
+.footer-widget ul li a:hover {
+  color: #0077b6; /* Changed to blue on hover for consistency */
+  padding-left: 10px;
+}
+
+.footer-widget ul li a:hover::before {
+  content: "\f0da";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #f2b200;
+}
+
+.social-icons-bottom {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.social-icons-bottom .social-icon-box {
+  background-color: #0077b6;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.social-icons-bottom .social-icon-box:hover {
+  background-color: #005a8d; /* Darker blue on hover */
+  transform: translateY(-5px); /* More pronounced lift */
+  border-radius: 50%; /* Make them circular on hover */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); /* Stronger shadow */
+}
+
+.footer-logo {
+  height: 60px;
+  margin-bottom: 15px;
+}
+
+.school-name {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.bottom-footer {
+  background-color: #0a182b;
+  color: #aaa;
+  font-size: 0.9em;
+  padding: 20px 0;
+  text-align: center;
+  border-top: 1px solid #222;
+}
+
+.bottom-footer p {
+  margin-bottom: 0;
+}
+
+.bottom-footer strong {
+  color: #fff;
+}
+/* Scroll to Top Button */
+.scroll-top-btn {
+  position: fixed;
+  bottom: 60px; /* 40px (whatsapp bottom) + 60px (whatsapp height) + 10px (margin) */
+  right: 40px;
+  width: 50px;
+  height: 50px;
+  background-color: #0077b6;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 50px;
+  font-size: 24px;
+  display: none; /* Hidden by default */
+  z-index: 1000;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+}
+
+.scroll-top-btn:hover {
+  background-color: #0077b6;
+  color: white;
+}
+
+/* =========================
+   CUSTOM NAV DROPDOWN SYSTEM
+   ========================= */
+
+.main-nav .navbar-nav .dropdown {
+  position: relative;
+}
+
+.main-nav .navbar-nav > li > a.nav-link {
+  position: relative;
+  text-decoration: none;
+}
+
+/* Underline (default hidden) */
+.main-nav .navbar-nav > li > a.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0%;
+  height: 2px;
+  background: #0077b6;
+  transition: width 0.3s ease;
+}
+
+/* Show underline on hover */
+.main-nav .navbar-nav > li:hover > a.nav-link::after {
+  width: 100%;
+}
+
+/* Keep underline for active link */
+.main-nav .navbar-nav > li > a.nav-link.active-link::after {
+  width: 100%;
+}
+
+.main-nav .navbar-nav .dropdown-menu {
+  display: block; /* keep block so animation works */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(10px);
+
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+
+  background-color: white;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  min-width: 180px;
+  z-index: 1000;
+  border-radius: 0;
+  transition: all 0.25s ease-in-out;
+  position: absolute;
+  top: 54px !important;
+}
+
+/* Open dropdown on hover */
+.main-nav .navbar-nav .dropdown:hover > .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.main-nav .dropdown-menu li {
+  margin: 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.main-nav .dropdown-menu li:last-child {
+  border-bottom: none;
+}
+
+/* Target dropdown-item directly (Bootstrap compatible) */
+.main-nav .dropdown-menu li a.dropdown-item {
+  padding: 8px 10px;
+  display: block;
+  white-space: nowrap;
+
+  color: #575656 !important;
+  text-decoration: none !important;
+  border-bottom: none !important;
+
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    padding-left 0.3s;
+  position: relative !important;
+
+  z-index: 1; /* IMPORTANT */
+}
+
+/* Hover effect */
+.main-nav .dropdown-menu li a.dropdown-item:hover {
+  background-color: #0077b6 !important;
+  color: white !important;
+  padding-left: 25px;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.main-nav .dropdown-menu li a.dropdown-item::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+
+  width: 100%;
+  height: 2px;
+
+  background-color: #f2b200;
+
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+
+  z-index: 5; /* IMPORTANT - stays above background */
+}
+
+.main-nav .dropdown-menu li a.dropdown-item:hover::after {
+  transform: scaleX(1);
+}
+
+.main-nav .navbar-nav li a .fa-caret-down {
+  transform: rotate(-90deg);
+  transition: transform 0.3s ease;
+}
+
+.main-nav .navbar-nav li.dropdown:hover > a .fa-caret-down {
+  transform: rotate(0deg);
+}
+
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-left: 10px;
+}
+
+.main-nav .navbar-nav .dropdown.dropdown-click-open > .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Remove bootstrap dropdown arrow */
+.main-nav .dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Remove ugly focus border + shadow */
+.main-nav .nav-link:focus,
+.main-nav .nav-link:focus-visible,
+.main-nav .nav-link:hover {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove bootstrap hover background */
+.main-nav .navbar-nav .nav-link:hover {
+  background: transparent !important;
+}
+
+/* Remove dropdown item focus border */
+.main-nav .dropdown-menu .dropdown-item:focus,
+.main-nav .dropdown-menu .dropdown-item:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Hero Image Section (for Syllabus, About Us, etc.) */
+.hero-image-section {
+  position: relative;
+  width: 100%;
+  /* height: 45vh; Reduced height to be more compact */
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.hero-image-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.hero-image-section .hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 20px;
+  max-width: 900px; /* Limit content width */
+}
+
+.hero-image-section .hero-title {
+  font-size: 3em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.hero-image-section .hero-subtitle {
+  font-size: 1.5em;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Donation Page Specific Styles */
+.hero-image-section .header-overlay {
+  /* background-color: rgba(
+    0,
+    0,
+    0,
+    0.4
+  ); */ /* Darker overlay for better text contrast */
+  padding: 30px 20px;
+  border-radius: 8px;
+}
+
+.hero-image-section .hero-title {
+  font-size: 3.5em; /* Slightly larger for impact */
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.9);
+  animation: fadeInDown 1s ease-out; /* Add animation */
+}
+
+.hero-image-section .hero-subtitle {
+  font-size: 1.8em; /* Slightly larger */
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+  animation: fadeInUp 1s ease-out 0.3s; /* Add animation with delay */
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Donation Options Card Enhancements */
+.donation-options .card {
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.donation-options .card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.donation-options .card-body i {
+  color: #0077b6; /* Consistent icon color */
+  transition: transform 0.3s ease;
+}
+
+.donation-options .card:hover .card-body i {
+  transform: scale(1.1);
+}
+
+.donation-options .card-title {
+  color: #333;
+  font-weight: 600;
+}
+
+.donation-options .btn {
+  border-radius: 50px; /* Pill-shaped buttons */
+  padding: 10px 25px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.donation-options .btn-primary {
+  background-color: #0077b6;
+  border-color: #0077b6;
+}
+
+.donation-options .btn-primary:hover {
+  background-color: #005a8d;
+  border-color: #005a8d;
+  box-shadow: 0 5px 15px rgba(0, 119, 182, 0.3);
+}
+
+.donation-options .btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.donation-options .btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.donation-options .btn-info {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.donation-options .btn-info:hover {
+  background-color: #138496;
+  border-color: #117a8b;
+  box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
+}
+
+/* Bank Details Collapse Section Styling */
+#bankDetails.collapse:not(.show) {
+  display: none;
+}
+
+#bankDetails.collapse.show {
+  display: block;
+}
+
+#bankDetails .card {
+  background-color: #f8f9fa; /* Light background for details */
+  border-radius: 12px;
+  border: 1px solid #dcdcdc;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  padding: 30px;
+}
+
+#bankDetails h3 {
+  color: #0077b6;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+#bankDetails p {
+  font-size: 1.1em;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+#bankDetails strong {
+  color: #333;
+}
+
+/* Contact for Donations Section Styling */
+.contact-for-donations {
+  background: linear-gradient(
+    to right,
+    #0077b6,
+    #005a8d
+  ); /* Gradient background */
+  color: white;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.contact-for-donations .section-title {
+  color: white;
+  font-weight: 700;
+  font-size: 2.8em;
+  margin-bottom: 25px;
+}
+
+.contact-for-donations .lead {
+  color: #f0f0f0;
+  font-size: 1.3em;
+  max-width: 800px;
+  margin: 0 auto 40px auto;
+}
+
+.contact-for-donations .btn-outline-primary {
+  color: white;
+  border-color: white;
+  padding: 15px 40px;
+  font-size: 1.2em;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.contact-for-donations .btn-outline-primary:hover {
+  background-color: white;
+  color: #0077b6;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Specific styling for the search input group */
+.input-group {
+  position: relative;
+}
+
+.input-group .form-control {
+  padding-right: 45px; /* Make space for the icon */
+}
+
+.input-group .search-icon {
+  position: absolute;
+  right: 1px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  background-color: transparent;
+  border: none;
+  color: #0077b6; /* Match primary color */
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.input-group .search-icon i {
+  font-size: 1.1em;
+}
+
+.input-group .clear-icon {
+  position: absolute;
+  right: 40px; /* Adjust based on search icon width */
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  background-color: transparent;
+  border: none;
+  color: #6c757d; /* A neutral gray color */
+  padding: 0 8px;
+  cursor: pointer;
+  display: flex; /* Ensure it respects the flex property from JS */
+  align-items: center;
+  justify-content: center;
+}
+
+.input-group .clear-icon i {
+  font-size: 1em;
+}
+
+@media (max-width: 768px) {
+  .hero-image-section {
+    height: 30vh; /* Adjust height for smaller screens */
+  }
+  .hero-image-section .hero-title {
+    font-size: 2.5em;
+  }
+  .hero-image-section .hero-subtitle {
+    font-size: 1.2em;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-image-section {
+    height: 25vh; /* Further adjust height for smaller screens */
+  }
+  .hero-image-section .hero-title {
+    font-size: 2em;
+  }
+  .hero-image-section .hero-subtitle {
+    font-size: 1em;
+  }
+}
+
+/* Scholarship Card Styles */
+.scholarship-card {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  border: none;
+}
+
+.scholarship-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+.scholarship-card .card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.scholarship-card .card-title {
+  color: #0077b6;
+}
+
+.scholarship-card .btn {
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.scholarship-card .btn:hover {
+  background-color: #005a8d;
+  transform: scale(1.05);
+}
+
+.scholarship-card .btn i {
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.scholarship-card .btn:hover i {
+  transform: translateX(5px);
+}
+
+/* --- General Form Styling (extracted from admission_form.html) --- */
+
+body {
+}
+
+/* Form Labels */
+.form-label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 5px; /* Reduced margin */
+  font-size: 0.9rem;
+}
+
+/* Input Fields, Selects, Textareas */
+.form-control,
+.form-select {
+  border-radius: 8px;
+  border: 1px solid #d9d9d9; /* Lighter border */
+  padding: 10px 15px;
+  font-size: 0.95rem;
+  height: 40px; /* Consistent height matching sample */
+}
+
+.form-control::placeholder {
+  color: #bfbfbf; /* Lighter placeholder text */
+  opacity: 1; /* Firefox fix */
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2); /* Softer blue shadow */
+}
+
+/* Radio Buttons */
+.form-check-input[type="radio"] {
+  width: 1.1em;
+  height: 1.1em;
+  margin-top: 0.25em;
+  vertical-align: top;
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 50%;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  position: relative;
+}
+.form-check-input[type="radio"]:checked {
+  background-color: #1890ff; /* Blue checked state */
+  border-color: #1890ff;
+}
+.form-check-input[type="radio"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff; /* White dot for checked */
+}
+.form-check-input[type="radio"]:focus {
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.25);
+}
+
+/* Required Asterisk */
+.text-danger {
+  color: #ff4d4f !important; /* Red color for asterisks */
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: #0077b6; /* Primary blue */
+  border-color: #0077b6;
+  border-radius: 8px; /* Slightly less rounded */
+  padding: 10px 25px;
+  font-size: 1rem;
+  font-weight: 500;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #005a8d; /* Darker blue on hover */
+  border-color: #005a8d;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.045),
+    0 0 0 2px rgba(0, 119, 182, 0.2); /* Theme-consistent shadow */
+  transform: translateY(-1px); /* Subtle lift */
+}
+
+.btn-secondary {
+  background-color: #ffffff; /* White background */
+  border-color: #d9d9d9; /* Light grey border */
+  color: #495057; /* Dark grey text */
+  border-radius: 8px;
+  padding: 10px 25px;
+  font-size: 1rem;
+  font-weight: 500;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  color: #1890ff; /* Blue text on hover */
+  border-color: #1890ff;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.015),
+    0 0 0 2px rgba(24, 144, 255, 0.2);
+  transform: translateY(-1px); /* Subtle lift */
+}
+
+.text-danger-custom {
+  color: #ff4d4f; /* Consistent red */
+  font-size: 0.75rem; /* Smaller font size */
+  margin-top: 2px;
+  display: block; /* Ensure it takes full width */
+}
+
+/* =====================================================
+   ADMISSION FORM – MODERN & COMPACT UI
+===================================================== */
+
+/* INFO NOTICE */
+.alert-info-banner {
+  background: #e7f1ff;
+  border-left: 4px solid #0d6efd;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: #084298;
+  margin-bottom: 18px;
+}
+
+.alert-info-banner i {
+  color: #0d6efd;
+  margin-top: 2px;
+}
+
+/* FORM CARD */
+.form-card {
+  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
+  border-radius: 14px;
+  padding: 26px 28px;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+/* SECTION HEADINGS */
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* LABELS */
+.form-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+/* INPUTS */
+
+.form-control,
+.form-select,
+textarea {
+  font-size: 13px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+/* Fix for form-floating labels not overflowing */
+.form-floating > .form-control,
+.form-floating > .form-select {
+  padding-top: 1.625rem;
+  padding-bottom: 0.625rem;
+}
+
+.form-floating > label {
+  padding: 0.625rem 0.75rem;
+  line-height: 1.25;
+}
+
+.form-floating.label-floated > label {
+  transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+  background-color: #fff; /* Match background to hide content underneath */
+  padding: 0 4px; /* Add some padding to the sides */
+  height: auto;
+  line-height: 1;
+}
+
+.select2-container--bootstrap-5 .select2-selection {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single {
+  height: 40px;
+}
+
+.select2-container--bootstrap-5
+  .select2-selection--single
+  .select2-selection__rendered {
+  padding-left: 10px;
+}
+
+.select2-container--bootstrap-5
+  .select2-selection--single
+  .select2-selection__arrow {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.select2-container--bootstrap-5 .select2-dropdown {
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.form-control::placeholder,
+textarea::placeholder {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.12rem rgba(13, 110, 253, 0.15);
+}
+
+/* RADIO & CHECKBOX */
+.form-check-input {
+  cursor: pointer;
+}
+
+.form-check-label {
+  font-size: 13px;
+}
+
+/* SMALL HELPER TEXT */
+.text-danger-custom {
+  font-size: 11px;
+}
+
+/* BUTTONS */
+.form-card .btn {
+  font-size: 13px;
+  padding: 8px 22px;
+  border-radius: 30px;
+}
+
+.form-card .btn-primary {
+  background: linear-gradient(135deg, #0d6efd, #084298);
+  border: none;
+  box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+}
+
+.form-card .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(13, 110, 253, 0.4);
+}
+
+/* COMPACT GRID SPACING */
+.row.g-3 > [class*="col"] {
+  margin-bottom: 6px;
+}
+
+/* MOBILE OPTIMIZATION */
+@media (max-width: 768px) {
+  .form-card {
+    padding: 20px;
+  }
+
+  .section-title {
+    font-size: 15px;
+  }
+}
+
+/* PRINT MODE */
+@media print {
+  .alert-info-banner,
+  .btn {
+    display: none;
+  }
+
+  .form-card {
+    box-shadow: none;
+    padding: 0;
+  }
+}
+
+/* =====================================================
+   FORM HEADER (LIKE IMAGE STYLE)
+===================================================== */
+.form-header {
+  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
+  border-radius: 14px;
+  padding: 22px 26px;
+  border: 1px solid #e5e7eb;
+}
+
+.form-header-content {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.form-header-logo img {
+  width: 72px;
+  height: auto;
+}
+
+.form-header-text h1 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  color: #111827;
+}
+
+.form-header-text p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.form-header-text span {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .form-header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .form-header-logo img {
+    width: 60px;
+  }
+
+  .form-header-text h1 {
+    font-size: 18px;
+  }
+}
+
+/* Page Background Styling (for contact.html) */
+body.page-background {
+  background-image: url("../../assets/image/contact_bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Ensures background stays fixed during scroll */
+  min-height: 100vh;
+  position: relative; /* Needed for pseudo-element */
+}
+
+body.page-background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.4
+  ); /* Semi-transparent white overlay for blur effect */
+  backdrop-filter: blur(8px); /* Apply blur effect */
+  z-index: -1; /* Place behind content */
+}
+
+/* New Loader CSS from new_loader.html */
+#page-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff; /* White background for the loader */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Ensure it's on top of everything */
+  transition:
+    opacity 0.5s ease-in-out,
+    visibility 0.5s ease-in-out;
+}
+
+#page-loader.page-loader-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none; /* Allow interaction with elements beneath when hidden */
+}
+
+#page-loader > .container {
+  /* Targeting the container inside the loader */
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+  width: 160px;
+  height: 100px;
+  margin-left: -80px;
+  margin-top: -50px;
+  border-radius: 5px;
+  background: #1e3f57;
+  animation: dot1_ 3s cubic-bezier(0.55, 0.3, 0.24, 0.99) infinite;
+}
+
+.loader:nth-child(2) {
+  z-index: 11;
+  width: 150px;
+  height: 90px;
+  margin-top: -45px;
+  margin-left: -75px;
+  border-radius: 3px;
+  background: #3c517d;
+  animation-name: dot2_;
+}
+
+.loader:nth-child(3) {
+  z-index: 12;
+  width: 40px;
+  height: 20px;
+  margin-top: 50px;
+  margin-left: -20px;
+  border-radius: 0 0 5px 5px;
+  background: #6bb2cd;
+  animation-name: dot3_;
+}
+
+@keyframes dot1_ {
+  3%,
+  97% {
+    width: 160px;
+    height: 100px;
+    margin-top: -50px;
+    margin-left: -80px;
+  }
+
+  30%,
+  36% {
+    width: 80px;
+    height: 120px;
+    margin-top: -60px;
+    margin-left: -40px;
+  }
+
+  63%,
+  69% {
+    width: 40px;
+    height: 80px;
+    margin-top: -40px;
+    margin-left: -20px;
+  }
+}
+
+@keyframes dot2_ {
+  3%,
+  97% {
+    height: 90px;
+    width: 150px;
+    margin-left: -75px;
+    margin-top: -45px;
+  }
+
+  30%,
+  36% {
+    width: 70px;
+    height: 96px;
+    margin-left: -35px;
+    margin-top: -48px;
+  }
+
+  63%,
+  69% {
+    width: 32px;
+    height: 60px;
+    margin-left: -16px;
+    margin-top: -30px;
+  }
+}
+
+@keyframes dot3_ {
+  3%,
+  97% {
+    height: 20px;
+    width: 40px;
+    margin-left: -20px;
+    margin-top: 50px;
+  }
+
+  30%,
+  36% {
+    width: 8px;
+    height: 8px;
+    margin-left: -5px;
+    margin-top: 49px;
+    border-radius: 8px;
+  }
+
+  63%,
+  69% {
+    width: 16px;
+    height: 4px;
+    margin-left: -8px;
+    margin-top: -37px;
+    border-radius: 10px;
+  }
+}
+
+/* Page Loader Styles (old loader styles, to be replaced) */
+/* This section should be removed if the new loader CSS fully replaces it. */
+#page-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff; /* White background for the loader */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Ensure it's on top of everything */
+  transition:
+    opacity 0.5s ease-in-out,
+    visibility 0.5s ease-in-out;
+}
+
+#page-loader.page-loader-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none; /* Allow interaction with elements beneath when hidden */
+}
+
+/* Fees Table Specific Styling */
+.fees-table thead th {
+  vertical-align: middle;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  padding: 0.75rem;
+}
+
+.fees-table tbody td {
+  vertical-align: middle;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  padding: 0.6rem;
+}
+
+.fees-table tbody tr:last-child td {
+  font-weight: bold;
+}
+
+/* Specific styling for the last two columns (Book List related) */
+.fees-table th:nth-last-child(1),
+.fees-table td:nth-last-child(1),
+.fees-table th:nth-last-child(2),
+.fees-table td:nth-last-child(2) {
+  /* background-color: #e9ecef; Light gray background */
+  background-color: #fff;
+  color: #495057; /* Darker text for contrast */
+  font-weight: 600;
+}
+
+/* Responsive Map Styling */
+.map-responsive {
+  overflow: hidden;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  position: relative;
+  height: 0;
+  border-radius: 8px; /* Match form-card border-radius */
+}
+
+.map-responsive iframe {
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  border: 0;
+}
+
+/* Page Background Styling (for contact.html) */
+body.page-background {
+  background-image: url("../../assets/image/contact_bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Ensures background stays fixed during scroll */
+  min-height: 100vh;
+  position: relative; /* Needed for pseudo-element */
+}
+
+body.page-background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.4
+  ); /* Semi-transparent white overlay for blur effect */
+  backdrop-filter: blur(8px); /* Apply blur effect */
+  z-index: -1; /* Place behind content */
+}
+
+/* Styling for Admission Rules Page */
+.admission-rules-content .card {
+  border: none; /* Remove default card border */
+  border-radius: 12px;
+  overflow: hidden; /* Ensure shadow and border-radius apply correctly */
+}
+
+.admission-rules-content .card-header {
+  background-color: #0077b6; /* Consistent primary color for headers */
+  color: white;
+  font-weight: 600;
+  font-size: 1.25rem;
+  padding: 1rem 1.5rem;
+  border-bottom: none; /* Remove default header border */
+}
+
+.admission-rules-content .card-header .card-title-modern {
+  font-size: 1.25rem; /* Ensure consistent heading size */
+  margin-bottom: 0;
+}
+
+.admission-rules-content .card-body {
+  padding: 1.5rem;
+  line-height: 1.7;
+  color: #333;
+}
+
+/* Enhanced List Styles */
+.modern-list {
+  list-style: none; /* Remove default bullet points */
+  padding-left: 0; /* Remove default padding */
+}
+
+.modern-list li {
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: flex-start; /* Align icon and text at the start */
+  color: #333;
+}
+
+.modern-list li i {
+  margin-right: 10px;
+  margin-top: 0.2em; /* Adjust icon vertical alignment */
+  font-size: 1.1em;
+  color: #0077b6; /* Use primary color for icons */
+}
+
+.modern-ordered-list {
+  padding-left: 1.5rem; /* Add some padding for numbers */
+  color: #333;
+}
+
+.modern-ordered-list li {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.modern-ordered-list li strong {
+  color: #0077b6; /* Highlight strong text in ordered lists */
+}
+
+/* Customizing the alert for a fresher look */
+.admission-rules-content .alert-info {
+  background-color: #e0f2f7; /* Light blue background consistent with theme */
+  border-color: rgba(
+    0,
+    119,
+    182,
+    0.3
+  ); /* Border color derived from theme blue */
+  color: #005a8d; /* Darker blue text for readability, derived from theme */
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.admission-rules-content .alert-info i {
+  color: #0077b6; /* Primary theme blue for icon */
+  margin-right: 0.75rem;
+  font-size: 1.2em;
+}
+
+/* Adjustments for the main title on the rules page */
+.admission-rules-content .about-school-title {
+  font-size: 2.2rem; /* Slightly smaller than main page title */
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 2rem;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.5rem;
+}
+
+.admission-rules-content .about-school-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 60px; /* Shorter underline */
+  height: 3px;
+  background-color: #f2b200; /* Yellow underline */
+  border-radius: 1px;
+}
+.longfazers span {
+  position: absolute;
+  height: 2px;
+  width: 20%;
+  background: #0077b6;
+}
+.longfazers span:nth-child(1) {
+  top: 20%;
+  animation: lf 0.6s linear infinite;
+  animation-delay: -5s;
+}
+.longfazers span:nth-child(2) {
+  top: 40%;
+  animation: lf2 0.8s linear infinite;
+  animation-delay: -1s;
+}
+.longfazers span:nth-child(3) {
+  top: 60%;
+  animation: lf3 0.6s linear infinite;
+
+  100% {
+    left: -100%;
+    opacity: 0;
+  }
+}
+@keyframes lf4 {
+  0% {
+    left: 200%;
+  }
+  100% {
+    left: -100%;
+    opacity: 0;
+  }
+}
+
+body {
+  background: #f4f7fb;
+}
+
+.contact-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.contact-form {
+  background: #ffffff;
+  padding: 35px;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 15px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.contact-form:hover {
+}
+
+/* New Profile Card Styles from Sample.png */
+/* New Profile Card Styles from Sample.png */
+.profile-card {
+  background-color: #fff;
+  border-radius: 15px; /* Increased border-radius */
+  border-radius: 50px 50px 0 0;
+  box-shadow: 0 12px 25px rgba(53 134 191 / 79%); /* More pronounced shadow */
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  overflow: visible; /* Allow image to "break out" */
+  text-align: center;
+  height: fit-content; /* To ensure cards in a row are of equal height */
+  position: relative; /* For absolute positioning of inner elements */
+  padding-top: 0; /* Reset padding from Bootstrap card */
+  margin-top: 60px;
+}
+
+/* Syllabus Section Custom Styles */
+.syllabus-section {
+  padding-top: 60px;
+  padding-bottom: 60px;
+  background-color: #f8f9fa; /* Light background for the section */
+}
+
+.syllabus-section .management-title {
+  color: #0077b6; /* Use primary blue for the title */
+}
+
+#syllabusSearchInput {
+  border-radius: 25px;
+  padding: 10px 20px;
+  border: 1px solid #ced4da;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+#syllabusSearchInput:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+.syllabus-table {
+  font-size: 0.95em;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden; /* Ensures rounded corners are applied to borders */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.syllabus-table thead th {
+  background-color: #0077b6; /* Dark blue from sample */
+  color: white;
+  padding: 12px 15px;
+  border-bottom: none;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.syllabus-table tbody tr {
+  transition: background-color 0.3s ease;
+}
+
+.syllabus-table tbody tr:hover {
+  background-color: #e9ecef; /* Light gray on hover */
+}
+
+.syllabus-table tbody td,
+.syllabus-table tbody th {
+  padding: 10px 15px;
+  vertical-align: middle;
+  border-top: 1px solid #dee2e6;
+}
+
+.syllabus-table .btn-info,
+.syllabus-table .btn-primary {
+  font-size: 0.85em;
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.syllabus-table .btn-info {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.syllabus-table .btn-info:hover {
+  background-color: #138496;
+  border-color: #138496;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(23, 162, 184, 0.3);
+}
+
+.syllabus-table .btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.syllabus-table .btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+}
+
+.syllabus-table .btn i {
+  margin-right: 5px;
+}
+
+/* Responsive adjustments for the table */
+@media (max-width: 768px) {
+  .syllabus-table thead {
+    display: none; /* Hide table headers on small screens */
+  }
+
+  .syllabus-table,
+  .syllabus-table tbody,
+  .syllabus-table tr,
+  .syllabus-table td,
+  .syllabus-table th {
+    display: block; /* Make table elements behave like blocks */
+    width: 100%;
+  }
+
+  .syllabus-table tr {
+    margin-bottom: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .syllabus-table td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 50%;
+    text-align: right;
+  }
+
+  .syllabus-table td::before {
+    content: attr(data-label); /* Use data-label for pseudo-elements */
+    position: absolute;
+    left: 15px;
+    width: calc(50% - 30px);
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+  }
+
+  .syllabus-table td:last-child {
+    border-bottom: none;
+    text-align: center;
+  }
+
+  .syllabus-table .btn-info,
+  .syllabus-table .btn-primary {
+    width: 48%; /* Adjust button width */
+  }
+}
+
+.profile-card:hover {
+  transform: translateY(-8px) rotateX(2deg); /* Added subtle 3D tilt */
+  box-shadow: 0 30px 60px rgba(0, 119, 182, 0.4); /* Even stronger shadow on hover */
+}
+
+/* Member Card Styles (for Leadership Messages and Founder's Message) */
+.member-card {
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  overflow: hidden; /* Ensure content respects border-radius */
+  padding: 25px; /* Added padding inside the card */
+}
+
+.member-card:hover {
+  transform: translateY(-8px) rotateX(2deg); /* Subtle 3D tilt on hover */
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
+}
+
+.member-card img.rounded-circle {
+  width: 120px; /* Larger image */
+  height: 120px;
+  object-fit: cover;
+  border: 5px solid #fff; /* White border around the circle */
+  box-shadow: 0 0 0 5px rgba(0, 119, 182, 0.2); /* Subtle blue outer ring */
+  transition:
+    box-shadow 0.3s ease-in-out,
+    border-color 0.3s ease-in-out;
+  margin-bottom: 20px; /* Space below image */
+}
+
+.member-card img.rounded-circle:hover {
+  box-shadow:
+    0 0 0 5px rgba(0, 119, 182, 0.5),
+    0 8px 20px rgba(0, 0, 0, 0.2); /* Blue glow effect on hover */
+  border-color: #0077b6; /* Change border color on hover */
+}
+
+.member-card .member-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #333;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.member-card .card-text.text-muted {
+  font-size: 0.95rem;
+  color: #777;
+  margin-bottom: 15px;
+}
+
+.member-card .card-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+.member-card ul {
+  padding-left: 20px;
+  text-align: left;
+  color: #555;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.member-card ul li {
+  margin-bottom: 5px;
+}
+
+/* Member Card Styles (for Leadership Messages and Founder's Message) */
+.member-card {
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  overflow: hidden; /* Ensure content respects border-radius */
+  padding: 25px; /* Added padding inside the card */
+}
+
+.member-card:hover {
+  transform: translateY(-8px) rotateX(2deg); /* Subtle 3D tilt on hover */
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
+}
+
+.member-card img.rounded-circle {
+  width: 120px; /* Larger image */
+  height: 120px;
+  object-fit: cover;
+  border: 5px solid #fff; /* White border around the circle */
+  box-shadow: 0 0 0 5px rgba(0, 119, 182, 0.2); /* Subtle blue outer ring */
+  transition:
+    box-shadow 0.3s ease-in-out,
+    border-color 0.3s ease-in-out;
+  margin-bottom: 20px; /* Space below image */
+}
+
+.member-card img.rounded-circle:hover {
+  box-shadow:
+    0 0 0 5px rgba(0, 119, 182, 0.5),
+    0 8px 20px rgba(0, 0, 0, 0.2); /* Blue glow effect on hover */
+  border-color: #0077b6; /* Change border color on hover */
+}
+
+.member-card .member-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #333;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.member-card .card-text.text-muted {
+  font-size: 0.95rem;
+  color: #777;
+  margin-bottom: 15px;
+}
+
+.member-card .card-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+.member-card ul {
+  padding-left: 20px;
+  text-align: left;
+  color: #555;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.member-card ul li {
+  margin-bottom: 5px;
+}
+
+.profile-card .profile-image-wrapper {
+  position: relative;
+  width: 180px; /* Fixed width for circular image */
+  height: 180px; /* Fixed height for circular image */
+  margin: -90px auto 20px auto; /* Center and lift the image above the card, adjust margin-bottom */
+  border-radius: 50%; /* Make it circular */
+  overflow: hidden; /* Ensure image stays within circle */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Softer, rounder shadow */
+  z-index: 1; /* Ensure image is above main card content */
+  background-color: #f8f9fa; /* Light background for the image box */
+  border: 5px solid #fff; /* White border around the circle */
+  transition:
+    box-shadow 0.3s ease-in-out,
+    border-color 0.3s ease-in-out; /* Add transition for hover effect */
+}
+
+.profile-card .profile-image-wrapper:hover {
+  box-shadow:
+    0 0 0 5px rgba(0, 119, 182, 0.5),
+    0 8px 20px rgba(0, 0, 0, 0.2); /* Blue glow effect on hover */
+  border-color: #0077b6; /* Change border color on hover */
+}
+
+.profile-card .profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center; /* Ensure the image content is centered */
+  transition: transform 0.5s ease;
+}
+
+.profile-card:hover .profile-image {
+  transform: scale(1.05); /* Subtle zoom on hover */
+}
+
+.profile-card .profile-name-new {
+  font-size: 1.6rem; /* Larger font size for prominence */
+  font-weight: 700; /* Bolder */
+  color: #333; /* Darker color for good contrast */
+  margin-top: 15px; /* Space from the image */
+  margin-bottom: 5px; /* Space before designation */
+}
+
+.profile-card .profile-body {
+  padding: 20px;
+  padding-top: 10px; /* Adjust padding to fit below the lifted image */
+  position: relative; /* To contain elements properly */
+  z-index: 0; /* Ensure body is below image wrapper */
+  margin-bottom: 25px;
+}
+
+.profile-card .profile-designation {
+  color: #0077b6; /* Consistent with primary blue */
+  font-weight: 600;
+  font-size: 1.1rem; /* Slightly larger */
+  margin-bottom: 15px; /* More space */
+}
+
+.profile-card .profile-description {
+  color: #444; /* Darker for better contrast */
+  font-size: 0.95rem; /* Slightly larger */
+  line-height: 1.6; /* Increased for readability */
+  margin-bottom: 25px; /* More space */
+}
+
+.profile-card .social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.profile-card .social-icons a {
+  color: #777; /* Slightly darker for better visibility */
+  font-size: 1.4rem; /* Slightly larger icons */
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease,
+    background-color 0.3s ease;
+  width: 40px; /* Make icons clickable area larger */
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%; /* Make them circular */
+}
+
+.profile-card .social-icons a:hover {
+  color: #fff; /* White icon on hover */
+  background-color: #0077b6; /* Primary blue background on hover */
+  transform: translateY(-5px); /* More pronounced lift on hover */
+}
+
+.mission-vision-item {
+  /* Renamed from card to item as per HTML */
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12); /* More pronounced shadow */
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  border: none; /* Remove default card border */
+  display: flex;
+  flex-direction: column; /* Stack content vertically within the card */
+  height: 100%; /* Ensure equal height when side-by-side */
+  padding: 30px; /* Increased padding */
+}
+
+.mission-vision-item:hover {
+  transform: translateY(-8px); /* Subtle lift on hover */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+.mission-vision-item .about-school-title {
+  font-size: 2em; /* Slightly larger title */
+  font-weight: 700; /* Bolder */
+  color: #333; /* Dark gray for prominence */
+  margin-top: 15px; /* Space from icon */
+  margin-bottom: 10px; /* Space before subtitle */
+}
+
+.mission-vision-item p.text-muted {
+  color: #777; /* Softer gray */
+  font-size: 0.95em;
+  margin-bottom: 20px; /* More space before main text */
+}
+
+.mission-vision-item p {
+  color: #555; /* Readable text color */
+  font-size: 1em;
+  line-height: 1.7; /* Increased line height for readability */
+  margin-bottom: 1em; /* Space between paragraphs */
+}
+
+.card-content-scroll {
+  max-height: 180px; /* Adjust as needed to control card height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding-right: 10px; /* Prevent text from touching scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.card-content-scroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.mission-vision-item .icon-wrapper {
+  width: 70px; /* Circular background for icon */
+  height: 70px;
+  border-radius: 50%;
+  background-color: #0077b6; /* Primary blue background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px; /* Space between icon and title */
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.mission-vision-item .icon-wrapper:hover {
+  transform: scale(1.1); /* Subtle zoom on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.mission-vision-item .icon-wrapper i {
+  color: #fff; /* White icon color */
+  font-size: 2.2em; /* Larger icon */
+}
+
+/* Feature Card Styles (for Infrastructure) */
+.feature-card {
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 12px 25px rgba(53 134 191 / 79%); /* Updated shadow as per user request */
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 30px; /* Increased padding */
+}
+
+.feature-card:hover {
+  transform: translateY(-8px) rotateX(2deg); /* Subtle 3D tilt on hover */
+  box-shadow: 0 30px 60px rgba(0, 119, 182, 0.4); /* More spread and blue tint on hover */
+}
+
+.feature-icon {
+  width: 70px; /* Circular background for icon */
+  height: 70px;
+  border-radius: 50%;
+  background-color: #0077b6; /* Primary blue background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 20px auto; /* Center and space below */
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon:hover {
+  transform: scale(1.1); /* Subtle zoom on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.feature-icon i {
+  color: #fff; /* White icon color */
+  font-size: 2.2em; /* Larger icon */
+}
+
+.feature-card .feature-title {
+  font-size: 1.8em; /* Prominent title */
+  font-weight: 700; /* Bolder */
+  color: #333; /* Dark gray */
+  margin-bottom: 15px; /* Space below title */
+}
+
+.feature-card p {
+  color: #555; /* Readable text color */
+  font-size: 1em;
+  line-height: 1.7; /* Increased line height for readability */
+  margin-bottom: 1em; /* Space between paragraphs */
+}
+
+.feature-btn {
+  background-color: #0077b6; /* Primary blue background */
+  color: white; /* White text */
+  border-color: #0077b6; /* Blue border */
+  padding: 10px 25px; /* Comfortable padding */
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 5px; /* Slightly rounded corners */
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  display: inline-flex; /* Align icon with text */
+  align-items: center;
+  justify-content: center;
+  text-decoration: none; /* Remove underline */
+}
+
+.feature-btn:hover {
+  background-color: #005a8d !important; /* Darker blue on hover */
+  border-color: #005a8d !important;
+  transform: translateY(-2px); /* Subtle lift on hover */
+  box-shadow: 0 8px 20px rgba(0, 119, 182, 0.4); /* Theme-consistent blue shadow */
+  color: white !important; /* Keep text white on hover */
+}
+
+/* Syllabus Accordion Styles */
+.accordion {
+  --bs-accordion-border-color: rgba(0, 0, 0, 0.05); /* Lighter border */
+  --bs-accordion-border-radius: 15px;
+  --bs-accordion-active-bg: #e7f1ff; /* Light blue when active */
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(0, 119, 182, 0.25);
+}
+
+.accordion-item {
+  margin-bottom: 20px;
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  overflow: hidden; /* Ensures shadow and border-radius apply correctly */
+}
+
+.accordion-item:hover {
+  transform: translateY(-5px); /* Subtle lift on hover */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.accordion-header {
+  border-bottom: none;
+}
+
+.accordion-button {
+  background-color: #fff; /* White background for button */
+  color: #333; /* Dark text */
+  font-weight: 600;
+  font-size: 1.2em;
+  padding: 20px 25px;
+  border-radius: 15px; /* Apply to button as well */
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.accordion-button:not(.collapsed) {
+  color: #0077b6; /* Primary blue when expanded */
+  background-color: #e7f1ff; /* Light blue background when expanded */
+  box-shadow: none; /* Remove default focus shadow */
+}
+
+.accordion-button::after {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%230077b6'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e"); /* Custom blue caret */
+  transition: transform 0.3s ease;
+}
+
+.accordion-button:not(.collapsed)::after {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%230077b6'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e"); /* Custom blue caret for expanded */
+  transform: rotate(-180deg);
+}
+
+.accordion-body {
+  padding: 20px 25px;
+  background-color: #f8faff; /* Very light blue background */
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+/* Table Styling within Accordions */
+.accordion-body .table {
+  margin-bottom: 0; /* Remove default table margin */
+}
+
+.accordion-body .table-dark {
+  background-color: #0077b6; /* Primary blue for header */
+  color: white;
+  border-color: #0077b6;
+}
+
+.accordion-body .table th,
+.accordion-body .table td {
+  padding: 12px 15px; /* Adjust padding for compactness */
+  vertical-align: middle;
+  border-top: 1px solid rgba(0, 0, 0, 0.05); /* Lighter border */
+}
+
+.accordion-body .table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.03); /* Subtle striping */
+}
+
+.accordion-body .btn-primary.btn-sm {
+  padding: 5px 15px; /* More compact button */
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 5px;
+}
+
+/* New Syllabus Table Styles */
+.syllabus-table {
+  width: 100%;
+  margin-bottom: 0;
+  border-collapse: separate; /* Allows border-radius */
+  border-spacing: 0;
+  border-radius: 10px; /* Rounded corners for the table */
+  overflow: hidden; /* Ensures rounded corners are visible */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Subtle shadow for the table */
+}
+
+.syllabus-table thead th {
+  background-color: #0077b6; /* Primary blue for header */
+  color: white;
+  border-bottom: 2px solid #0077b6; /* Stronger border for header */
+  padding: 12px 15px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.syllabus-table tbody tr {
+  transition: background-color 0.3s ease;
+}
+
+.syllabus-table tbody tr:hover {
+  background-color: #eef7ff; /* Light hover effect for rows */
+}
+
+.syllabus-table tbody td {
+  padding: 12px 15px;
+  vertical-align: middle;
+  border-top: 1px solid rgba(0, 0, 0, 0.05); /* Lighter border */
+  text-align: left;
+}
+
+.syllabus-table tbody td:last-child {
+  text-align: center; /* Center action buttons */
+}
+
+.syllabus-table .btn {
+  /* General button styling within table */
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+}
+
+.syllabus-table .btn-info {
+  background-color: #17a2b8; /* Bootstrap Info color */
+  border-color: #17a2b8;
+  color: white;
+}
+
+.syllabus-table .btn-info:hover {
+  background-color: #117a8b;
+  border-color: #117a8b;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.syllabus-table .btn-primary {
+  background-color: #0077b6; /* Primary blue */
+  border-color: #0077b6;
+  color: white;
+}
+
+.syllabus-table .btn-primary:hover {
+  background-color: #005a8d;
+  border-color: #005a8d;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Sidebar Menu Styles */
+.sidebar-menu {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar-menu .list-group-item {
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 15px 20px;
+  font-weight: 500;
+  color: #555;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.sidebar-menu .list-group-item:last-child {
+  border-bottom: none;
+}
+
+.sidebar-menu .list-group-item.active {
+  background-color: #0077b6;
+  color: white;
+  font-weight: 600;
+}
+
+.sidebar-menu .list-group-item:hover:not(.active) {
+  background-color: #f0f4f8;
+  color: #0077b6;
+}
+
+.student-zone-header {
+  background-color: #0077b6;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1em;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Syllabus Page Title */
+.syllabus-page-title {
+  color: #333;
+  font-weight: 800;
+  font-size: 2.8em;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 15px;
+  letter-spacing: -0.02em;
+  margin-bottom: 40px !important; /* Space below title */
+}
+
+.syllabus-page-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background-color: #f2b200;
+  border-radius: 2px;
+  transition: width 0.6s ease-out;
+}
+
+.syllabus-page-title.visible::after {
+  width: 100%;
+}
+
+/* Syllabus Data Table */
+.syllabus-data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.syllabus-data-table thead th {
+  background-color: #0077b6;
+  color: white;
+  border-bottom: 2px solid #0077b6;
+  padding: 12px 15px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.syllabus-data-table tbody tr {
+  transition: background-color 0.3s ease;
+}
+
+.syllabus-data-table tbody tr:hover {
+  background-color: #eef7ff;
+}
+
+.syllabus-data-table tbody td {
+  padding: 12px 15px;
+  vertical-align: middle;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  text-align: left;
+}
+
+.syllabus-data-table tbody td:last-child {
+  text-align: center;
+}
+
+.syllabus-data-table .syllabus-action-btn {
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  border-radius: 5px;
+}
+
+.feature-btn i {
+  margin-left: 8px; /* Space between text and icon */
+  transition: transform 0.3s ease;
+}
+
+.feature-btn:hover i {
+  transform: translateX(3px); /* Arrow moves slightly right on hover */
+}
+
+.mission-vision-item:hover {
+  transform: translateY(-8px);
+}
+
+.hero-about-us {
+  position: relative; /* Adjust height as needed */
+  background: url("../image/childrenscorner.jpg") no-repeat center center/cover; /* Example background image */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 200px;
+}
+
+.hero-about-us::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* Overlay to make text more readable */
+}
+
+.hero-about-us .hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-about-us .hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  text-decoration: underline;
+  text-decoration-color: #f2b200;
+}
+
+/* Style for the about-text-content */
+.about-text-content {
+  background-color: #ffffff;
+  padding: 23px;
+  border-radius: 10px;
+  /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); */
+  margin-bottom: 30px; /* Space between content blocks */
+  height: 362px; /* Fixed height to match image */
+  overflow-y: auto; /* Enable vertical scrolling */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+.about-text-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.about-text-content p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.about-text-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* For images within content sections to ensure consistent height */
+.content-image {
+  height: 250px; /* Fixed height for visual consistency */
+  object-fit: cover; /* Ensures image covers the area without distortion */
+  width: 100%; /* Takes full width of its container */
+}
+
+/* Key Highlights Section */
+.highlight-item {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  height: 100%; /* Ensure cards are of equal height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.highlight-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 60px rgba(0, 119, 182, 0.4);
+}
+
+.highlight-item i {
+  color: #0077b6; /* Primary blue for icons */
+  margin-bottom: 15px;
+}
+
+.highlight-item h4 {
+  color: #333;
+  font-weight: 700;
+  margin-bottom: 10px;
+  font-size: 1.4rem;
+}
+
+.highlight-item p {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Animation delays for staggered effect */
+.highlight-item.delay-1 {
+  transition-delay: 0.1s;
+}
+
+.highlight-item.delay-2 {
+  transition-delay: 0.2s;
+}
+.label-end {
+  text-align: justify;
+}
+.common-shadow {
+  /* box-shadow: 0 12px 25px rgba(53 134 191 / 79%); */
+  box-shadow: 0 2px 12px rgba(53 134 191 / 79%);
+}
+.common-shadow:hover {
+  box-shadow: 0 30px 60px rgba(0, 119, 182, 0.4);
+}
+
+/* Leadership Messages Section Styles */
+.leadership-messages {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    #f0f4f8,
+    #e7ebee
+  ); /* Subtle gradient */
+  padding: 100px 0; /* More vertical padding */
+  overflow: hidden;
+}
+
+.leadership-messages::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g fill="%23d0d6db" fill-opacity="0.2"><path d="M100 0L0 100V0H100zM0 0l100 100H0V0z"></path></g></svg>'); /* Light geometric pattern */
+  z-index: -1;
+  opacity: 0.5;
+}
+
+/* Founder Message Section Styles */
+.founder-message {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(to bottom, #fff, #f0f4f8); /* Subtle gradient */
+  padding: 100px 0;
+  overflow: hidden;
+}
+
+.founder-message::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g fill="%23e8e8e8" fill-opacity="0.2"><path d="M100 0L0 100V0H100zM0 0l100 100H0V0z"></path></g></svg>'); /* Light geometric pattern */
+  z-index: -1;
+  opacity: 0.5;
+}
+
+.hero-scholarship::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 0;
+}
+
+.result-section .card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.result-section .card-img-top {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  height: 200px;
+  object-fit: contain;
+}
+
+.result-section .card-body {
+  padding: 2.5rem;
+}
+
+.result-section .card-title {
+  font-weight: 700;
+  color: #333;
+}
+
+.result-section .form-floating > .form-control,
+.result-section .form-floating > .form-select {
+  height: calc(3.5rem + 2px);
+  padding: 1rem 0.75rem;
+}
+
+.result-section .form-floating > label {
+  padding: 1rem 0.75rem;
+}
+
+.result-section .form-floating > .form-select,
+.result-section .form-floating > input[type="date"] {
+  padding-top: 1.625rem;
+  padding-bottom: 0.625rem;
+}
+
+.result-section .btn-primary {
+  background-color: #0077b6;
+  border-color: #0077b6;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 119, 182, 0.3);
+}
+
+.result-section .btn-primary:hover {
+  background-color: #005a8d;
+  border-color: #005a8d;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 90, 141, 0.4);
+}
+
+#resultDisplay {
+  background-color: #f8f9fa;
+  padding: 2rem;
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+}
+.select2-container .select2-selection--single {
+  height: calc(3.5rem + 2px) !important;
+  padding: 1rem 0.75rem !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 0.5rem !important;
+}
+
+.select2-container--default
+  .select2-selection--single
+  .select2-selection__rendered {
+  line-height: 2.5rem !important;
+}
+
+.select2-container--default
+  .select2-selection--single
+  .select2-selection__arrow {
+  height: calc(3.5rem + 2px) !important;
+}
+/* Specific styles for Fees Structure page */
+
+.form-card {
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.form-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.section-title {
+  font-weight: 700;
+  color: #343a40;
+}
+
+.lead {
+  font-weight: 400;
+  color: #6c757d;
+}
+
+/* Modern Table styles (with bordering and theme color) */
+.fees-table-container {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  transition: 0.3s;
+  border-radius: 5px;
+  overflow: hidden;
+  border:; /* Use theme blue for outer border */
+}
+.fees-table {
+  border-collapse: separate; /* Allow individual cell borders */
+  border-spacing: 0; /* Important for separate borders */
+  width: 100%;
+}
+
+.fees-table th,
+.fees-table td {
+  text-align: left;
+  padding: 12px;
+  border: 1px solid #dee2e6; /* Light gray borders for cells */
+}
+
+.fees-table thead th {
+  background-color: #0077b6 !important; /* Primary blue theme color for header */
+  color: #ffffff !important; /* White text for contrast */
+  font-weight: 600;
+}
+
+.fees-table tbody tr:nth-child(even) {
+  background-color: #f8f9fa; /* Lighter alternating row background */
+}
+
+.fees-table tbody tr:hover {
+  background-color: #e9ecef; /* Slightly darker hover effect */
+}
+/* Button styles */
+.btn-outline-secondary {
+  border-color: #6c757d;
+  color: #6c757d;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d;
+  color: #ffffff;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.75rem;
+  }
+
+  .lead {
+    font-size: 1rem;
+  }
+
+  .fees-table th,
+  .fees-table td {
+    padding: 0.75rem;
+  }
+}
+
+/* =====================================================
+   Fees Structure Table Adjustments
+===================================================== */
+.fees-table th,
+.fees-table td {
+  text-align: center; /* Ensure all text in table headers and data cells is centered */
+  vertical-align: middle; /* Center content vertically too */
+}
+
+.table-responsive::-webkit-scrollbar {
+  display: none;
+}
+
+.table-responsive {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* =====================================================
+   WhatsApp Floating Box
+===================================================== */
+.whatsapp-float-box {
+  position: fixed;
+  bottom: 40px;
+  left: 40px;
+  width: auto;
+  padding: 10px 15px;
+  background-color: rgba(
+    37,
+    211,
+    102,
+    0.9
+  ); /* Semi-transparent WhatsApp green */
+  color: #fff;
+  border-radius: 15px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.whatsapp-float-box:hover {
+  background-color: rgba(37, 211, 102, 1);
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.4);
+  transform: translateY(-5px);
+  color: #fff;
+}
+
+.whatsapp-box-content {
+  display: flex;
+  align-items: center;
+}
+
+.whatsapp-box-content .fab.fa-whatsapp {
+  font-size: 30px;
+  margin-right: 10px;
+}
+
+.whatsapp-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.whatsapp-text span {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.whatsapp-text .online-status {
+  font-size: 12px;
+  font-weight: normal;
+}
+
+/* Donation float icon */
+.donation-float-box {
+  position: fixed;
+  bottom: 450px; /* Adjust to be above WhatsApp button (40px + 60px + 10px margin) */
+  right: 2px;
+  width: 60px;
+  height: 60px;
+  background-color: #e74c3c; /* A distinct color for donation (e.g., red) */
+  color: white;
+  border-radius: 5%;
+  text-align: center;
+  font-size: 24px; /* Slightly smaller icon */
+  line-height: 60px;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.donation-float-box:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.donation-float-box .donation-box-content {
+  display: flex;
+  flex-direction: column; /* Stack icon and text vertically */
+  align-items: center;
+  justify-content: center;
+  gap: 2px; /* Small space between icon and text */
+}
+
+.donation-float-box .donation-text {
+  display: block; /* Always show text */
+  font-size: 10px; /* Smaller font size for "DONATE" */
+  font-weight: bold;
+  line-height: 1; /* Adjust line height */
+  margin-top: 2px; /* Space above text */
+}
+
+.donation-float-box .support-text {
+  display: none; /* Hidden by default */
+  font-size: 10px;
+  line-height: 1;
+}
+
+.donation-float-box:hover .support-text {
+  display: block; /* Show "Support Us" on hover */
+}
+
+@media (max-width: 767px) {
+  .main-nav .logo-text .school-name {
+    font-size: 20px;
+  }
+  .whatsapp-float-box {
+    padding: 0px 13px;
+    width: 50px;
+    height: 50px;
+    left: 18px;
+  }
+  .whatsapp-text > span {
+    visibility: hidden;
+  }
+}
