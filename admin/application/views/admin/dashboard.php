@@ -140,6 +140,9 @@
         border-radius: 0;
         box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
         overflow: hidden;
+        height: 337px;
+        display: flex;
+        flex-direction: column;
     }
 
     .govt-school-widget__header {
@@ -177,6 +180,11 @@
         margin-bottom: 0;
     }
 
+    .govt-school-widget .table-responsive {
+        flex: 1;
+        overflow: auto;
+    }
+
     .govt-school-widget__table thead th {
         padding: 11px 18px;
         background: #f8fafc;
@@ -196,6 +204,16 @@
 
     .govt-school-widget__table tbody tr:hover {
         background: #f8fbff;
+    }
+
+    .govt-school-widget__table tfoot td {
+        position: sticky;
+        bottom: 0;
+        padding: 10px 18px;
+        background: #f1f5f9;
+        border-top: 1px solid #dce4ed;
+        color: #334155;
+        font-weight: 700;
     }
 
     .govt-school-count {
@@ -552,6 +570,12 @@ if ($this->rbac->hasPrivilege('govt_school', 'can_view')) {
                                                 </tr>
                                             <?php } ?>
                                         </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="2">Total Students</td>
+                                                <td class="text-right"><span class="govt-school-count"><?php echo $govt_school_students; ?></span></td>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                             <?php } else { ?>
