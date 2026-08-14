@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mysql -h localhost -u root cc -e \"SELECT DISTINCT religion, COUNT\\(*\\) FROM students GROUP BY religion;\")"
+    ]
+  }
+}
