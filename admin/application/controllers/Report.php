@@ -882,8 +882,9 @@ class Report extends Admin_Controller
 
     private function getConcessionStudentReportFilters()
     {
+        $session_id = $this->input->get_post('session_id');
         return array(
-            'selected_session' => $this->input->get_post('session_id'),
+            'selected_session' => ($session_id !== null) ? $session_id : $this->setting_model->getCurrentSession(),
             'selected_class' => $this->input->get_post('class_id'),
             'selected_section' => $this->input->get_post('section_id'),
             'selected_free_type' => $this->input->get_post('free_type'),

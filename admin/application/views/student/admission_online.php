@@ -41,7 +41,7 @@
                                                 <select id="session_id" name="session_id" class="form-control">
                                                     <option value="">All</option>
                                                     <?php foreach ($sessionlist as $session) { ?>
-                                                        <option value="<?php echo $session['id']; ?>" <?php echo set_select('session_id', $session['id']); ?>><?php echo $session['session']; ?></option>
+                                                        <option value="<?php echo $session['id']; ?>" <?php echo set_select('session_id', $session['id'], !$this->input->post('session_id') && $session['id'] == $this->setting_model->getCurrentSession()); ?>><?php echo $session['session']; ?></option>
                                                     <?php } ?>
                                                 </select>
                                             </div>

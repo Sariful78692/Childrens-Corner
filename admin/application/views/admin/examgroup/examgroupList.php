@@ -34,7 +34,7 @@
                                     <select name="session_id" class="form-control">
                                         <option value=""><?php echo $this->lang->line('select'); ?></option>
                                         <?php foreach ($sessionList as $session): ?>
-                                            <option value="<?php echo $session['id']; ?>" <?php echo set_select('session_id', $session['id']); ?>>
+                                            <option value="<?php echo $session['id']; ?>" <?php echo set_select('session_id', $session['id'], !$this->input->post('session_id') && $session['id'] == $this->setting_model->getCurrentSession()); ?>>
                                                 <?php echo $session['session']; ?>
                                             </option>
                                         <?php endforeach; ?>

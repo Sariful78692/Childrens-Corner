@@ -55,7 +55,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                         foreach ($sessionlist as $session) {
                                             ?>
                                             <option value="<?php echo $session['id'] ?>" <?php
-                                            if (set_value('session_id') == $session['id']) {
+                                            if (set_value('session_id') != '' ? set_value('session_id') == $session['id'] : $session['id'] == $this->setting_model->getCurrentSession()) {
                                                 echo "selected=selected";
                                             }
                                             ?>><?php echo $session['session'] ?></option>

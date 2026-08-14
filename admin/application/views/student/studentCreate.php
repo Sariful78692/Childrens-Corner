@@ -5,6 +5,38 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
     .datepicker {
         z-index: 9999 !important;
     }
+
+    .field-label-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .field-add-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: fit-content;
+        height: 20px;
+        border-radius: 2px;
+        background: #3c8dbc;
+        color: #fff;
+        font-size: 11px;
+        line-height: 1;
+        text-decoration: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        transition: background 0.15s ease, transform 0.15s ease;
+        padding: 5px 8px;
+        margin-bottom: 5px;
+    }
+
+    .field-add-btn:hover,
+    .field-add-btn:focus {
+        background: #367fa9;
+        color: #fff;
+        text-decoration: none;
+        transform: scale(1.1);
+    }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" />
 <div class="content-wrapper">
@@ -66,7 +98,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                             $selected = '';
                                                             if (set_value('selected_session_id') == $session['id']) {
                                                                 $selected = 'selected';
-                                                            } else if ($session['active'] == 1) {
+                                                            } else if ($session['id'] == $this->setting_model->getCurrentSession()) {
                                                                 $selected = 'selected';
                                                             }
                                                             echo '<option value="' . $session['id'] . '" ' . $selected . '>' . $session['session'] . '</option>';
@@ -132,8 +164,8 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <!-- First_Name -->
                                             <div class="form-group">
                                                 <label for="exampleInputEmail1"><?php echo $this->lang->line('first_name'); ?></label><small class="req"> *</small>
-                                                <input id="firstname" name="firstname" placeholder="Enter Your First Name" type="text" class="form-control" style="text-transform: capitalize;" 
-                                                oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('firstname'); ?>" />
+                                                <input id="firstname" name="firstname" placeholder="Enter Your First Name" type="text" class="form-control" style="text-transform: capitalize;"
+                                                    oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('firstname'); ?>" />
                                                 <span class="text-danger"><?php echo form_error('firstname'); ?></span>
                                             </div>
                                         </div>
@@ -178,6 +210,21 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                 <span class="text-danger"><?php echo form_error('dob'); ?></span>
                                             </div>
                                         </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="religion"><?php echo $this->lang->line('religion'); ?></label>
+                                                <input id="religion" name="religion" list="religionOptions" placeholder="" type="text" class="form-control" value="<?php echo set_value('religion'); ?>" autocomplete="off" />
+                                                <datalist id="religionOptions">
+                                                    <option value="Muslim">
+                                                    <option value="Hindu">
+                                                    <option value="Christian">
+                                                    <option value="Sikh">
+                                                    <option value="Buddhist">
+                                                    <option value="Jain">
+                                                </datalist>
+                                                <span class="text-danger"><?php echo form_error('religion'); ?></span>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-3">
@@ -201,8 +248,16 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                         </div>
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label for="govt_school">Govt. School</label>
-                                                <input id="govt_school" name="govt_school" placeholder="" type="text" class="form-control" value="<?php echo set_value('govt_school'); ?>" />
+                                                <div class="field-label-row">
+                                                    <label for="govt_school" class="mb0">Govt. School</label>
+                                                    <a href="<?php echo site_url('govtschool/index'); ?>" target="_blank" class="field-add-btn" data-toggle="tooltip" title="Manage Govt. School list"><i class="fa fa-plus"></i>&nbsp;Add</a>
+                                                </div>
+                                                <select id="govt_school" name="govt_school" class="form-control">
+                                                    <option value=""><?php echo $this->lang->line('select'); ?></option>
+                                                    <?php foreach ($govtschoollist as $govtschool) { ?>
+                                                        <option value="<?php echo $govtschool['name']; ?>" <?php echo (set_value('govt_school') == $govtschool['name']) ? "selected" : ""; ?>><?php echo $govtschool['name']; ?></option>
+                                                    <?php } ?>
+                                                </select>
                                                 <span class="text-danger"><?php echo form_error('govt_school'); ?></span>
                                             </div>
                                         </div>
@@ -272,7 +327,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('father_name'); ?></label>
-                                                    <input id="father_name" name="father_name" placeholder="Enter Father Name" type="text" class="form-control" style="text-transform: capitalize;" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())"  value="<?php echo set_value('father_name'); ?>" />
+                                                    <input id="father_name" name="father_name" placeholder="Enter Father Name" type="text" class="form-control" style="text-transform: capitalize;" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('father_name'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('father_name'); ?></span>
                                                 </div>
                                             </div>
@@ -311,7 +366,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('mother_name'); ?></label>
-                                                    <input id="mother_name" name="mother_name" placeholder="Enter Mother Name" type="text" class="form-control" style="text-transform: capitalize;" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())"  value="<?php echo set_value('mother_name'); ?>" />
+                                                    <input id="mother_name" name="mother_name" placeholder="Enter Mother Name" type="text" class="form-control" style="text-transform: capitalize;" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('mother_name'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('mother_name'); ?></span>
                                                 </div>
                                             </div>
@@ -432,7 +487,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                         if ($sch_setting->guardian_address) { ?>
                                             <div class="col-md-6">
                                                 <label for="exampleInputEmail1"><?php echo $this->lang->line('guardian_address'); ?></label>
-                                                <textarea id="guardian_address" name="guardian_address" placeholder="Enter Address" class="form-control" style="text-transform: capitalize;" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())"  rows="2"><?php echo set_value('guardian_address'); ?></textarea>
+                                                <textarea id="guardian_address" name="guardian_address" placeholder="Enter Address" class="form-control" style="text-transform: capitalize;" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" rows="2"><?php echo set_value('guardian_address'); ?></textarea>
                                                 <span class="text-danger"><?php echo form_error('guardian_address'); ?></span>
                                             </div>
                                         <?php } ?>

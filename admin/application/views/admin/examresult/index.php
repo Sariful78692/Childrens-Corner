@@ -21,7 +21,10 @@
                                         <label><?php echo $this->lang->line('session'); ?></label><small class="req"> *</small>
                                         <select id="session_id" name="session_id" class="form-control">
                                             <option value=""><?= $this->lang->line('select'); ?></option>
-                                            <?php foreach ($sessionlist as $session) echo '<option value="' . $session['id'] . '" ' . (set_value('session_id') == $session['id'] ? 'selected' : '') . '>' . $session['session'] . '</option>'; ?>
+                                            <?php foreach ($sessionlist as $session) {
+                                                $is_selected = set_value('session_id') != '' ? (set_value('session_id') == $session['id']) : ($session['id'] == $this->setting_model->getCurrentSession());
+                                                echo '<option value="' . $session['id'] . '" ' . ($is_selected ? 'selected' : '') . '>' . $session['session'] . '</option>';
+                                            } ?>
                                         </select>
                                         <span class="text-danger"><?php echo form_error('session_id'); ?></span>
                                     </div>

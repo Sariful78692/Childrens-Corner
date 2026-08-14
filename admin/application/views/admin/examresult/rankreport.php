@@ -54,7 +54,8 @@ if (set_value('exam_group_id') == $ex_group_value->id) {
 foreach ($sessionlist as $session) {
     ?>
                                                 <option value="<?php echo $session['id'] ?>" <?php
-if (set_value('session_id') == $session['id']) {
+$is_selected = set_value('session_id') != '' ? (set_value('session_id') == $session['id']) : ($session['id'] == $this->setting_model->getCurrentSession());
+if ($is_selected) {
         echo "selected=selected";
     }
     ?>><?php echo $session['session'] ?></option>

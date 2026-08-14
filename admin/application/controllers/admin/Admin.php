@@ -409,7 +409,12 @@ class Admin extends Admin_Controller
         }
         $data['percentTotalStaff_data'] = $percentTotalStaff_data;
         $data['sch_setting']            = $this->sch_setting_detail;
-        $data['class_wise_students']    = $this->studentsession_model->getClassWiseStudentCounts();
+        $class_wise_students             = $this->studentsession_model->getClassWiseStudentCounts();
+        $data['class_wise_students']     = $class_wise_students;
+        $data['male_students']           = array_sum(array_column($class_wise_students, 'male_students'));
+        $data['female_students']         = array_sum(array_column($class_wise_students, 'female_students'));
+        $data['muslim_students']         = array_sum(array_column($class_wise_students, 'muslim_students'));
+        $data['hindu_students']          = array_sum(array_column($class_wise_students, 'hindu_students'));
 
         if ($data['sch_setting']->attendence_type == 0) {
             $data['std_graphclass'] = "col-lg-3 col-md-6 col-sm-6";

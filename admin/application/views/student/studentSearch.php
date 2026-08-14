@@ -539,29 +539,50 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                 // Hide loader on success
                                                 $('#loader').removeClass('active');
 
+                                                // Fixed, ordered set of columns for the export
+                                                var exportColumns = [
+                                                    { key: 'id', label: 'Id' },
+                                                    { key: 'roll_no', label: 'Roll No' },
+                                                    { key: 'session', label: 'Session' },
+                                                    { key: 'student_name', label: 'Student Name' },
+                                                    { key: 'class', label: 'Class' },
+                                                    { key: 'section', label: 'Section' },
+                                                    { key: 'account_department', label: 'Account Department' },
+                                                    { key: 'gender', label: 'Gender' },
+                                                    { key: 'dob', label: 'Dob' },
+                                                    { key: 'admission_date', label: 'Admission Date' },
+                                                    { key: 'mobileno', label: 'Mobileno' },
+                                                    { key: 'religion', label: 'Religion' },
+                                                    { key: 'father_name', label: 'Father Name' },
+                                                    { key: 'father_phone', label: 'Father Phone' },
+                                                    { key: 'father_occupation', label: 'Father Occupation' },
+                                                    { key: 'mother_name', label: 'Mother Name' },
+                                                    { key: 'mother_phone', label: 'Mother Phone' },
+                                                    { key: 'mother_occupation', label: 'Mother Occupation' },
+                                                    { key: 'guardian_address', label: 'Guardian Address' },
+                                                    { key: 'bank_account_no', label: 'Bank Account No' },
+                                                    { key: 'bank_name', label: 'Bank Name' },
+                                                    { key: 'ifsc_code', label: 'Ifsc Code' },
+                                                    { key: 'aadhaar_no', label: 'Aadhaar No' },
+                                                    { key: 'govt_school_id', label: 'Govt School Id' },
+                                                    { key: 'govt_school', label: 'Govt School' }
+                                                ];
+
                                                 // Create a temporary DataTable instance for export
                                                 var tempTable = $('<table><thead><tr></tr></thead><tbody></tbody></table>').hide().appendTo('body');
                                                 var tempHeader = $('<tr></tr>');
-                                                // Dynamically create headers from the first data object's keys
-                                                if (response.length > 0) {
-                                                    for (var key in response[0]) {
-                                                        if (key !== 'id') { // Exclude 'id' or other unwanted columns
-                                                            tempHeader.append('<th>' + key.replace(/_/g, ' ').replace(/\b\w/g, function(l) {
-                                                                return l.toUpperCase()
-                                                            }) + '</th>');
-                                                        }
-                                                    }
-                                                    tempTable.find('thead').append(tempHeader);
-                                                }
+                                                exportColumns.forEach(function(col) {
+                                                    tempHeader.append('<th>' + col.label + '</th>');
+                                                });
+                                                tempTable.find('thead').append(tempHeader);
 
                                                 // Populate temporary table body
                                                 $.each(response, function(i, student) {
                                                     var row = $('<tr></tr>');
-                                                    for (var key in student) {
-                                                        if (key !== 'id') {
-                                                            row.append('<td>' + student[key] + '</td>');
-                                                        }
-                                                    }
+                                                    exportColumns.forEach(function(col) {
+                                                        var val = student[col.key];
+                                                        row.append('<td>' + (val !== undefined && val !== null ? val : '') + '</td>');
+                                                    });
                                                     tempTable.find('tbody').append(row);
                                                 });
 

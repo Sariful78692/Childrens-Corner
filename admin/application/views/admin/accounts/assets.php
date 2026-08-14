@@ -39,7 +39,13 @@
                                     <option value="">Select Session</option>
                                     <?php foreach ($sessionList as $session): ?>
                                         <option value="<?= $session['id']; ?>"
-                                            <?= (isset($selected_data) && $selected_data->session_id == $session['id']) ? 'selected' : ''; ?>>
+                                            <?php
+                                            if (isset($selected_data)) {
+                                                echo ($selected_data->session_id == $session['id']) ? 'selected' : '';
+                                            } else {
+                                                echo ($session['id'] == $this->setting_model->getCurrentSession()) ? 'selected' : '';
+                                            }
+                                            ?>>
                                             <?= $session['session']; ?>
                                         </option>
                                     <?php endforeach; ?>

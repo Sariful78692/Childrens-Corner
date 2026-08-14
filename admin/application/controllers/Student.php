@@ -473,6 +473,9 @@ class Student extends Admin_Controller
         $this->load->model('account_department_model');
         $data['account_departments'] = $this->account_department_model->get();
 
+        $this->load->model('govtschool_model');
+        $data['govtschoollist'] = $this->govtschool_model->get();
+
         $data["month"] = $this->customlib->getMonthDropdown();
         $this->session->set_userdata('top_menu', 'Student Information');
         $this->session->set_userdata('sub_menu', 'student/create');
@@ -2616,6 +2619,66 @@ class Student extends Admin_Controller
         $this->load->view('layout/footer', $data);
     }
 
+    public function bulkreligion()
+    {
+        if (!$this->rbac->hasPrivilege('student', 'can_edit')) {
+            access_denied();
+        }
+        $this->session->set_userdata('top_menu', 'Student Information');
+        $this->session->set_userdata('sub_menu', 'bulkreligion');
+        $class               = $this->class_model->get();
+        $data['classlist']   = $class;
+        $data['sch_setting'] = $this->sch_setting_detail;
+        $session_id          = $this->setting_model->getCurrentSession();
+
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            $class   = $this->input->post('class_id');
+            $section = $this->input->post('section_id');
+
+            $data['searchby']   = "filter";
+            $data['class_id']   = $this->input->post('class_id');
+            $data['section_id'] = $this->input->post('section_id');
+            $resultlist          = $this->student_model->searchByClassSection($class, $section, $session_id);
+            $data['resultlist']  = $resultlist;
+        } else {
+            $resultlist          = $this->student_model->searchByClassSection("", "", $session_id);
+            $data['resultlist']  = $resultlist;
+        }
+        $this->load->view('layout/header', $data);
+        $this->load->view('student/bulkreligion', $data);
+        $this->load->view('layout/footer', $data);
+    }
+
+    public function ajax_update_religion()
+    {
+        if (!$this->rbac->hasPrivilege('student', 'can_edit')) {
+            $array = array('status' => 0, 'error' => array(), 'message' => 'Access denied.');
+            echo json_encode($array);
+            return;
+        }
+
+        $this->form_validation->set_error_delimiters('', '');
+        $this->form_validation->set_rules('student[]', $this->lang->line('student'), 'trim|required|xss_clean');
+        $this->form_validation->set_rules('religion', $this->lang->line('religion'), 'trim|required|xss_clean');
+
+        if ($this->form_validation->run() == false) {
+
+            $msg = array(
+                'student[]' => form_error('student[]'),
+                'religion'  => form_error('religion'),
+            );
+            $array = array('status' => 0, 'error' => $msg, 'message' => '');
+        } else {
+            $students = $this->input->post('student');
+            $religion = $this->input->post('religion');
+
+            $this->student_model->bulkUpdateReligion($students, $religion);
+
+            $array = array('status' => 1, 'error' => '', 'message' => $this->lang->line('update_message'));
+        }
+        echo json_encode($array);
+    }
+
     public function search()
     {
         if (!$this->rbac->hasPrivilege('student', 'can_view')) {
@@ -3463,6 +3526,9 @@ class Student extends Admin_Controller
 
         $class_id = $this->input->post('class_id');
         $session_id = $this->input->post('session_id');
+        if ($session_id === null) {
+            $session_id = $this->setting_model->getCurrentSession();
+        }
         $status = $this->input->post('status');
         $from_date = $this->input->post('from_date');
         $to_date = $this->input->post('to_date');

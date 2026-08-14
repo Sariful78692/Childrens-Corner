@@ -2042,6 +2042,18 @@ class Student_model extends MY_Model
         }
     }
 
+    public function bulkUpdateReligion($students, $religion)
+    {
+        if (!empty($students)) {
+            $this->db->where_in('id', $students);
+            $this->db->update('students', array('religion' => $religion));
+
+            return true;
+        }
+
+        return false;
+    }
+
     public function valid_student_admission_no()
     {
         $admission_no = $this->input->post('admission_no');

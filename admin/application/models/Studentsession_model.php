@@ -88,7 +88,12 @@ class Studentsession_model extends CI_Model
 
     public function getClassWiseStudentCounts()
     {
-        $this->db->select('classes.id as class_id, classes.class, COUNT(student_session.id) as total_students');
+        $this->db->select("classes.id as class_id, classes.class,
+            COUNT(student_session.id) as total_students,
+            SUM(CASE WHEN LOWER(students.gender) = 'male' THEN 1 ELSE 0 END) as male_students,
+            SUM(CASE WHEN LOWER(students.gender) = 'female' THEN 1 ELSE 0 END) as female_students,
+            SUM(CASE WHEN LOWER(students.religion) = 'muslim' THEN 1 ELSE 0 END) as muslim_students,
+            SUM(CASE WHEN LOWER(students.religion) = 'hindu' THEN 1 ELSE 0 END) as hindu_students", false);
         $this->db->from('student_session');
         $this->db->join('students', 'students.id = student_session.student_id');
         $this->db->join('classes', 'classes.id = student_session.class_id');

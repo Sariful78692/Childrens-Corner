@@ -21,8 +21,9 @@
                                             <option value=""><?php echo $this->lang->line('select'); ?></option>
                                             <?php
                                             foreach ($sessionlist as $session) {
+                                                $is_selected = set_value('session_id') != '' ? (set_value('session_id') == $session['id']) : ($session['id'] == $this->setting_model->getCurrentSession());
                                             ?>
-                                                <option value="<?php echo $session['id'] ?>" <?php if (set_value('session_id') == $session['id']) echo "selected=selected"; ?>><?php echo $session['session'] ?></option>
+                                                <option value="<?php echo $session['id'] ?>" <?php if ($is_selected) echo "selected=selected"; ?>><?php echo $session['session'] ?></option>
                                             <?php
                                                 $count++;
                                             }

@@ -26,7 +26,6 @@
         margin-bottom: 0;
         border-collapse: separate;
         border-spacing: 0;
-        overflow: hidden;
     }
 
     .classwise-table thead th {
@@ -37,6 +36,27 @@
         letter-spacing: .04em;
         border-bottom: 1px solid #e2e8f0;
         white-space: nowrap;
+    }
+
+    .classwise-table thead th.classwise-th-m {
+        background: #e8f3ff;
+        color: #1766b6;
+    }
+
+    .classwise-table thead th.classwise-th-f {
+        background: #fff0f5;
+        color: #c73f6b;
+    }
+
+    .classwise-table thead th.classwise-th-mus {
+        background: #eafaf1;
+        color: #1a7a4c;
+        border-left: 1px solid #e2e8f0;
+    }
+
+    .classwise-table thead th.classwise-th-hin {
+        background: #fff7e6;
+        color: #b5750a;
     }
 
     .classwise-table td,
@@ -72,6 +92,46 @@
     .classwise-pill-f {
         background: #fff0f5;
         color: #c73f6b;
+    }
+
+    .classwise-pill-mus {
+        background: #eafaf1;
+        color: #1a7a4c;
+    }
+
+    .classwise-pill-hin {
+        background: #fff7e6;
+        color: #b5750a;
+    }
+
+    .classwise-scroll {
+        max-height: 260px;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .classwise-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .classwise-table tfoot td {
+        position: sticky;
+        bottom: 0;
+        z-index: 2;
+        background: #f8fafc;
+    }
+
+    .classwise-widget-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .classwise-widget-header h5 {
+        margin: 0;
     }
 </style>
 
@@ -296,17 +356,24 @@ if ($this->module_lib->hasActive('expense')) {
 <?php
 if ($this->rbac->hasPrivilege('student_count_widget', 'can_view')) {
     ?>
-                    <div class="col-md-4 col-sm-6">
+                    <div class="col-md-6 col-sm-6">
                         <div class="classwise-widget">
-                            <h5 class="pro-border pb10">Class Wise Students</h5>
+                            <div class="classwise-widget-header">
+                                <h5 class="pro-border pb10">Class Wise Students</h5>
+                                <?php if ($this->rbac->hasPrivilege('student', 'can_edit')) { ?>
+                                    <a href="<?php echo site_url('student/bulkreligion'); ?>" class="btn btn-xs btn-default" title="Set religion for students in bulk"><i class="fa fa-pencil"></i> Set Religion</a>
+                                <?php } ?>
+                            </div>
                             <?php if (!empty($class_wise_students)) { ?>
-                                <div style="max-height: 260px; overflow-y: auto;">
+                                <div class="classwise-scroll">
                                     <table id="classWiseStudentTable" class="table table-hover classwise-table">
                                         <thead>
                                             <tr>
                                                 <th>Class</th>
-                                                <th class="text-center">M</th>
-                                                <th class="text-center">F</th>
+                                                <th class="text-center classwise-th-m" title="Male">M</th>
+                                                <th class="text-center classwise-th-f" title="Female">F</th>
+                                                <th class="text-center classwise-th-mus" title="Muslim">M</th>
+                                                <th class="text-center classwise-th-hin" title="Hindu">H</th>
                                                 <th class="text-right">Students</th>
                                             </tr>
                                         </thead>
@@ -320,6 +387,12 @@ if ($this->rbac->hasPrivilege('student_count_widget', 'can_view')) {
                                                     <td class="classwise-count">
                                                         <span class="classwise-pill classwise-pill-f"><?php echo (int) ($class_count['female_students'] ?? 0); ?></span>
                                                     </td>
+                                                    <td class="classwise-count">
+                                                        <span class="classwise-pill classwise-pill-mus"><?php echo (int) ($class_count['muslim_students'] ?? 0); ?></span>
+                                                    </td>
+                                                    <td class="classwise-count">
+                                                        <span class="classwise-pill classwise-pill-hin"><?php echo (int) ($class_count['hindu_students'] ?? 0); ?></span>
+                                                    </td>
                                                     <td class="text-right"><strong><?php echo $class_count['total_students']; ?></strong></td>
                                                 </tr>
                                             <?php } ?>
@@ -332,6 +405,12 @@ if ($this->rbac->hasPrivilege('student_count_widget', 'can_view')) {
     </td>
     <td class="text-center">
         <b><?php echo $female_students; ?></b>
+    </td>
+    <td class="text-center">
+        <b><?php echo $muslim_students; ?></b>
+    </td>
+    <td class="text-center">
+        <b><?php echo $hindu_students; ?></b>
     </td>
     <td class="text-right">
         <b><?php echo $total_students; ?></b>
