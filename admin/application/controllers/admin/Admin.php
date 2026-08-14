@@ -411,6 +411,7 @@ class Admin extends Admin_Controller
         $data['sch_setting']            = $this->sch_setting_detail;
         $class_wise_students             = $this->studentsession_model->getClassWiseStudentCounts();
         $data['class_wise_students']     = $class_wise_students;
+        $data['govt_school_class_counts'] = $this->studentsession_model->getGovtSchoolClassWiseStudentCounts();
         $data['male_students']           = array_sum(array_column($class_wise_students, 'male_students'));
         $data['female_students']         = array_sum(array_column($class_wise_students, 'female_students'));
         $data['muslim_students']         = array_sum(array_column($class_wise_students, 'muslim_students'));
@@ -425,6 +426,32 @@ class Admin extends Admin_Controller
         $this->load->view('layout/header', $data);
         $this->load->view('admin/dashboard', $data);
         $this->load->view('layout/footer', $data);
+    }
+
+    public function download_govt_school_students()
+    {
+        if (!$this->rbac->hasPrivilege('govt_school', 'can_view')) {
+            access_denied();
+        }
+
+        $school_counts = $this->studentsession_model->getGovtSchoolClassWiseStudentCounts();
+        $filename      = 'government-school-students-' . date('Y-m-d') . '.xls';
+
+        header('Content-Type: application/vnd.ms-excel; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        echo '<table border="1">';
+        echo '<thead><tr><th>Government School</th><th>Class</th><th>Students</th></tr></thead><tbody>';
+        foreach ($school_counts as $school_count) {
+            $school_name = html_escape($school_count['govt_school']);
+            $class_name  = !empty($school_count['class']) ? html_escape($school_count['class']) : '-';
+            $total       = (int) $school_count['total_students'];
+            echo '<tr><td>' . $school_name . '</td><td>' . $class_name . '</td><td>' . $total . '</td></tr>';
+        }
+        echo '</tbody></table>';
+        exit;
     }
 
     public function getUserImage()

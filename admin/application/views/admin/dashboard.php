@@ -133,6 +133,92 @@
     .classwise-widget-header h5 {
         margin: 0;
     }
+
+    .govt-school-widget {
+        background: #fff;
+        border: 1px solid #e5eaf1;
+        border-radius: 0;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
+        overflow: hidden;
+    }
+
+    .govt-school-widget__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 18px;
+        border-bottom: 1px solid #edf1f5;
+        background: linear-gradient(90deg, #f8fbff, #fff);
+    }
+
+    .govt-school-widget__title {
+        margin: 0;
+        color: #1f2937;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .govt-school-widget__subtitle {
+        display: block;
+        margin-top: 3px;
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    .govt-school-widget__actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .govt-school-widget__table {
+        margin-bottom: 0;
+    }
+
+    .govt-school-widget__table thead th {
+        padding: 11px 18px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e5eaf1;
+        color: #475569;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+
+    .govt-school-widget__table tbody td {
+        padding: 11px 18px;
+        vertical-align: middle;
+        border-top: 1px solid #f0f3f6;
+    }
+
+    .govt-school-widget__table tbody tr:hover {
+        background: #f8fbff;
+    }
+
+    .govt-school-count {
+        display: inline-block;
+        min-width: 32px;
+        padding: 3px 9px;
+        color: #145a9e;
+        background: #eaf4ff;
+        border-radius: 999px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    @media (max-width: 767px) {
+        .govt-school-widget__header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .govt-school-widget__actions {
+            justify-content: flex-start;
+        }
+    }
 </style>
 
 <div class="content-wrapper">
@@ -426,6 +512,54 @@ if ($this->rbac->hasPrivilege('student_count_widget', 'can_view')) {
                     </div><!--./col-md-3-->
 <?php
 }
+
+if ($this->rbac->hasPrivilege('govt_school', 'can_view')) {
+    $govt_school_names    = array();
+    $govt_school_students = 0;
+    foreach ($govt_school_class_counts as $school_count) {
+        $govt_school_names[$school_count['govt_school_id']] = true;
+        $govt_school_students += (int) $school_count['total_students'];
+    }
+    ?>
+                    <div class="col-md-6 col-sm-6">
+                        <div class="govt-school-widget">
+                            <div class="govt-school-widget__header">
+                                <div>
+                                    <h4 class="govt-school-widget__title"><i class="fa fa-building-o"></i> Government School Students</h4>
+                                    <span class="govt-school-widget__subtitle"><?php echo count($govt_school_names); ?> schools &middot; <?php echo $govt_school_students; ?> students in the current session</span>
+                                </div>
+                                <div class="govt-school-widget__actions">
+                                    <a href="<?php echo site_url('admin/admin/download_govt_school_students'); ?>" class="btn btn-success btn-sm"><i class="fa fa-file-excel-o"></i> Excel</a>
+                                    <a href="<?php echo site_url('govtschool/index'); ?>" class="btn btn-default btn-sm"><i class="fa fa-cog"></i> Manage</a>
+                                </div>
+                            </div>
+                            <?php if (!empty($govt_school_class_counts)) { ?>
+                                <div class="table-responsive">
+                                    <table class="table govt-school-widget__table">
+                                        <thead>
+                                            <tr>
+                                                <th>Government School</th>
+                                                <th>Class</th>
+                                                <th class="text-right">Students</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($govt_school_class_counts as $school_count) { ?>
+                                                <tr>
+                                                    <td><strong><?php echo html_escape($school_count['govt_school']); ?></strong></td>
+                                                    <td><?php echo !empty($school_count['class']) ? html_escape($school_count['class']) : '<span class="text-muted">No students enrolled</span>'; ?></td>
+                                                    <td class="text-right"><span class="govt-school-count"><?php echo (int) $school_count['total_students']; ?></span></td>
+                                                </tr>
+                                            <?php } ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php } else { ?>
+                                <div class="p-3 text-muted">No government schools have been added yet.</div>
+                            <?php } ?>
+                        </div>
+                    </div>
+<?php }
 
 if ($this->module_lib->hasActive('fees_collection')) {
     if ($this->rbac->hasPrivilege('fees_overview_widegts', 'can_view')) {

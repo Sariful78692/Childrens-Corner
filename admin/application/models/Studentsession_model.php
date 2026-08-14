@@ -105,6 +105,27 @@ class Studentsession_model extends CI_Model
         return $this->db->get()->result_array();
     }
 
+    /**
+     * Return the current-session student count for every government school and class.
+     * Schools without enrolled students are retained so they are still visible on the
+     * dashboard.
+     *
+     * @return array
+     */
+    public function getGovtSchoolClassWiseStudentCounts()
+    {
+        $this->db->select('govt_schools.id as govt_school_id, govt_schools.name as govt_school, classes.id as class_id, classes.class, COUNT(student_session.id) as total_students', false);
+        $this->db->from('govt_schools');
+        $this->db->join('students', "students.govt_school = govt_schools.name AND students.is_active = 'yes'", 'left', false);
+        $this->db->join('student_session', 'student_session.student_id = students.id AND student_session.session_id = ' . $this->db->escape($this->current_session), 'left', false);
+        $this->db->join('classes', 'classes.id = student_session.class_id', 'left');
+        $this->db->group_by('govt_schools.id, govt_schools.name, classes.id, classes.class');
+        $this->db->order_by('govt_schools.name', 'ASC');
+        $this->db->order_by('classes.id', 'ASC');
+
+        return $this->db->get()->result_array();
+    }
+
     public function add($insert_array, $student_id)
     {
         $not_delarray = array();
