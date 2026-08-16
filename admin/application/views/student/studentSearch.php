@@ -576,12 +576,22 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                 });
                                                 tempTable.find('thead').append(tempHeader);
 
+                                                // Columns that must stay plain text on export (long ID numbers)
+                                                // Excel auto-converts long numeric cells to scientific notation
+                                                // unless SheetJS is told to keep them as strings via data-t="s".
+                                                var forceTextColumns = ['aadhaar_no', 'govt_school_id'];
+
                                                 // Populate temporary table body
                                                 $.each(response, function(i, student) {
                                                     var row = $('<tr></tr>');
                                                     exportColumns.forEach(function(col) {
                                                         var val = student[col.key];
-                                                        row.append('<td>' + (val !== undefined && val !== null ? val : '') + '</td>');
+                                                        var cellText = (val !== undefined && val !== null ? val : '');
+                                                        if (forceTextColumns.indexOf(col.key) !== -1) {
+                                                            row.append($('<td data-t="s"></td>').text(cellText));
+                                                        } else {
+                                                            row.append('<td>' + cellText + '</td>');
+                                                        }
                                                     });
                                                     tempTable.find('tbody').append(row);
                                                 });

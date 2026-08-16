@@ -520,7 +520,8 @@ class Student extends Admin_Controller
         $this->form_validation->set_rules('second_doc', $this->lang->line('image'), 'callback_handle_uploadfordoc[second_doc]');
         $this->form_validation->set_rules('fourth_doc', $this->lang->line('image'), 'callback_handle_uploadfordoc[fourth_doc]');
         $this->form_validation->set_rules('fifth_doc', $this->lang->line('image'), 'callback_handle_uploadfordoc[fifth_doc]');
-        $this->form_validation->set_rules('firstname', $this->lang->line('first_name'), 'trim|required|xss_clean');
+        $this->form_validation->set_rules('firstname', $this->lang->line('first_name'), "trim|required|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('middlename', $this->lang->line('middle_name'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
         $this->form_validation->set_rules('gender', $this->lang->line('gender'), 'trim|required|xss_clean');
         /* $this->form_validation->set_rules('dob', $this->lang->line('date_of_birth'), 'trim|required|xss_clean'); */
         $this->form_validation->set_rules('class_id', $this->lang->line('class'), 'trim|required|xss_clean');
@@ -540,13 +541,26 @@ class Student extends Admin_Controller
         }
 
         if ($this->sch_setting_detail->guardian_name) {
-            $this->form_validation->set_rules('guardian_name', $this->lang->line('guardian_name'), 'trim|required|xss_clean');
+            $this->form_validation->set_rules('guardian_name', $this->lang->line('guardian_name'), "trim|required|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
             $this->form_validation->set_rules('guardian_is', $this->lang->line('guardian'), 'trim|required|xss_clean');
         }
 
         if ($this->sch_setting_detail->guardian_phone) {
-            $this->form_validation->set_rules('guardian_phone', $this->lang->line('guardian_phone'), 'trim|required|xss_clean');
+            $this->form_validation->set_rules('guardian_phone', $this->lang->line('guardian_phone'), 'trim|required|xss_clean|regex_match[/^[0-9]{10}$/]');
         }
+
+        $this->form_validation->set_rules('guardian_relation', $this->lang->line('guardian_relation'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('guardian_occupation', $this->lang->line('guardian_occupation'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('father_name', $this->lang->line('father_name'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('father_phone', $this->lang->line('father_phone'), 'trim|xss_clean|regex_match[/^[0-9]{10}$/]');
+        $this->form_validation->set_rules('father_occupation', $this->lang->line('father_occupation'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('mother_name', $this->lang->line('mother_name'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('mother_phone', $this->lang->line('mother_phone'), 'trim|xss_clean|regex_match[/^[0-9]{10}$/]');
+        $this->form_validation->set_rules('mother_occupation', $this->lang->line('mother_occupation'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('aadhaar_no', 'Aadhaar No', 'trim|xss_clean|regex_match[/^[0-9]{12}$/]');
+        $this->form_validation->set_rules('govt_school_id', 'Govt. School ID', 'trim|xss_clean|regex_match[/^[A-Za-z0-9]{1,20}$/]');
+        $this->form_validation->set_rules('bank_account_no', $this->lang->line('bank_account_number'), 'trim|xss_clean|regex_match[/^[0-9]{9,18}$/]');
+        $this->form_validation->set_rules('ifsc_code', $this->lang->line('ifsc_code'), 'trim|xss_clean|regex_match[/^[A-Za-z]{4}0[A-Za-z0-9]{6}$/]');
 
         $this->form_validation->set_rules(
             'email',
@@ -563,6 +577,7 @@ class Student extends Admin_Controller
             $this->lang->line('mobile_no'),
             array(
                 'xss_clean',
+                'regex_match[/^[0-9]{10}$/]',
                 // array('check_student_mobile_exists', array($this->student_model, 'check_student_mobile_no_exists')),
             )
         );
@@ -2049,6 +2064,9 @@ class Student extends Admin_Controller
         $this->load->model('account_department_model');
         $data['account_departments'] = $this->account_department_model->get();
 
+        $this->load->model('govtschool_model');
+        $data['govtschoollist'] = $this->govtschool_model->get();
+
         /* echo "<pre>";
         print_r($student);
         die; */
@@ -2092,7 +2110,8 @@ class Student extends Admin_Controller
             }
         }
 
-        $this->form_validation->set_rules('firstname', $this->lang->line('first_name'), 'trim|required|xss_clean');
+        $this->form_validation->set_rules('firstname', $this->lang->line('first_name'), "trim|required|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('middlename', $this->lang->line('middle_name'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
         /* $this->form_validation->set_rules('dob', $this->lang->line('date_of_birth'), 'trim|required|xss_clean'); */
         $this->form_validation->set_rules('class_id', $this->lang->line('class'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('section_id', $this->lang->line('section'), 'trim|required|xss_clean');
@@ -2112,13 +2131,26 @@ class Student extends Admin_Controller
         }
 
         if ($this->sch_setting_detail->guardian_name) {
-            $this->form_validation->set_rules('guardian_name', $this->lang->line('guardian_name'), 'trim|required|xss_clean');
+            $this->form_validation->set_rules('guardian_name', $this->lang->line('guardian_name'), "trim|required|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
             $this->form_validation->set_rules('guardian_is', $this->lang->line('guardian'), 'trim|required|xss_clean');
         }
 
         if ($this->sch_setting_detail->guardian_phone) {
-            $this->form_validation->set_rules('guardian_phone', $this->lang->line('guardian_phone'), 'trim|required|xss_clean');
+            $this->form_validation->set_rules('guardian_phone', $this->lang->line('guardian_phone'), 'trim|required|xss_clean|regex_match[/^[0-9]{10}$/]');
         }
+
+        $this->form_validation->set_rules('guardian_relation', $this->lang->line('guardian_relation'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('guardian_occupation', $this->lang->line('guardian_occupation'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('father_name', $this->lang->line('father_name'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('father_phone', $this->lang->line('father_phone'), 'trim|xss_clean|regex_match[/^[0-9]{10}$/]');
+        $this->form_validation->set_rules('father_occupation', $this->lang->line('father_occupation'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('mother_name', $this->lang->line('mother_name'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('mother_phone', $this->lang->line('mother_phone'), 'trim|xss_clean|regex_match[/^[0-9]{10}$/]');
+        $this->form_validation->set_rules('mother_occupation', $this->lang->line('mother_occupation'), "trim|xss_clean|regex_match[/^[A-Za-z .'-]+$/]");
+        $this->form_validation->set_rules('aadhaar_no', 'Aadhaar No', 'trim|xss_clean|regex_match[/^[0-9]{12}$/]');
+        $this->form_validation->set_rules('govt_school_id', 'Govt. School ID', 'trim|xss_clean|regex_match[/^[A-Za-z0-9]{1,20}$/]');
+        $this->form_validation->set_rules('bank_account_no', $this->lang->line('bank_account_number'), 'trim|xss_clean|regex_match[/^[0-9]{9,18}$/]');
+        $this->form_validation->set_rules('ifsc_code', $this->lang->line('ifsc_code'), 'trim|xss_clean|regex_match[/^[A-Za-z]{4}0[A-Za-z0-9]{6}$/]');
 
         $this->form_validation->set_rules(
             'email',
@@ -2134,6 +2166,7 @@ class Student extends Admin_Controller
             $this->lang->line('mobile_no'),
             array(
                 'xss_clean',
+                'regex_match[/^[0-9]{10}$/]',
                 // array('check_student_mobile_exists', array($this->student_model, 'check_student_mobile_no_exists')),
             )
         );

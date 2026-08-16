@@ -161,11 +161,11 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                     </div>
                                     <div class="row">
                                         <div class="col-md-3">
-                                            <!-- First_Name -->
+                                            <!-- Student_Name -->
                                             <div class="form-group">
-                                                <label for="exampleInputEmail1"><?php echo $this->lang->line('first_name'); ?></label><small class="req"> *</small>
-                                                <input id="firstname" name="firstname" placeholder="Enter Your First Name" type="text" class="form-control" style="text-transform: capitalize;"
-                                                    oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('firstname'); ?>" />
+                                                <label for="exampleInputEmail1">Student Name</label><small class="req"> *</small>
+                                                <input id="firstname" name="firstname" placeholder="Enter Student Name" type="text" class="form-control" style="text-transform: capitalize;" required minlength="2" maxlength="100" pattern="[A-Za-z .'\-]+" title="Only letters, spaces, apostrophes and hyphens are allowed"
+                                                    oninput="this.value = this.value.replace(/[0-9]/g, '').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('firstname'); ?>" />
                                                 <span class="text-danger"><?php echo form_error('firstname'); ?></span>
                                             </div>
                                         </div>
@@ -173,17 +173,8 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('middle_name'); ?></label>
-                                                    <input id="middlename" name="middlename" placeholder="" type="text" class="form-control" value="<?php echo set_value('middlename'); ?>" />
+                                                    <input id="middlename" name="middlename" placeholder="" type="text" class="form-control" maxlength="100" pattern="[A-Za-z .'\-]+" title="Only letters, spaces, apostrophes and hyphens are allowed" value="<?php echo set_value('middlename'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('middlename'); ?></span>
-                                                </div>
-                                            </div>
-                                        <?php } ?>
-                                        <?php if ($sch_setting->lastname) { ?>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="exampleInputEmail1"><?php echo $this->lang->line('last_name'); ?></label>
-                                                    <input id="lastname" name="lastname" placeholder="Enter Your Last Name" type="text" class="form-control" value="<?php echo set_value('lastname'); ?>" />
-                                                    <span class="text-danger"><?php echo form_error('lastname'); ?></span>
                                                 </div>
                                             </div>
                                         <?php } ?>
@@ -206,7 +197,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="exampleInputEmail1"><?php echo $this->lang->line('date_of_birth'); ?></label>
-                                                <input id="dob" name="dob" placeholder="Enter D.O.B" type="text" class="form-control date" value="<?php echo set_value('dob'); ?>" />
+                                                <input id="dob" name="dob" placeholder="Enter D.O.B" type="text" class="form-control date" oninput="this.value = this.value.replace(/[^0-9\/\-]/g, '')" value="<?php echo set_value('dob'); ?>" />
                                                 <span class="text-danger"><?php echo form_error('dob'); ?></span>
                                             </div>
                                         </div>
@@ -242,7 +233,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="inputAdhr">Aadhaar No</label>
-                                                <input id="aadhaar_no" name="aadhaar_no" placeholder="Enter 12 Digit Aadhar Number" type="text" class="form-control" value="<?php echo set_value('aadhaar_no'); ?>" />
+                                                <input id="aadhaar_no" name="aadhaar_no" placeholder="Enter 12 Digit Aadhar Number" type="text" class="form-control" inputmode="numeric" maxlength="12" pattern="[0-9]{12}" title="Enter a valid 12-digit Aadhaar number" oninput="this.value = this.value.replace(/\D/g, '')" value="<?php echo set_value('aadhaar_no'); ?>" />
                                                 <span class="text-danger"><?php echo form_error('aadhaar_no'); ?></span>
                                             </div>
                                         </div>
@@ -264,7 +255,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="govt_school_id">Govt. School ID</label>
-                                                <input id="govt_school_id" name="govt_school_id" placeholder="" type="text" class="form-control" value="<?php echo set_value('govt_school_id'); ?>" />
+                                                <input id="govt_school_id" name="govt_school_id" placeholder="" type="text" class="form-control" maxlength="20" pattern="[A-Za-z0-9]+" title="Alphanumeric characters only" value="<?php echo set_value('govt_school_id'); ?>" />
                                                 <span class="text-danger"><?php echo form_error('govt_school_id'); ?></span>
                                             </div>
                                         </div>
@@ -273,7 +264,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="exampleInputEmail1"><?php echo $this->lang->line('mobile_number'); ?></label>
-                                                <input id="mobileno" name="mobileno" placeholder="" type="text" class="form-control" value="<?php echo set_value('mobileno'); ?>" />
+                                                <input id="mobileno" name="mobileno" placeholder="" type="text" class="form-control" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" title="Enter a valid 10-digit mobile number" oninput="this.value = this.value.replace(/\D/g, '')" value="<?php echo set_value('mobileno'); ?>" />
                                                 <span class="text-danger"><?php echo form_error('mobileno'); ?></span>
                                             </div>
                                         </div>
@@ -281,7 +272,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('admission_date'); ?></label>
-                                                    <input id="admission_date" name="admission_date" placeholder="" type="text" class="form-control date" value="<?php echo set_value('admission_date', date($this->customlib->getSchoolDateFormat())); ?>" readonly="readonly" />
+                                                    <input id="admission_date" name="admission_date" placeholder="" type="text" class="form-control date" oninput="this.value = this.value.replace(/[^0-9\/\-]/g, '')" value="<?php echo set_value('admission_date', date($this->customlib->getSchoolDateFormat())); ?>" readonly="readonly" />
                                                     <span class="text-danger"><?php echo form_error('admission_date'); ?></span>
                                                 </div>
                                             </div>
@@ -327,7 +318,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('father_name'); ?></label>
-                                                    <input id="father_name" name="father_name" placeholder="Enter Father Name" type="text" class="form-control" style="text-transform: capitalize;" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('father_name'); ?>" />
+                                                    <input id="father_name" name="father_name" placeholder="Enter Father Name" type="text" class="form-control" style="text-transform: capitalize;" maxlength="100" pattern="[A-Za-z .'\-]+" title="Only letters, spaces, apostrophes and hyphens are allowed" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('father_name'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('father_name'); ?></span>
                                                 </div>
                                             </div>
@@ -336,7 +327,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('father_phone'); ?></label>
-                                                    <input id="father_phone" name="father_phone" placeholder="Enter Father Phone Number" type="text" class="form-control" value="<?php echo set_value('father_phone'); ?>" />
+                                                    <input id="father_phone" name="father_phone" placeholder="Enter Father Phone Number" type="text" class="form-control" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" title="Enter a valid 10-digit phone number" value="<?php echo set_value('father_phone'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('father_phone'); ?></span>
                                                 </div>
                                             </div>
@@ -345,7 +336,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('father_occupation'); ?></label>
-                                                    <input id="father_occupation" name="father_occupation" placeholder="Enter Father Occupation" type="text" class="form-control" style="text-transform: capitalize;" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('father_occupation'); ?>" />
+                                                    <input id="father_occupation" name="father_occupation" placeholder="Enter Father Occupation" type="text" class="form-control" style="text-transform: capitalize;" maxlength="100" pattern="[A-Za-z .'\-]+" title="Only letters, spaces, apostrophes and hyphens are allowed" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('father_occupation'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('father_occupation'); ?></span>
                                                 </div>
                                             </div>
@@ -366,7 +357,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('mother_name'); ?></label>
-                                                    <input id="mother_name" name="mother_name" placeholder="Enter Mother Name" type="text" class="form-control" style="text-transform: capitalize;" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('mother_name'); ?>" />
+                                                    <input id="mother_name" name="mother_name" placeholder="Enter Mother Name" type="text" class="form-control" style="text-transform: capitalize;" maxlength="100" pattern="[A-Za-z .'\-]+" title="Only letters, spaces, apostrophes and hyphens are allowed" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('mother_name'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('mother_name'); ?></span>
                                                 </div>
                                             </div>
@@ -375,7 +366,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('mother_phone'); ?></label>
-                                                    <input id="mother_phone" name="mother_phone" placeholder="" type="text" class="form-control" value="<?php echo set_value('mother_phone'); ?>" />
+                                                    <input id="mother_phone" name="mother_phone" placeholder="" type="text" class="form-control" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" title="Enter a valid 10-digit phone number" value="<?php echo set_value('mother_phone'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('mother_phone'); ?></span>
                                                 </div>
                                             </div>
@@ -384,7 +375,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('mother_occupation'); ?></label>
-                                                    <input id="mother_occupation" name="mother_occupation" placeholder="" type="text" class="form-control" value="<?php echo set_value('mother_occupation'); ?>" />
+                                                    <input id="mother_occupation" name="mother_occupation" placeholder="" type="text" class="form-control" maxlength="100" pattern="[A-Za-z .'\-]+" title="Only letters, spaces, apostrophes and hyphens are allowed" value="<?php echo set_value('mother_occupation'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('mother_occupation'); ?></span>
                                                 </div>
                                             </div>
@@ -428,7 +419,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('guardian_name'); ?></label><small class="req"> *</small>
-                                                    <input id="guardian_name" name="guardian_name" placeholder="" type="text" class="form-control" value="<?php echo set_value('guardian_name'); ?>" />
+                                                    <input id="guardian_name" name="guardian_name" placeholder="" type="text" class="form-control" maxlength="100" pattern="[A-Za-z .'\-]+" title="Only letters, spaces, apostrophes and hyphens are allowed" value="<?php echo set_value('guardian_name'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('guardian_name'); ?></span>
                                                 </div>
                                             </div>
@@ -437,7 +428,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('guardian_relation'); ?></label>
-                                                    <input id="guardian_relation" name="guardian_relation" placeholder="" type="text" class="form-control" value="<?php echo set_value('guardian_relation'); ?>" />
+                                                    <input id="guardian_relation" name="guardian_relation" placeholder="" type="text" class="form-control" maxlength="50" pattern="[A-Za-z .'\-]+" title="Only letters, spaces, apostrophes and hyphens are allowed" value="<?php echo set_value('guardian_relation'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('guardian_relation'); ?></span>
                                                 </div>
                                             </div>
@@ -448,7 +439,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('guardian_phone'); ?></label><small class="req"> *</small>
-                                                    <input id="guardian_phone" name="guardian_phone" placeholder="" type="text" class="form-control" value="<?php echo set_value('guardian_phone'); ?>" />
+                                                    <input id="guardian_phone" name="guardian_phone" placeholder="" type="text" class="form-control" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" title="Enter a valid 10-digit phone number" value="<?php echo set_value('guardian_phone'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('guardian_phone'); ?></span>
                                                 </div>
                                             </div>
@@ -458,7 +449,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('guardian_occupation'); ?></label>
-                                                    <input id="guardian_occupation" name="guardian_occupation" placeholder="" type="text" class="form-control" value="<?php echo set_value('guardian_occupation'); ?>" />
+                                                    <input id="guardian_occupation" name="guardian_occupation" placeholder="" type="text" class="form-control" maxlength="100" pattern="[A-Za-z .'\-]+" title="Only letters, spaces, apostrophes and hyphens are allowed" value="<?php echo set_value('guardian_occupation'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('guardian_occupation'); ?></span>
                                                 </div>
                                             </div>
@@ -469,7 +460,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('guardian_email'); ?></label>
-                                                    <input id="guardian_email" name="guardian_email" placeholder="" type="text" class="form-control" value="<?php echo set_value('guardian_email'); ?>" />
+                                                    <input id="guardian_email" name="guardian_email" placeholder="" type="email" class="form-control" value="<?php echo set_value('guardian_email'); ?>" />
                                                     <span class="text-danger"><?php echo form_error('guardian_email'); ?></span>
                                                 </div>
                                             </div>
@@ -548,7 +539,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label for="exampleInputEmail1"><?php echo $this->lang->line('bank_account_number'); ?></label>
-                                                        <input id="bank_account_no" name="bank_account_no" placeholder="" type="text" class="form-control" value="<?php echo set_value('bank_account_no'); ?>" />
+                                                        <input id="bank_account_no" name="bank_account_no" placeholder="" type="text" class="form-control" inputmode="numeric" maxlength="18" pattern="[0-9]{9,18}" title="Enter a valid bank account number (9 to 18 digits)" value="<?php echo set_value('bank_account_no'); ?>" />
                                                         <span class="text-danger"><?php echo form_error('bank_account_no'); ?></span>
                                                     </div>
                                                 </div><?php }
@@ -564,7 +555,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label for="exampleInputEmail1"><?php echo $this->lang->line('ifsc_code'); ?></label>
-                                                        <input id="ifsc_code" name="ifsc_code" placeholder="" type="text" class="form-control" value="<?php echo set_value('ifsc_code'); ?>" />
+                                                        <input id="ifsc_code" name="ifsc_code" placeholder="" type="text" class="form-control" maxlength="11" pattern="[A-Za-z]{4}0[A-Za-z0-9]{6}" title="Format: 4 letters, 0, then 6 alphanumeric characters (e.g. SBIN0001234)" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()" value="<?php echo set_value('ifsc_code'); ?>" />
                                                         <span class="text-danger"><?php echo form_error('ifsc_code'); ?></span>
                                                     </div>
                                                 </div>

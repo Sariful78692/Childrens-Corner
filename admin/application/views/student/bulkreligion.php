@@ -86,8 +86,11 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th><?php echo $this->lang->line('admission_no'); ?></th>
+                                                        <th>Reg No.</th>
                                                         <th><?php echo $this->lang->line('student_name'); ?></th>
+                                                        <?php if ($sch_setting->father_name) { ?>
+                                                            <th><?php echo $this->lang->line('father_name'); ?></th>
+                                                        <?php } ?>
                                                         <th><?php echo $this->lang->line('class'); ?></th>
                                                         <th><?php echo $this->lang->line('gender'); ?></th>
                                                         <th><?php echo $this->lang->line('religion'); ?></th>
@@ -102,11 +105,14 @@
                                                                 <td>
                                                                     <input type="checkbox" name="student[]" value="<?php echo $student['id']; ?>">
                                                                 </td>
-                                                                <td><?php echo $student['admission_no']; ?></td>
+                                                                <td><?php echo $student['id']; ?></td>
                                                                 <td>
                                                                     <a href="<?php echo base_url(); ?>student/view/<?php echo $student['id']; ?>"><?php echo $this->customlib->getFullName($student['firstname'],$student['middlename'],$student['lastname'],$sch_setting->middlename,$sch_setting->lastname); ?>
                                                                     </a>
                                                                 </td>
+                                                                <?php if ($sch_setting->father_name) { ?>
+                                                                    <td><?php echo $student['father_name']; ?></td>
+                                                                <?php } ?>
                                                                 <td class="white-space-nowrap"><?php echo $student['class'] . "(" . $student['section'] . ")" ?></td>
                                                                 <td><?php echo $this->lang->line(strtolower($student['gender'])); ?></td>
                                                                 <td><?php echo !empty($student['religion']) ? $student['religion'] : '-'; ?></td>
