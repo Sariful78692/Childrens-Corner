@@ -417,6 +417,64 @@ class Admin extends Admin_Controller
         $data['muslim_students']         = array_sum(array_column($class_wise_students, 'muslim_students'));
         $data['hindu_students']          = array_sum(array_column($class_wise_students, 'hindu_students'));
 
+        if ($this->rbac->hasPrivilege('student_report', 'can_view')) {
+            $current_session_id = $this->setting_model->getCurrentSession();
+            $concession_students = $this->studentfee_model->getConcessionStudentReport($current_session_id);
+
+            $concession_free_status_counts = array(
+                'fully_free'     => 0,
+                'admission_free' => 0,
+                'monthly_free'   => 0,
+                'concession'     => 0,
+            );
+            $concession_class_wise = array();
+            foreach ($concession_students as $concession_student) {
+                $status_key = !empty($concession_student['free_status']) ? $concession_student['free_status'] : 'concession';
+                if (!isset($concession_free_status_counts[$status_key])) {
+                    $concession_free_status_counts[$status_key] = 0;
+                }
+                $concession_free_status_counts[$status_key]++;
+
+                $class_key = (!empty($concession_student['class_id']) ? $concession_student['class_id'] : $concession_student['class'])
+                    . '-' . (!empty($concession_student['section_id']) ? $concession_student['section_id'] : $concession_student['section']);
+                if (!isset($concession_class_wise[$class_key])) {
+                    $concession_class_wise[$class_key] = array(
+                        'class'                 => $concession_student['class'],
+                        'section'               => $concession_student['section'],
+                        'boys'                  => 0,
+                        'girls'                 => 0,
+                        'fully_free'            => 0,
+                        'admission_free'        => 0,
+                        'monthly_free'          => 0,
+                        'concession'            => 0,
+                        'total_students'        => 0,
+                        'total_discount_amount' => 0,
+                    );
+                }
+                $gender = strtolower((string) ($concession_student['gender'] ?? ''));
+                if ($gender === 'female') {
+                    $concession_class_wise[$class_key]['girls']++;
+                } else {
+                    $concession_class_wise[$class_key]['boys']++;
+                }
+                if (!isset($concession_class_wise[$class_key][$status_key])) {
+                    $concession_class_wise[$class_key][$status_key] = 0;
+                }
+                $concession_class_wise[$class_key][$status_key]++;
+                $concession_class_wise[$class_key]['total_students']++;
+                $concession_class_wise[$class_key]['total_discount_amount'] += (float) $concession_student['total_discount_amount'];
+            }
+
+            $data['concession_class_wise']             = array_values($concession_class_wise);
+            $data['concession_total_students']         = count($concession_students);
+            $data['concession_total_discount']         = array_sum(array_column($concession_students, 'total_discount_amount'));
+            $data['concession_monthly_discount']       = array_sum(array_column($concession_students, 'monthly_discount_amount'));
+            $data['concession_admission_discount']     = array_sum(array_column($concession_students, 'admission_discount_amount'));
+            $data['concession_free_status_counts']     = $concession_free_status_counts;
+        } else {
+            $data['concession_class_wise'] = array();
+        }
+
         if ($data['sch_setting']->attendence_type == 0) {
             $data['std_graphclass'] = "col-lg-3 col-md-6 col-sm-6";
         } else {

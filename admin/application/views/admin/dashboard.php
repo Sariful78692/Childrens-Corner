@@ -237,6 +237,126 @@
             justify-content: flex-start;
         }
     }
+
+    .concession-widget {
+        background: #fff;
+        border: 1px solid #e5eaf1;
+        border-radius: 0;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
+        overflow: hidden;
+        margin-top: 20px;
+    }
+
+    .concession-widget__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 18px;
+        border-bottom: 1px solid #edf1f5;
+        background: linear-gradient(90deg, #f8fbff, #fff);
+    }
+
+    .concession-widget__title {
+        margin: 0;
+        color: #1f2937;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .concession-widget__subtitle {
+        display: block;
+        margin-top: 3px;
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    .concession-widget__actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .concession-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px 18px;
+        border-bottom: 1px solid #edf1f5;
+        background: #fbfdff;
+    }
+
+    .concession-stat-card {
+        flex: 1 1 150px;
+        min-width: 150px;
+        background: #fff;
+        border: 1px solid #e5eaf1;
+        border-radius: 10px;
+        padding: 12px 14px;
+    }
+
+    .concession-stat-card .concession-stat-label {
+        color: #6b7280;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        font-weight: 700;
+    }
+
+    .concession-stat-card .concession-stat-value {
+        margin-top: 6px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .concession-widget__table-wrap {
+        padding: 0 18px 18px;
+    }
+
+    .concession-widget__table-wrap .dataTables_scrollHead,
+    .concession-widget__table-wrap .dataTables_scrollFoot {
+        background: #f8fafc;
+    }
+
+    .concession-widget__table-wrap .dataTables_scrollBody {
+        border-top: 0 !important;
+    }
+
+    .concession-widget__table {
+        margin-bottom: 0;
+    }
+
+    .concession-widget__table thead th {
+        white-space: nowrap;
+        background: #f8fafc;
+        color: #475569;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+
+    .concession-widget__table tbody td {
+        vertical-align: middle;
+    }
+
+    .concession-widget__table tfoot th {
+        background: #f1f5f9;
+        border-top: 1px solid #dce4ed;
+    }
+
+    @media (max-width: 767px) {
+        .concession-widget__header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .concession-widget__actions {
+            justify-content: flex-start;
+        }
+    }
 </style>
 
 <div class="content-wrapper">
@@ -474,10 +594,10 @@ if ($this->rbac->hasPrivilege('student_count_widget', 'can_view')) {
                                         <thead>
                                             <tr>
                                                 <th>Class</th>
-                                                <th class="text-center classwise-th-m" title="Male">M</th>
-                                                <th class="text-center classwise-th-f" title="Female">F</th>
-                                                <th class="text-center classwise-th-mus" title="Muslim">M</th>
-                                                <th class="text-center classwise-th-hin" title="Hindu">H</th>
+                                                <th class="text-center classwise-th-m" title="Male">Boys</th>
+                                                <th class="text-center classwise-th-f" title="Female">Girls</th>
+                                                <th class="text-center classwise-th-mus" title="Muslim">Muslim</th>
+                                                <th class="text-center classwise-th-hin" title="Hindu">Hindu</th>
                                                 <th class="text-right">Students</th>
                                             </tr>
                                         </thead>
@@ -580,6 +700,107 @@ if ($this->rbac->hasPrivilege('govt_school', 'can_view')) {
                                 </div>
                             <?php } else { ?>
                                 <div class="p-3 text-muted">No government schools have been added yet.</div>
+                            <?php } ?>
+                        </div>
+                    </div>
+<?php }
+
+if ($this->rbac->hasPrivilege('student_report', 'can_view')) {
+    ?>
+                    <div class="col-md-12">
+                        <div class="concession-widget">
+                            <div class="concession-widget__header">
+                                <div>
+                                    <h4 class="concession-widget__title"><i class="fa fa-percent"></i> Concession Students Overview</h4>
+                                    <span class="concession-widget__subtitle"><?php echo (int) $concession_total_students; ?> students on concession/free fees in the current session</span>
+                                </div>
+                                <div class="concession-widget__actions">
+                                    <button type="button" id="concessionOverviewExport" class="btn btn-success btn-sm"><i class="fa fa-file-excel-o"></i> Export Excel</button>
+                                    <a href="<?php echo site_url('report/concession_student_report'); ?>" class="btn btn-default btn-sm"><i class="fa fa-list"></i> Full Report</a>
+                                </div>
+                            </div>
+
+                            <div class="concession-stats">
+                                <div class="concession-stat-card">
+                                    <div class="concession-stat-label">Total Students</div>
+                                    <div class="concession-stat-value"><?php echo (int) $concession_total_students; ?></div>
+                                </div>
+                                <div class="concession-stat-card">
+                                    <div class="concession-stat-label">Total Discount</div>
+                                    <div class="concession-stat-value"><?php echo $currency_symbol . amountFormat((float) $concession_total_discount); ?></div>
+                                </div>
+                                <div class="concession-stat-card">
+                                    <div class="concession-stat-label">Monthly Fee Discount</div>
+                                    <div class="concession-stat-value"><?php echo $currency_symbol . amountFormat((float) $concession_monthly_discount); ?></div>
+                                </div>
+                                <div class="concession-stat-card">
+                                    <div class="concession-stat-label">Admission Fee Discount</div>
+                                    <div class="concession-stat-value"><?php echo $currency_symbol . amountFormat((float) $concession_admission_discount); ?></div>
+                                </div>
+                                <div class="concession-stat-card">
+                                    <div class="concession-stat-label">Fully Free</div>
+                                    <div class="concession-stat-value"><?php echo (int) ($concession_free_status_counts['fully_free'] ?? 0); ?></div>
+                                </div>
+                                <div class="concession-stat-card">
+                                    <div class="concession-stat-label">Admission Free</div>
+                                    <div class="concession-stat-value"><?php echo (int) ($concession_free_status_counts['admission_free'] ?? 0); ?></div>
+                                </div>
+                                <div class="concession-stat-card">
+                                    <div class="concession-stat-label">Monthly Free</div>
+                                    <div class="concession-stat-value"><?php echo (int) ($concession_free_status_counts['monthly_free'] ?? 0); ?></div>
+                                </div>
+                            </div>
+
+                            <?php if (!empty($concession_class_wise)) { ?>
+                                <div class="concession-widget__table-wrap">
+                                    <table id="concessionClassWiseTable" class="table table-hover table-bordered concession-widget__table">
+                                        <thead>
+                                            <tr>
+                                                <th>Class</th>
+                                                <th>Section</th>
+                                                <th class="text-center">Boys</th>
+                                                <th class="text-center">Girls</th>
+                                                <th class="text-center">Fully Free</th>
+                                                <th class="text-center">Admission Free</th>
+                                                <th class="text-center">Monthly Free</th>
+                                                <th class="text-center">Concession</th>
+                                                <th class="text-center">Total Students</th>
+                                                <th class="text-right">Total Discount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($concession_class_wise as $class_row) { ?>
+                                                <tr>
+                                                    <td><?php echo html_escape($class_row['class'] ?? ''); ?></td>
+                                                    <td><?php echo html_escape($class_row['section'] ?? ''); ?></td>
+                                                    <td class="text-center"><?php echo (int) $class_row['boys']; ?></td>
+                                                    <td class="text-center"><?php echo (int) $class_row['girls']; ?></td>
+                                                    <td class="text-center"><?php echo (int) $class_row['fully_free']; ?></td>
+                                                    <td class="text-center"><?php echo (int) $class_row['admission_free']; ?></td>
+                                                    <td class="text-center"><?php echo (int) $class_row['monthly_free']; ?></td>
+                                                    <td class="text-center"><?php echo (int) $class_row['concession']; ?></td>
+                                                    <td class="text-center"><strong><?php echo (int) $class_row['total_students']; ?></strong></td>
+                                                    <td class="text-right"><?php echo $currency_symbol . amountFormat((float) $class_row['total_discount_amount']); ?></td>
+                                                </tr>
+                                            <?php } ?>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th colspan="2">Total</th>
+                                                <th class="text-center"><?php echo (int) array_sum(array_column($concession_class_wise, 'boys')); ?></th>
+                                                <th class="text-center"><?php echo (int) array_sum(array_column($concession_class_wise, 'girls')); ?></th>
+                                                <th class="text-center"><?php echo (int) ($concession_free_status_counts['fully_free'] ?? 0); ?></th>
+                                                <th class="text-center"><?php echo (int) ($concession_free_status_counts['admission_free'] ?? 0); ?></th>
+                                                <th class="text-center"><?php echo (int) ($concession_free_status_counts['monthly_free'] ?? 0); ?></th>
+                                                <th class="text-center"><?php echo (int) ($concession_free_status_counts['concession'] ?? 0); ?></th>
+                                                <th class="text-center"><?php echo (int) $concession_total_students; ?></th>
+                                                <th class="text-right"><?php echo $currency_symbol . amountFormat((float) $concession_total_discount); ?></th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            <?php } else { ?>
+                                <div class="p-3 text-muted" style="padding: 0 18px 18px;">No concession/free fee students found for the current session.</div>
                             <?php } ?>
                         </div>
                     </div>
@@ -1318,6 +1539,33 @@ if ($this->rbac->hasPrivilege('fees_collection_and_expense_yearly_chart', 'can_v
         ordering: false
 
     });
+
+    if ($('#concessionClassWiseTable').length) {
+        var concessionClassWiseTable = $('#concessionClassWiseTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    title: 'Concession Class Wise Overview Report',
+                    text: '<i class="fa fa-file-excel-o"></i> Export Excel',
+                    className: 'btn btn-success',
+                    exportOptions: {
+                        footer: true
+                    }
+                }
+            ],
+            paging: false,
+            searching: false,
+            ordering: false,
+            info: false,
+            scrollY: '360px',
+            scrollCollapse: true
+        });
+        concessionClassWiseTable.buttons().container().hide();
+        $('#concessionOverviewExport').on('click', function () {
+            concessionClassWiseTable.button('.buttons-excel').trigger();
+        });
+    }
 
 });
 </script>

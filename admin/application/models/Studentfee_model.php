@@ -568,9 +568,12 @@ class Studentfee_model extends MY_Model
             s.id as student_id,
             CONCAT(s.firstname, " ", IFNULL(s.middlename, ""), " ", s.lastname) as student_name,
             ss.roll_no,
+            sec.id as section_id,
             sec.section,
             IFNULL(NULLIF(ss.recommendationNumber, ""), NULLIF(s.recommendationNumber, "")) as recommendation_number,
+            c.id as class_id,
             c.class,
+            s.gender,
             COALESCE(NULLIF(s.mobileno, ""), NULLIF(s.guardian_phone, "")) as phone,
             SUM(CASE WHEN sfm.is_skipped = 0 THEN (fmcw.fees_amount - sfm.discounted_fees) ELSE 0 END) as total_discount_amount,
             SUM(CASE WHEN sfm.is_skipped = 0 AND sfm.is_monthly = 1 THEN (fmcw.fees_amount - sfm.discounted_fees) ELSE 0 END) as monthly_discount_amount,
@@ -622,7 +625,7 @@ class Studentfee_model extends MY_Model
             $this->db->where('ss.section_id', $section_id);
         }
 
-        $this->db->group_by('ses.id, ses.session, sfm.student_session_id, s.id, s.firstname, s.middlename, s.lastname, ss.roll_no, sec.section, ss.recommendationNumber, s.recommendationNumber, c.class, s.mobileno, s.guardian_phone');
+        $this->db->group_by('ses.id, ses.session, sfm.student_session_id, s.id, s.firstname, s.middlename, s.lastname, ss.roll_no, sec.id, sec.section, ss.recommendationNumber, s.recommendationNumber, c.id, c.class, s.gender, s.mobileno, s.guardian_phone');
         $this->db->order_by('ses.id', 'DESC');
         $this->db->order_by('c.id', 'ASC');
         $this->db->order_by('sec.id', 'ASC');
