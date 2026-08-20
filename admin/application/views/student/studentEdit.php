@@ -1314,6 +1314,8 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                             var othersTR = "";
 
                             for (var i = 0; i < feesData.length; i++) {
+                                var currentIsSkipped = (feesData[i].is_skipped === '1') ? '1' : '0';
+
                                 var rowHtml = '<td>' + feesData[i].type + ' (' + feesData[i].session + ')</td>';
                                 rowHtml += '<input type="hidden" name="sfm_id[]" value="' + (feesData[i].id !== undefined ? feesData[i].id : 0) + '">';
                                 rowHtml += '<input type="hidden" name="feetype_id[]" value="' + feesData[i].feetype_id + '">';
@@ -1327,10 +1329,19 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                     '<option value="0" ' + (feesData[i].is_monthly === '0' ? 'selected' : '') + '>ADMISSION</option>' +
                                     '<option value="2" ' + (feesData[i].is_monthly === '2' ? 'selected' : '') + '>OTHERS</option>' +
                                     '</select></label></td>';
-                                rowHtml += '<td><label><select class="is_skipped_changed form-control" name="is_skipped[]">' +
-                                    '<option value="0" ' + ((feesData[i].is_skipped === undefined || feesData[i].is_skipped === null || feesData[i].is_skipped === '0') ? 'selected' : '') + '>Active</option>' +
-                                    '<option value="1" ' + (feesData[i].is_skipped === '1' ? 'selected' : '') + '>Skip</option>' +
-                                    '</select></label></td>';
+
+                                if (feesData[i].is_monthly === '1') {
+                                    // Monthly fees no longer expose an Active/Skip control. The
+                                    // existing stored value is still submitted via a hidden field
+                                    // so sfm_id[]/discounted_fees[]/is_skipped[] indices stay aligned
+                                    // and saving the form doesn't change monthly skip status.
+                                    rowHtml += '<td><input type="hidden" name="is_skipped[]" value="' + currentIsSkipped + '">&mdash;</td>';
+                                } else {
+                                    rowHtml += '<td><label><select class="is_skipped_changed form-control" name="is_skipped[]">' +
+                                        '<option value="0" ' + (currentIsSkipped === '0' ? 'selected' : '') + '>Active</option>' +
+                                        '<option value="1" ' + (currentIsSkipped === '1' ? 'selected' : '') + '>Skip</option>' +
+                                        '</select></label></td>';
+                                }
 
                                 if (feesData[i].is_monthly == 0) {
                                     admissionTR += '<tr>' + rowHtml + '</tr>';

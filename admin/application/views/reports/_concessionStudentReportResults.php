@@ -55,6 +55,8 @@ $currency_symbol = isset($currency_symbol) ? $currency_symbol : $this->customlib
                                 <th class="recommendation-col">Recommendation Number</th>
                                 <th>Class</th>
                                 <th>Phone</th>
+                                <th>Fee Status</th>
+                                <th class="reason-col">Why Included</th>
                                 <th class="breakdown-col">Discount Breakdown</th>
                                 <th class="text-right">Total Discount Amount</th>
                                 <th class="text-center">Details</th>
@@ -72,6 +74,8 @@ $currency_symbol = isset($currency_symbol) ? $currency_symbol : $this->customlib
                                     <td class="recommendation-col"><?php echo $student['recommendation_number']; ?></td>
                                     <td><?php echo $student['class']; ?></td>
                                     <td><?php echo !empty($student['phone']) ? $student['phone'] : '-'; ?></td>
+                                    <td><?php echo html_escape($student['free_status_label'] ?? ''); ?></td>
+                                    <td class="reason-col"><?php echo html_escape($student['concession_reason'] ?? ''); ?></td>
                                     <td class="breakdown-col"><?php echo $student['discount_breakdown']; ?></td>
                                     <td class="text-right"><?php echo $currency_symbol . amountFormat($student['total_discount_amount']); ?></td>
                                     <td class="text-center">
@@ -85,7 +89,7 @@ $currency_symbol = isset($currency_symbol) ? $currency_symbol : $this->customlib
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="10" class="text-right">Session Total</th>
+                                <th colspan="12" class="text-right">Session Total</th>
                                 <th class="text-right"><?php echo $currency_symbol . amountFormat($group['total_discount_amount']); ?></th>
                                 <th></th>
                             </tr>

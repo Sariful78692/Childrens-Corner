@@ -612,6 +612,7 @@ class Report extends Admin_Controller
             $row[] = html_escape($student['class'] ?? '');
             $row[] = html_escape(!empty($student['phone']) ? $student['phone'] : '-');
             $row[] = html_escape($this->getConcessionFreeStatusLabel($student['free_status'] ?? ''));
+            $row[] = html_escape($student['concession_reason'] ?? '');
             $row[] = $student['discount_breakdown'] ?? '';
             $row[] = $this->customlib->getSchoolCurrencyFormat() . amountFormat((float) ($student['total_discount_amount'] ?? 0));
             $row[] = '<a href="' . $details_link . '" class="btn btn-default btn-xs"><i class="fa fa-eye"></i> View</a>';
@@ -672,6 +673,7 @@ class Report extends Admin_Controller
             'Class',
             'Phone',
             'Fee Status',
+            'Why Included',
             'Discount Breakdown',
             'Total Discount Amount',
         ));
@@ -691,6 +693,7 @@ class Report extends Admin_Controller
                 $row['class'] ?? '',
                 !empty($row['phone']) ? $row['phone'] : '-',
                 $this->getConcessionFreeStatusLabel($row['free_status'] ?? ''),
+                $row['concession_reason'] ?? '',
                 $discount_breakdown,
                 $this->customlib->getSchoolCurrencyFormat() . amountFormat((float) ($row['total_discount_amount'] ?? 0)),
             ));
@@ -756,27 +759,69 @@ class Report extends Admin_Controller
         }
 
         $student = $details[0];
-        $total_monthly_count = (int) ($student['total_monthly_count'] ?? 0);
-        $skipped_monthly_count = (int) ($student['skipped_monthly_count'] ?? 0);
-        $skipped_new_admission_count = (int) ($student['skipped_new_admission_count'] ?? 0);
-        $skipped_re_admission_count = (int) ($student['skipped_re_admission_count'] ?? 0);
-        $active_details = array_values(array_filter($details, function ($detail) {
-            return (int) $detail['is_skipped'] === 0;
-        }));
+        $free_status = $this->studentfee_model->getConcessionFreeStatusFromRow($student);
+
+        // Skipped fees never contribute to discount/payable totals — they are
+        // only ever identified as "Skipped", never priced.
+        //
+        // Admission items: shown individually, skipped or active, so the admin
+        // can see exactly which admission fees were waived vs. still applicable.
+        // Monthly items: only active (non-skipped) items are shown/used — no
+        // per-item skip status is displayed for the monthly group.
+        $admission_discount_amount = 0;
+        $monthly_discount_amount = 0;
         $total_standard_fee = 0;
         $total_student_fee = 0;
         $total_discount_amount = 0;
+        $fee_details = array();
+        $has_skipped_monthly = false;
 
-        foreach ($active_details as $detail) {
-            $total_standard_fee += (float) $detail['standard_fee'];
-            $total_student_fee += (float) $detail['student_fee'];
-            $total_discount_amount += (float) $detail['discount_amount'];
+        foreach ($details as $detail) {
+            $is_skipped = (int) $detail['is_skipped'] === 1;
+            $is_monthly = (int) $detail['is_monthly'] === 1;
+
+            if ($is_monthly && $is_skipped) {
+                // Skipped monthly items are excluded entirely — they don't
+                // get an individual status and don't feed the calculations.
+                $has_skipped_monthly = true;
+                continue;
+            }
+
+            $standard_fee = (float) $detail['standard_fee'];
+            $student_fee = $is_skipped ? 0 : (float) $detail['student_fee'];
+            $discount_amount = $is_skipped ? 0 : (float) $detail['discount_amount'];
+
+            $detail['is_admission_skipped'] = $is_monthly ? null : $is_skipped;
+            $detail['display_student_fee'] = $is_skipped ? null : $student_fee;
+            $detail['display_discount_amount'] = $is_skipped ? null : $discount_amount;
+
+            if (!$is_skipped) {
+                $total_standard_fee += $standard_fee;
+                $total_student_fee += $student_fee;
+                $total_discount_amount += $discount_amount;
+
+                if ($is_monthly) {
+                    $monthly_discount_amount += $discount_amount;
+                } else {
+                    $admission_discount_amount += $discount_amount;
+                }
+            }
+
+            $fee_details[] = $detail;
         }
-        $fully_free = $skipped_new_admission_count > 0
-            && $skipped_re_admission_count > 0
-            && $total_monthly_count > 1
-            && $skipped_monthly_count === $total_monthly_count;
-        $admission_free = !$fully_free && ($skipped_new_admission_count > 0 || $skipped_re_admission_count > 0);
+
+        $concession_reason = $this->studentfee_model->getConcessionReason(
+            (int) ($student['total_admission_count'] ?? 0),
+            (int) ($student['total_monthly_count'] ?? 0),
+            (float) ($student['total_admission_payable'] ?? 0),
+            (float) ($student['total_monthly_payable'] ?? 0),
+            $admission_discount_amount,
+            $monthly_discount_amount
+        );
+
+        $fully_free = $free_status === 'fully_free';
+        $admission_free = $free_status === 'admission_free';
+        $monthly_free = $free_status === 'monthly_free';
 
         $this->session->set_userdata('top_menu', 'Reports');
         $this->session->set_userdata('sub_menu', 'Reports/student_information');
@@ -784,12 +829,16 @@ class Report extends Admin_Controller
 
         $data['title'] = 'Concession Student Report Detail';
         $data['student'] = $student;
-        $data['fee_details'] = $active_details;
+        $data['fee_details'] = $fee_details;
+        $data['has_skipped_monthly'] = $has_skipped_monthly;
         $data['total_standard_fee'] = $total_standard_fee;
         $data['total_student_fee'] = $total_student_fee;
         $data['total_discount_amount'] = $total_discount_amount;
         $data['admission_free'] = $admission_free;
         $data['fully_free'] = $fully_free;
+        $data['monthly_free'] = $monthly_free;
+        $data['concession_reason'] = $concession_reason;
+        $data['free_status_label'] = $this->getConcessionFreeStatusLabel($free_status);
 
         $this->load->view('layout/header', $data);
         $this->load->view('reports/concessionStudentReportDetail', $data);
@@ -844,6 +893,11 @@ class Report extends Admin_Controller
     {
         $report_rows = $this->studentfee_model->getConcessionStudentReport($selected_session, $selected_class, $selected_section, $selected_free_type);
         $report_rows = $this->filterConcessionReportRowsBySearch($report_rows, $selected_search_text);
+
+        foreach ($report_rows as &$row) {
+            $row['free_status_label'] = $this->getConcessionFreeStatusLabel($row['free_status'] ?? '');
+        }
+        unset($row);
 
         $session_groups = array();
         $summary_total_discount = 0;

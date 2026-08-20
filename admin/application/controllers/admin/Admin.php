@@ -427,6 +427,8 @@ class Admin extends Admin_Controller
                 'monthly_free'   => 0,
                 'concession'     => 0,
             );
+            $concession_monthly_concession_students   = 0;
+            $concession_admission_concession_students = 0;
             $concession_class_wise = array();
             foreach ($concession_students as $concession_student) {
                 $status_key = !empty($concession_student['free_status']) ? $concession_student['free_status'] : 'concession';
@@ -435,20 +437,31 @@ class Admin extends Admin_Controller
                 }
                 $concession_free_status_counts[$status_key]++;
 
+                $has_monthly_concession   = !empty($concession_student['has_monthly_concession']);
+                $has_admission_concession = !empty($concession_student['has_admission_concession']);
+                if ($has_monthly_concession) {
+                    $concession_monthly_concession_students++;
+                }
+                if ($has_admission_concession) {
+                    $concession_admission_concession_students++;
+                }
+
                 $class_key = (!empty($concession_student['class_id']) ? $concession_student['class_id'] : $concession_student['class'])
                     . '-' . (!empty($concession_student['section_id']) ? $concession_student['section_id'] : $concession_student['section']);
                 if (!isset($concession_class_wise[$class_key])) {
                     $concession_class_wise[$class_key] = array(
-                        'class'                 => $concession_student['class'],
-                        'section'               => $concession_student['section'],
-                        'boys'                  => 0,
-                        'girls'                 => 0,
-                        'fully_free'            => 0,
-                        'admission_free'        => 0,
-                        'monthly_free'          => 0,
-                        'concession'            => 0,
-                        'total_students'        => 0,
-                        'total_discount_amount' => 0,
+                        'class'                             => $concession_student['class'],
+                        'section'                           => $concession_student['section'],
+                        'boys'                               => 0,
+                        'girls'                              => 0,
+                        'fully_free'                         => 0,
+                        'admission_free'                     => 0,
+                        'monthly_free'                       => 0,
+                        'monthly_concession_students'        => 0,
+                        'admission_concession_students'      => 0,
+                        'concession'                         => 0,
+                        'total_students'                     => 0,
+                        'total_discount_amount'              => 0,
                     );
                 }
                 $gender = strtolower((string) ($concession_student['gender'] ?? ''));
@@ -461,16 +474,24 @@ class Admin extends Admin_Controller
                     $concession_class_wise[$class_key][$status_key] = 0;
                 }
                 $concession_class_wise[$class_key][$status_key]++;
+                if ($has_monthly_concession) {
+                    $concession_class_wise[$class_key]['monthly_concession_students']++;
+                }
+                if ($has_admission_concession) {
+                    $concession_class_wise[$class_key]['admission_concession_students']++;
+                }
                 $concession_class_wise[$class_key]['total_students']++;
                 $concession_class_wise[$class_key]['total_discount_amount'] += (float) $concession_student['total_discount_amount'];
             }
 
-            $data['concession_class_wise']             = array_values($concession_class_wise);
-            $data['concession_total_students']         = count($concession_students);
-            $data['concession_total_discount']         = array_sum(array_column($concession_students, 'total_discount_amount'));
-            $data['concession_monthly_discount']       = array_sum(array_column($concession_students, 'monthly_discount_amount'));
-            $data['concession_admission_discount']     = array_sum(array_column($concession_students, 'admission_discount_amount'));
-            $data['concession_free_status_counts']     = $concession_free_status_counts;
+            $data['concession_class_wise']                       = array_values($concession_class_wise);
+            $data['concession_total_students']                   = count($concession_students);
+            $data['concession_total_discount']                   = array_sum(array_column($concession_students, 'total_discount_amount'));
+            $data['concession_monthly_discount']                 = array_sum(array_column($concession_students, 'monthly_discount_amount'));
+            $data['concession_admission_discount']               = array_sum(array_column($concession_students, 'admission_discount_amount'));
+            $data['concession_free_status_counts']               = $concession_free_status_counts;
+            $data['concession_monthly_concession_students']      = $concession_monthly_concession_students;
+            $data['concession_admission_concession_students']    = $concession_admission_concession_students;
         } else {
             $data['concession_class_wise'] = array();
         }

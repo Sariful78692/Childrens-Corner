@@ -555,7 +555,9 @@ class Studentfee_model extends MY_Model
                 SUM(CASE WHEN sfm_mix.is_monthly = 1 AND sfm_mix.is_skipped = 1 THEN 1 ELSE 0 END) as skipped_monthly_count,
                 SUM(CASE WHEN sfm_mix.is_monthly = 1 AND sfm_mix.is_skipped = 0 THEN 1 ELSE 0 END) as active_monthly_count,
                 SUM(CASE WHEN sfm_mix.is_monthly = 0 AND sfm_mix.is_skipped = 1 AND UPPER(ft_mix.type) LIKE '%NEW ADMISSION%' THEN 1 ELSE 0 END) as skipped_new_admission_count,
-                SUM(CASE WHEN sfm_mix.is_monthly = 0 AND sfm_mix.is_skipped = 1 AND UPPER(ft_mix.type) LIKE '%RE- ADMISSION%' THEN 1 ELSE 0 END) as skipped_re_admission_count
+                SUM(CASE WHEN sfm_mix.is_monthly = 0 AND sfm_mix.is_skipped = 1 AND UPPER(ft_mix.type) LIKE '%RE- ADMISSION%' THEN 1 ELSE 0 END) as skipped_re_admission_count,
+                SUM(CASE WHEN sfm_mix.is_monthly = 0 AND sfm_mix.is_skipped = 0 THEN sfm_mix.discounted_fees ELSE 0 END) as total_admission_payable,
+                SUM(CASE WHEN sfm_mix.is_monthly = 1 AND sfm_mix.is_skipped = 0 THEN sfm_mix.discounted_fees ELSE 0 END) as total_monthly_payable
             FROM student_fees_management sfm_mix
             LEFT JOIN feetype ft_mix ON ft_mix.id = sfm_mix.feetype_id
             GROUP BY sfm_mix.student_session_id
@@ -570,7 +572,7 @@ class Studentfee_model extends MY_Model
             ss.roll_no,
             sec.id as section_id,
             sec.section,
-            IFNULL(NULLIF(ss.recommendationNumber, ""), NULLIF(s.recommendationNumber, "")) as recommendation_number,
+            ss.recommendationNumber as recommendation_number,
             c.id as class_id,
             c.class,
             s.gender,
@@ -584,6 +586,8 @@ class Studentfee_model extends MY_Model
             IFNULL(fm.active_monthly_count, 0) as active_monthly_count,
             IFNULL(fm.skipped_new_admission_count, 0) as skipped_new_admission_count,
             IFNULL(fm.skipped_re_admission_count, 0) as skipped_re_admission_count,
+            IFNULL(fm.total_admission_payable, 0) as total_admission_payable,
+            IFNULL(fm.total_monthly_payable, 0) as total_monthly_payable,
             GROUP_CONCAT(
                 CASE
                     WHEN sfm.is_skipped = 0 THEN CONCAT(
@@ -613,7 +617,7 @@ class Studentfee_model extends MY_Model
         $this->db->where('(fmcw.status IS NULL OR fmcw.status = 1)', null, false);
         $this->db->where('(sfm.is_skipped = 1 OR sfm.discounted_fees < fmcw.fees_amount)', null, false);
         $this->db->where('(af.admission_fee_type IS NULL OR (af.admission_fee_type = "NEW ADMISSION" AND ft.type <> "RE- ADMISSION") OR (af.admission_fee_type = "RE- ADMISSION" AND ft.type <> "NEW ADMISSION"))', null, false);
-        $this->db->where('COALESCE(NULLIF(ss.recommendationNumber, ""), NULLIF(s.recommendationNumber, "")) IS NOT NULL', null, false);
+        $this->db->where('NULLIF(ss.recommendationNumber, "") IS NOT NULL', null, false);
 
         if (!empty($session_id)) {
             $this->db->where('sfm.session_id', $session_id);
@@ -625,7 +629,7 @@ class Studentfee_model extends MY_Model
             $this->db->where('ss.section_id', $section_id);
         }
 
-        $this->db->group_by('ses.id, ses.session, sfm.student_session_id, s.id, s.firstname, s.middlename, s.lastname, ss.roll_no, sec.id, sec.section, ss.recommendationNumber, s.recommendationNumber, c.id, c.class, s.gender, s.mobileno, s.guardian_phone');
+        $this->db->group_by('ses.id, ses.session, sfm.student_session_id, s.id, s.firstname, s.middlename, s.lastname, ss.roll_no, sec.id, sec.section, ss.recommendationNumber, c.id, c.class, s.gender, s.mobileno, s.guardian_phone');
         $this->db->order_by('ses.id', 'DESC');
         $this->db->order_by('c.id', 'ASC');
         $this->db->order_by('sec.id', 'ASC');
@@ -634,7 +638,11 @@ class Studentfee_model extends MY_Model
         $result = $this->db->get()->result_array();
 
         foreach ($result as &$row) {
+            $flags = $this->getConcessionCategoryFlagsFromRow($row);
             $row['free_status'] = $this->getConcessionFreeStatusFromRow($row);
+            $row['concession_reason'] = $this->getConcessionReasonFromFlags($flags);
+            $row['has_admission_concession'] = $flags['has_admission_concession'];
+            $row['has_monthly_concession'] = $flags['has_monthly_concession'];
             $active_breakdown = trim((string) ($row['active_discount_breakdown'] ?? ''));
 
             if ($row['free_status'] === 'fully_free') {
@@ -665,7 +673,9 @@ class Studentfee_model extends MY_Model
                 SUM(CASE WHEN sfm_mix.is_monthly = 1 THEN 1 ELSE 0 END) as total_monthly_count,
                 SUM(CASE WHEN sfm_mix.is_monthly = 1 AND sfm_mix.is_skipped = 1 THEN 1 ELSE 0 END) as skipped_monthly_count,
                 SUM(CASE WHEN sfm_mix.is_monthly = 0 AND sfm_mix.is_skipped = 1 AND UPPER(ft_mix.type) LIKE '%NEW ADMISSION%' THEN 1 ELSE 0 END) as skipped_new_admission_count,
-                SUM(CASE WHEN sfm_mix.is_monthly = 0 AND sfm_mix.is_skipped = 1 AND UPPER(ft_mix.type) LIKE '%RE- ADMISSION%' THEN 1 ELSE 0 END) as skipped_re_admission_count
+                SUM(CASE WHEN sfm_mix.is_monthly = 0 AND sfm_mix.is_skipped = 1 AND UPPER(ft_mix.type) LIKE '%RE- ADMISSION%' THEN 1 ELSE 0 END) as skipped_re_admission_count,
+                SUM(CASE WHEN sfm_mix.is_monthly = 0 AND sfm_mix.is_skipped = 0 THEN sfm_mix.discounted_fees ELSE 0 END) as total_admission_payable,
+                SUM(CASE WHEN sfm_mix.is_monthly = 1 AND sfm_mix.is_skipped = 0 THEN sfm_mix.discounted_fees ELSE 0 END) as total_monthly_payable
             FROM student_fees_management sfm_mix
             LEFT JOIN feetype ft_mix ON ft_mix.id = sfm_mix.feetype_id
             GROUP BY sfm_mix.student_session_id
@@ -680,7 +690,7 @@ class Studentfee_model extends MY_Model
             sec.section,
             c.class,
             ss.admission_no,
-            IFNULL(NULLIF(ss.recommendationNumber, ""), NULLIF(s.recommendationNumber, "")) as recommendation_number,
+            ss.recommendationNumber as recommendation_number,
             COALESCE(NULLIF(s.mobileno, ""), NULLIF(s.guardian_phone, "")) as phone,
             ft.type as fee_type,
             sfm.is_monthly,
@@ -690,6 +700,8 @@ class Studentfee_model extends MY_Model
             IFNULL(fm.skipped_monthly_count, 0) as skipped_monthly_count,
             IFNULL(fm.skipped_new_admission_count, 0) as skipped_new_admission_count,
             IFNULL(fm.skipped_re_admission_count, 0) as skipped_re_admission_count,
+            IFNULL(fm.total_admission_payable, 0) as total_admission_payable,
+            IFNULL(fm.total_monthly_payable, 0) as total_monthly_payable,
             fmcw.fees_amount as standard_fee,
             sfm.discounted_fees as student_fee,
             CASE
@@ -712,7 +724,7 @@ class Studentfee_model extends MY_Model
         $this->db->where_in('fmcw.is_monthly', array(0, 1));
         $this->db->where('(fmcw.status IS NULL OR fmcw.status = 1)', null, false);
         $this->db->where('(sfm.is_skipped = 1 OR sfm.discounted_fees < fmcw.fees_amount)', null, false);
-        $this->db->where('COALESCE(NULLIF(ss.recommendationNumber, ""), NULLIF(s.recommendationNumber, "")) IS NOT NULL', null, false);
+        $this->db->where('NULLIF(ss.recommendationNumber, "") IS NOT NULL', null, false);
         $this->db->order_by('sfm.is_monthly', 'ASC');
         $this->db->order_by('ft.id', 'ASC');
 
@@ -750,36 +762,112 @@ class Studentfee_model extends MY_Model
         return $filtered_rows;
     }
 
-    private function getConcessionFreeStatusFromRow(array $row)
+    public function getConcessionFreeStatusFromRow(array $row)
     {
-        $total_monthly_count = (int) ($row['total_monthly_count'] ?? 0);
-        $skipped_monthly_count = (int) ($row['skipped_monthly_count'] ?? 0);
-        $skipped_new_admission_count = (int) ($row['skipped_new_admission_count'] ?? 0);
-        $skipped_re_admission_count = (int) ($row['skipped_re_admission_count'] ?? 0);
+        $flags = $this->getConcessionCategoryFlagsFromRow($row);
 
-        $fully_free = $skipped_new_admission_count > 0
-            && $skipped_re_admission_count > 0
-            && $total_monthly_count > 1
-            && $skipped_monthly_count === $total_monthly_count;
-
-        if ($fully_free) {
+        if ($flags['admission_fully_waived'] && $flags['monthly_fully_waived']) {
             return 'fully_free';
         }
 
-        $monthly_free = $total_monthly_count > 0
-            && $skipped_monthly_count === $total_monthly_count
-            && $skipped_new_admission_count === 0
-            && $skipped_re_admission_count === 0;
-
-        if ($monthly_free) {
+        if ($flags['monthly_fully_waived']) {
             return 'monthly_free';
         }
 
-        if ($skipped_new_admission_count > 0 || $skipped_re_admission_count > 0) {
+        if ($flags['admission_fully_waived']) {
             return 'admission_free';
         }
 
         return '';
+    }
+
+    /**
+     * Per-student admission/monthly concession flags, shared by the overall
+     * free_status bucket (§ getConcessionFreeStatusFromRow), the fee-level
+     * "why included" reason, and the "Admission/Monthly Concession Students"
+     * overview counters — one definition of "has a concession" used everywhere.
+     */
+    public function getConcessionCategoryFlagsFromRow(array $row)
+    {
+        return $this->getConcessionCategoryFlags(
+            (int) ($row['total_admission_count'] ?? 0),
+            (int) ($row['total_monthly_count'] ?? 0),
+            (float) ($row['total_admission_payable'] ?? 0),
+            (float) ($row['total_monthly_payable'] ?? 0),
+            (float) ($row['admission_discount_amount'] ?? 0),
+            (float) ($row['monthly_discount_amount'] ?? 0)
+        );
+    }
+
+    public function getConcessionCategoryFlags(
+        $total_admission_count,
+        $total_monthly_count,
+        $admission_payable,
+        $monthly_payable,
+        $admission_discount_amount,
+        $monthly_discount_amount
+    ) {
+        $total_admission_count = (int) $total_admission_count;
+        $total_monthly_count = (int) $total_monthly_count;
+
+        // "Fully waived" means the student's actual payable amount for that
+        // fee category is zero, not merely that one item in it was skipped.
+        $admission_fully_waived = $total_admission_count > 0 && (float) $admission_payable <= 0.001;
+        $monthly_fully_waived = $total_monthly_count > 0 && (float) $monthly_payable <= 0.001;
+
+        return array(
+            'admission_fully_waived' => $admission_fully_waived,
+            'monthly_fully_waived' => $monthly_fully_waived,
+            'has_admission_concession' => $total_admission_count > 0
+                && ($admission_fully_waived || (float) $admission_discount_amount > 0.001),
+            'has_monthly_concession' => $total_monthly_count > 0
+                && ($monthly_fully_waived || (float) $monthly_discount_amount > 0.001),
+        );
+    }
+
+    /**
+     * Fee-level "why included" reason for the concession report — identifies
+     * the exact fee category (admission and/or monthly) responsible for the
+     * student qualifying, distinct from the overall free_status bucket.
+     */
+    public function getConcessionReasonFromRow(array $row)
+    {
+        return $this->getConcessionReasonFromFlags($this->getConcessionCategoryFlagsFromRow($row));
+    }
+
+    public function getConcessionReason(
+        $total_admission_count,
+        $total_monthly_count,
+        $admission_payable,
+        $monthly_payable,
+        $admission_discount_amount,
+        $monthly_discount_amount
+    ) {
+        return $this->getConcessionReasonFromFlags($this->getConcessionCategoryFlags(
+            $total_admission_count,
+            $total_monthly_count,
+            $admission_payable,
+            $monthly_payable,
+            $admission_discount_amount,
+            $monthly_discount_amount
+        ));
+    }
+
+    private function getConcessionReasonFromFlags(array $flags)
+    {
+        if ($flags['has_admission_concession'] && $flags['has_monthly_concession']) {
+            return 'Admission + Monthly Concession';
+        }
+
+        if ($flags['has_admission_concession']) {
+            return $flags['admission_fully_waived'] ? 'Admission Fee Fully Waived' : 'Admission Fee Discount';
+        }
+
+        if ($flags['has_monthly_concession']) {
+            return $flags['monthly_fully_waived'] ? 'Monthly Fee Fully Waived' : 'Monthly Fee Discount';
+        }
+
+        return 'Concession';
     }
 
     private function detectConcessionAdmissionFeeType(array $rows)

@@ -46,8 +46,8 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
     }
 
     .recommendation-col {
-        width: 140px;
-        max-width: 140px;
+        min-width: 140px;
+        max-width: 160px;
         word-break: break-word;
         white-space: normal;
     }
@@ -58,6 +58,13 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
         word-break: break-word;
         white-space: normal;
         line-height: 1.5;
+    }
+
+    .reason-col {
+        min-width: 200px;
+        max-width: 260px;
+        word-break: break-word;
+        white-space: normal;
     }
 
     .dt-buttons {
@@ -205,6 +212,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                     <th>Class</th>
                                     <th>Phone</th>
                                     <th>Fee Status</th>
+                                    <th class="reason-col">Why Included</th>
                                     <th class="breakdown-col">Discount Breakdown</th>
                                     <th class="text-right">Total Discount Amount</th>
                                     <th class="text-center noExport">Details</th>
@@ -352,14 +360,21 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                     },
                     {
                         targets: 9,
-                        className: 'breakdown-col'
-                    },
-                    {
-                        targets: 5,
-                        className: 'recommendation-col'
+                        className: 'reason-col',
+                        width: '200px'
                     },
                     {
                         targets: 10,
+                        className: 'breakdown-col',
+                        width: '260px'
+                    },
+                    {
+                        targets: 5,
+                        className: 'recommendation-col',
+                        width: '140px'
+                    },
+                    {
+                        targets: 11,
                         className: 'text-right'
                     },
                     {

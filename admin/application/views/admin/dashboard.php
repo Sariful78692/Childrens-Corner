@@ -279,21 +279,66 @@
     }
 
     .concession-stats {
-        display: flex;
-        flex-wrap: wrap;
+        --stat-blue: #2a78d6;
+        --stat-blue-tint: rgba(42, 120, 214, .12);
+        --stat-violet: #4a3aa7;
+        --stat-violet-tint: rgba(74, 58, 167, .12);
+        --stat-orange: #eb6834;
+        --stat-orange-tint: rgba(235, 104, 52, .12);
+        --stat-green: #0ca30c;
+        --stat-green-tint: rgba(12, 163, 12, .12);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
         gap: 12px;
-        padding: 16px 18px;
+        padding: 18px;
         border-bottom: 1px solid #edf1f5;
-        background: #fbfdff;
+        background: #f8fafc;
     }
 
     .concession-stat-card {
-        flex: 1 1 150px;
-        min-width: 150px;
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
         background: #fff;
         border: 1px solid #e5eaf1;
+        border-radius: 12px;
+        padding: 14px 16px 14px 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .concession-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(15, 23, 42, .08);
+    }
+
+    .concession-stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--stat-accent, var(--stat-blue));
+    }
+
+    .concession-stat-card .concession-stat-icon {
+        flex: 0 0 auto;
+        width: 38px;
+        height: 38px;
         border-radius: 10px;
-        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        color: var(--stat-accent, var(--stat-blue));
+        background: var(--stat-accent-tint, var(--stat-blue-tint));
+    }
+
+    .concession-stat-card .concession-stat-body {
+        min-width: 0;
     }
 
     .concession-stat-card .concession-stat-label {
@@ -302,13 +347,34 @@
         text-transform: uppercase;
         letter-spacing: .04em;
         font-weight: 700;
+        line-height: 1.3;
     }
 
     .concession-stat-card .concession-stat-value {
-        margin-top: 6px;
-        font-size: 20px;
+        margin-top: 4px;
+        font-size: 21px;
         font-weight: 700;
         color: #1f2937;
+    }
+
+    .concession-stat-card--blue {
+        --stat-accent: var(--stat-blue);
+        --stat-accent-tint: var(--stat-blue-tint);
+    }
+
+    .concession-stat-card--violet {
+        --stat-accent: var(--stat-violet);
+        --stat-accent-tint: var(--stat-violet-tint);
+    }
+
+    .concession-stat-card--orange {
+        --stat-accent: var(--stat-orange);
+        --stat-accent-tint: var(--stat-orange-tint);
+    }
+
+    .concession-stat-card--green {
+        --stat-accent: var(--stat-green);
+        --stat-accent-tint: var(--stat-green-tint);
     }
 
     .concession-widget__table-wrap {
@@ -357,6 +423,70 @@
             justify-content: flex-start;
         }
     }
+
+    /* Quick-stat cards (Student / Monthly Fees Collection / Staff Present Today / Student Present Today) */
+    .dashboard-quick-stats .topprograssstart {
+        --qs-accent: #2a78d6;
+        --qs-accent-tint: rgba(42, 120, 214, .12);
+        position: relative;
+        border-left: 4px solid var(--qs-accent);
+        overflow: hidden;
+    }
+
+    .dashboard-quick-stats .topprograssstart p.text-uppercase {
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .03em;
+        color: #6b7280;
+    }
+
+    .dashboard-quick-stats .topprograssstart .ftlayer {
+        flex: 0 0 auto;
+        width: 30px;
+        height: 30px;
+        line-height: 30px !important;
+        border-radius: 8px;
+        box-shadow: none;
+        background: var(--qs-accent-tint) !important;
+        color: var(--qs-accent) !important;
+        font-size: 13px;
+        margin-right: 10px;
+    }
+
+    .dashboard-quick-stats .topprograssstart p .pull-right {
+        margin-left: auto;
+        padding-left: 8px;
+        font-size: 19px;
+        font-weight: 700;
+        color: #1f2937;
+        letter-spacing: 0;
+    }
+
+    .dashboard-quick-stats .topprograssstart .progress-bar {
+        background: var(--qs-accent) !important;
+    }
+
+    .dashboard-quick-stats .topprograssstart--blue {
+        --qs-accent: #2a78d6;
+        --qs-accent-tint: rgba(42, 120, 214, .12);
+    }
+
+    .dashboard-quick-stats .topprograssstart--green {
+        --qs-accent: #0ca30c;
+        --qs-accent-tint: rgba(12, 163, 12, .12);
+    }
+
+    .dashboard-quick-stats .topprograssstart--orange {
+        --qs-accent: #eb6834;
+        --qs-accent-tint: rgba(235, 104, 52, .12);
+    }
+
+    .dashboard-quick-stats .topprograssstart--violet {
+        --qs-accent: #4a3aa7;
+        --qs-accent-tint: rgba(74, 58, 167, .12);
+    }
 </style>
 
 <div class="content-wrapper">
@@ -399,7 +529,7 @@ foreach ($notifications as $notice_key => $notice_value) {
 }
 ?>
         </div>
-        <div class="row">
+        <div class="row dashboard-quick-stats">
             <?php
 /*
 if ($this->module_lib->hasActive('expense') && $this->rbac->hasPrivilege('monthly_expense_widget', 'can_view')) {
@@ -421,7 +551,7 @@ if ($this->module_lib->hasActive('expense') && $this->rbac->hasPrivilege('monthl
 if ($this->rbac->hasPrivilege('student_count_widget', 'can_view')) {
     ?>
                 <div class="<?php echo $std_graphclass; ?>">
-                    <div class="topprograssstart">
+                    <div class="topprograssstart topprograssstart--blue">
                         <p class="text-uppercase mt5 clearfix"><i class="fa fa-user ftlayer"></i><?php echo $this->lang->line('student'); ?><span class="pull-right"><?php echo $total_students; ?></span>
                         </p>
                         <div class="progress-group">
@@ -437,7 +567,7 @@ if ($this->rbac->hasPrivilege('student_count_widget', 'can_view')) {
 if ($this->module_lib->hasActive('fees_collection') && $this->rbac->hasPrivilege('Monthly fees_collection_widget', 'can_view')) {
     ?>
                 <div class="<?php echo $std_graphclass; ?>">
-                    <div class="topprograssstart">
+                    <div class="topprograssstart topprograssstart--green">
                         <p class="text-uppercase mt5 clearfix"><i class="fa fa-money ftlayer"></i><?php echo $this->lang->line('monthly_fees_collection'); ?><span class="pull-right"><?php echo $currency_symbol . amountFormat((float) $month_collection); ?></span>
                         </p>
                         <div class="progress-group">
@@ -453,7 +583,7 @@ if ($this->module_lib->hasActive('fees_collection') && $this->rbac->hasPrivilege
 if ($this->rbac->hasPrivilege('staff_present_today_widegts', 'can_view')) {
     ?>
                 <div class="<?php echo $std_graphclass; ?>">
-                    <div class="topprograssstart">
+                    <div class="topprograssstart topprograssstart--orange">
                         <p class="text-uppercase mt5 clearfix"><i class="fa fa-calendar-check-o ftlayer"></i><?php echo $this->lang->line('staff_present_today'); ?><span class="pull-right"><?php echo $Staffattendence_data + 0; ?>/<?php echo $getTotalStaff_data; ?></span>
                         </p>
                         <div class="progress-group">
@@ -469,7 +599,7 @@ if ($this->module_lib->hasActive('student_attendance') && $sch_setting->attenden
     if ($this->rbac->hasPrivilege('student_present_today_widegts', 'can_view')) {
         ?>
                     <div class="<?php echo $std_graphclass; ?>">
-                        <div class="topprograssstart">
+                        <div class="topprograssstart topprograssstart--violet">
                             <p class="text-uppercase mt5 clearfix"><i class="fa fa-calendar-check-o ftlayer"></i><?php echo $this->lang->line('student_present_today'); ?><span class="pull-right"> <?php echo 0 + $attendence_data['total_half_day'] + $attendence_data['total_late'] + $attendence_data['total_present']; ?>/<?php echo $total_students; ?></span>
                             </p>
                                     <div class="progress-group">
@@ -721,33 +851,68 @@ if ($this->rbac->hasPrivilege('student_report', 'can_view')) {
                             </div>
 
                             <div class="concession-stats">
-                                <div class="concession-stat-card">
-                                    <div class="concession-stat-label">Total Students</div>
-                                    <div class="concession-stat-value"><?php echo (int) $concession_total_students; ?></div>
+                                <div class="concession-stat-card concession-stat-card--blue">
+                                    <div class="concession-stat-icon"><i class="fa fa-users"></i></div>
+                                    <div class="concession-stat-body">
+                                        <div class="concession-stat-label">Total Concession Students</div>
+                                        <div class="concession-stat-value"><?php echo (int) $concession_total_students; ?></div>
+                                    </div>
                                 </div>
-                                <div class="concession-stat-card">
-                                    <div class="concession-stat-label">Total Discount</div>
-                                    <div class="concession-stat-value"><?php echo $currency_symbol . amountFormat((float) $concession_total_discount); ?></div>
+                                <div class="concession-stat-card concession-stat-card--violet">
+                                    <div class="concession-stat-icon"><i class="fa fa-calendar"></i></div>
+                                    <div class="concession-stat-body">
+                                        <div class="concession-stat-label">Monthly Concession Students</div>
+                                        <div class="concession-stat-value"><?php echo (int) $concession_monthly_concession_students; ?></div>
+                                    </div>
                                 </div>
-                                <div class="concession-stat-card">
-                                    <div class="concession-stat-label">Monthly Fee Discount</div>
-                                    <div class="concession-stat-value"><?php echo $currency_symbol . amountFormat((float) $concession_monthly_discount); ?></div>
+                                <div class="concession-stat-card concession-stat-card--orange">
+                                    <div class="concession-stat-icon"><i class="fa fa-graduation-cap"></i></div>
+                                    <div class="concession-stat-body">
+                                        <div class="concession-stat-label">Admission Concession Students</div>
+                                        <div class="concession-stat-value"><?php echo (int) $concession_admission_concession_students; ?></div>
+                                    </div>
                                 </div>
-                                <div class="concession-stat-card">
-                                    <div class="concession-stat-label">Admission Fee Discount</div>
-                                    <div class="concession-stat-value"><?php echo $currency_symbol . amountFormat((float) $concession_admission_discount); ?></div>
+                                <div class="concession-stat-card concession-stat-card--green">
+                                    <div class="concession-stat-icon"><i class="fa fa-star"></i></div>
+                                    <div class="concession-stat-body">
+                                        <div class="concession-stat-label">Fully Free Students</div>
+                                        <div class="concession-stat-value"><?php echo (int) ($concession_free_status_counts['fully_free'] ?? 0); ?></div>
+                                    </div>
                                 </div>
-                                <div class="concession-stat-card">
-                                    <div class="concession-stat-label">Fully Free</div>
-                                    <div class="concession-stat-value"><?php echo (int) ($concession_free_status_counts['fully_free'] ?? 0); ?></div>
+                                <div class="concession-stat-card concession-stat-card--violet">
+                                    <div class="concession-stat-icon"><i class="fa fa-calendar-check-o"></i></div>
+                                    <div class="concession-stat-body">
+                                        <div class="concession-stat-label">Monthly Free Students</div>
+                                        <div class="concession-stat-value"><?php echo (int) ($concession_free_status_counts['monthly_free'] ?? 0); ?></div>
+                                    </div>
                                 </div>
-                                <div class="concession-stat-card">
-                                    <div class="concession-stat-label">Admission Free</div>
-                                    <div class="concession-stat-value"><?php echo (int) ($concession_free_status_counts['admission_free'] ?? 0); ?></div>
+                                <div class="concession-stat-card concession-stat-card--orange">
+                                    <div class="concession-stat-icon"><i class="fa fa-certificate"></i></div>
+                                    <div class="concession-stat-body">
+                                        <div class="concession-stat-label">Admission Free Students</div>
+                                        <div class="concession-stat-value"><?php echo (int) ($concession_free_status_counts['admission_free'] ?? 0); ?></div>
+                                    </div>
                                 </div>
-                                <div class="concession-stat-card">
-                                    <div class="concession-stat-label">Monthly Free</div>
-                                    <div class="concession-stat-value"><?php echo (int) ($concession_free_status_counts['monthly_free'] ?? 0); ?></div>
+                                <div class="concession-stat-card concession-stat-card--blue">
+                                    <div class="concession-stat-icon"><i class="fa fa-money"></i></div>
+                                    <div class="concession-stat-body">
+                                        <div class="concession-stat-label">Total Concession Amount</div>
+                                        <div class="concession-stat-value"><?php echo $currency_symbol . amountFormat((float) $concession_total_discount); ?></div>
+                                    </div>
+                                </div>
+                                <div class="concession-stat-card concession-stat-card--violet">
+                                    <div class="concession-stat-icon"><i class="fa fa-money"></i></div>
+                                    <div class="concession-stat-body">
+                                        <div class="concession-stat-label">Monthly Concession Amount</div>
+                                        <div class="concession-stat-value"><?php echo $currency_symbol . amountFormat((float) $concession_monthly_discount); ?></div>
+                                    </div>
+                                </div>
+                                <div class="concession-stat-card concession-stat-card--orange">
+                                    <div class="concession-stat-icon"><i class="fa fa-money"></i></div>
+                                    <div class="concession-stat-body">
+                                        <div class="concession-stat-label">Admission Concession Amount</div>
+                                        <div class="concession-stat-value"><?php echo $currency_symbol . amountFormat((float) $concession_admission_discount); ?></div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -760,12 +925,13 @@ if ($this->rbac->hasPrivilege('student_report', 'can_view')) {
                                                 <th>Section</th>
                                                 <th class="text-center">Boys</th>
                                                 <th class="text-center">Girls</th>
-                                                <th class="text-center">Fully Free</th>
-                                                <th class="text-center">Admission Free</th>
-                                                <th class="text-center">Monthly Free</th>
-                                                <th class="text-center">Concession</th>
-                                                <th class="text-center">Total Students</th>
-                                                <th class="text-right">Total Discount</th>
+                                                <th class="text-center">Fully Free Students</th>
+                                                <th class="text-center">Monthly Free Students</th>
+                                                <th class="text-center">Admission Free Students</th>
+                                                <th class="text-center">Monthly Concession Students</th>
+                                                <th class="text-center">Admission Concession Students</th>
+                                                <th class="text-center">Total Concession Students</th>
+                                                <th class="text-right">Total Concession Amount</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -776,9 +942,10 @@ if ($this->rbac->hasPrivilege('student_report', 'can_view')) {
                                                     <td class="text-center"><?php echo (int) $class_row['boys']; ?></td>
                                                     <td class="text-center"><?php echo (int) $class_row['girls']; ?></td>
                                                     <td class="text-center"><?php echo (int) $class_row['fully_free']; ?></td>
-                                                    <td class="text-center"><?php echo (int) $class_row['admission_free']; ?></td>
                                                     <td class="text-center"><?php echo (int) $class_row['monthly_free']; ?></td>
-                                                    <td class="text-center"><?php echo (int) $class_row['concession']; ?></td>
+                                                    <td class="text-center"><?php echo (int) $class_row['admission_free']; ?></td>
+                                                    <td class="text-center"><?php echo (int) $class_row['monthly_concession_students']; ?></td>
+                                                    <td class="text-center"><?php echo (int) $class_row['admission_concession_students']; ?></td>
                                                     <td class="text-center"><strong><?php echo (int) $class_row['total_students']; ?></strong></td>
                                                     <td class="text-right"><?php echo $currency_symbol . amountFormat((float) $class_row['total_discount_amount']); ?></td>
                                                 </tr>
@@ -786,13 +953,15 @@ if ($this->rbac->hasPrivilege('student_report', 'can_view')) {
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th colspan="2">Total</th>
+                                                <th>Total</th>
+                                                <th></th>
                                                 <th class="text-center"><?php echo (int) array_sum(array_column($concession_class_wise, 'boys')); ?></th>
                                                 <th class="text-center"><?php echo (int) array_sum(array_column($concession_class_wise, 'girls')); ?></th>
                                                 <th class="text-center"><?php echo (int) ($concession_free_status_counts['fully_free'] ?? 0); ?></th>
-                                                <th class="text-center"><?php echo (int) ($concession_free_status_counts['admission_free'] ?? 0); ?></th>
                                                 <th class="text-center"><?php echo (int) ($concession_free_status_counts['monthly_free'] ?? 0); ?></th>
-                                                <th class="text-center"><?php echo (int) ($concession_free_status_counts['concession'] ?? 0); ?></th>
+                                                <th class="text-center"><?php echo (int) ($concession_free_status_counts['admission_free'] ?? 0); ?></th>
+                                                <th class="text-center"><?php echo (int) $concession_monthly_concession_students; ?></th>
+                                                <th class="text-center"><?php echo (int) $concession_admission_concession_students; ?></th>
                                                 <th class="text-center"><?php echo (int) $concession_total_students; ?></th>
                                                 <th class="text-right"><?php echo $currency_symbol . amountFormat((float) $concession_total_discount); ?></th>
                                             </tr>
@@ -1540,7 +1709,23 @@ if ($this->rbac->hasPrivilege('fees_collection_and_expense_yearly_chart', 'can_v
 
     });
 
+    <?php if (!empty($concession_class_wise)) { ?>
     if ($('#concessionClassWiseTable').length) {
+        // Overview card totals, repeated here so the Excel export can carry
+        // them as a summary block above the class/section-wise table.
+        var concessionOverviewSummary = [
+            ['Total Concession Students', '<?php echo (int) $concession_total_students; ?>'],
+            ['Monthly Concession Students', '<?php echo (int) $concession_monthly_concession_students; ?>'],
+            ['Admission Concession Students', '<?php echo (int) $concession_admission_concession_students; ?>'],
+            ['Fully Free Students', '<?php echo (int) ($concession_free_status_counts['fully_free'] ?? 0); ?>'],
+            ['Monthly Free Students', '<?php echo (int) ($concession_free_status_counts['monthly_free'] ?? 0); ?>'],
+            ['Admission Free Students', '<?php echo (int) ($concession_free_status_counts['admission_free'] ?? 0); ?>'],
+            ['Total Concession Amount', '<?php echo addslashes($currency_symbol . amountFormat((float) $concession_total_discount)); ?>'],
+            ['Monthly Concession Amount', '<?php echo addslashes($currency_symbol . amountFormat((float) $concession_monthly_discount)); ?>'],
+            ['Admission Concession Amount', '<?php echo addslashes($currency_symbol . amountFormat((float) $concession_admission_discount)); ?>'],
+            ['', '']
+        ];
+
         var concessionClassWiseTable = $('#concessionClassWiseTable').DataTable({
             dom: 'Bfrtip',
             buttons: [
@@ -1551,6 +1736,46 @@ if ($this->rbac->hasPrivilege('fees_collection_and_expense_yearly_chart', 'can_v
                     className: 'btn btn-success',
                     exportOptions: {
                         footer: true
+                    },
+                    customize: function (xlsx) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        var extraRows = concessionOverviewSummary.length;
+
+                        // Push every existing row (and its cells' cell references)
+                        // down to make room for the summary block at the top.
+                        $('row', sheet).each(function () {
+                            var $row = $(this);
+                            var newR = parseInt($row.attr('r'), 10) + extraRows;
+                            $row.attr('r', newR);
+                            $('c', $row).each(function () {
+                                var $cell = $(this);
+                                var match = /^([A-Z]+)(\d+)$/.exec($cell.attr('r'));
+                                if (match) {
+                                    $cell.attr('r', match[1] + newR);
+                                }
+                            });
+                        });
+
+                        // Build the "Concession Students Overview" summary rows.
+                        var newRowsXml = '';
+                        $.each(concessionOverviewSummary, function (i, pair) {
+                            var r = i + 1;
+                            newRowsXml += '<row r="' + r + '">';
+                            if (pair[0] !== '') {
+                                newRowsXml += '<c r="A' + r + '" t="inlineStr"><is><t xml:space="preserve">' + pair[0] + '</t></is></c>';
+                            }
+                            if (pair[1] !== '') {
+                                newRowsXml += '<c r="B' + r + '" t="inlineStr"><is><t xml:space="preserve">' + pair[1] + '</t></is></c>';
+                            }
+                            newRowsXml += '</row>';
+                        });
+                        $('sheetData', sheet).prepend(newRowsXml);
+
+                        var dimension = $('dimension', sheet);
+                        var dimMatch = dimension.length ? /^([A-Z]+\d+):([A-Z]+)(\d+)$/.exec(dimension.attr('ref')) : null;
+                        if (dimMatch) {
+                            dimension.attr('ref', 'A1:' + dimMatch[2] + (parseInt(dimMatch[3], 10) + extraRows));
+                        }
                     }
                 }
             ],
@@ -1566,6 +1791,7 @@ if ($this->rbac->hasPrivilege('fees_collection_and_expense_yearly_chart', 'can_v
             concessionClassWiseTable.button('.buttons-excel').trigger();
         });
     }
+    <?php } ?>
 
 });
 </script>

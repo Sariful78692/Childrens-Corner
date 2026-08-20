@@ -30,6 +30,40 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
     .summary-strip strong {
         font-size: 18px;
     }
+
+    .reason-strip {
+        border: 1px solid #bcdff1;
+        background: #eef8fd;
+        border-radius: 4px;
+        padding: 14px 16px;
+        margin-bottom: 15px;
+    }
+
+    .reason-strip .reason-label {
+        color: #6c757d;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+
+    .reason-strip .reason-value {
+        font-size: 18px;
+        font-weight: 700;
+        margin-top: 4px;
+    }
+
+    .label-skipped {
+        background: #5cb85c;
+    }
+
+    .label-active {
+        background: #d9534f;
+    }
+
+    .fee-note {
+        margin-top: 8px;
+        font-style: italic;
+    }
 </style>
 
 <div class="content-wrapper">
@@ -46,6 +80,11 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                         </div>
                     </div>
                     <div class="box-body">
+                        <div class="reason-strip">
+                            <div class="reason-label">Why Included / Concession Reason</div>
+                            <div class="reason-value"><?php echo html_escape($concession_reason); ?></div>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="detail-card">
@@ -63,14 +102,11 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                             <div class="col-md-6">
                                 <div class="detail-card">
                                     <h4>Concession Summary</h4>
+                                    <div class="meta-line"><strong>Status:</strong> <?php echo html_escape($free_status_label); ?></div>
+                                    <div class="meta-line"><strong>Why Included:</strong> <?php echo html_escape($concession_reason); ?></div>
                                     <div class="meta-line"><strong>Main/Class Fees Total:</strong> <?php echo $currency_symbol . amountFormat($total_standard_fee); ?></div>
                                     <div class="meta-line"><strong>Student Actual Fees Total:</strong> <?php echo $currency_symbol . amountFormat($total_student_fee); ?></div>
                                     <div class="meta-line"><strong>Total Discount Amount:</strong> <?php echo $currency_symbol . amountFormat($total_discount_amount); ?></div>
-                                    <?php if (!empty($fully_free)) { ?>
-                                        <div class="meta-line"><strong>Discount Breakdown:</strong> Fully Free</div>
-                                    <?php } elseif (!empty($admission_free)) { ?>
-                                        <div class="meta-line"><strong>Discount Breakdown:</strong> Admission Free</div>
-                                    <?php } ?>
                                     <div class="meta-line"><strong>Fee Items:</strong> <?php echo count($fee_details); ?></div>
                                 </div>
                             </div>
@@ -78,7 +114,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 
                         <div class="summary-strip">
                             <strong>Detailed Fee Comparison</strong>
-                            <div class="text-muted">This view compares the original class fees with the actual fees assigned to the student for each admission or monthly fee item.</div>
+                            <div class="text-muted">Admission fee items are listed individually as Skipped or Active. Monthly fee items are listed without an individual status — skipped monthly fees are excluded entirely and never priced; only active monthly fees are used to calculate the concession.</div>
                         </div>
 
                         <div class="table-responsive">
@@ -86,10 +122,11 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                 <thead>
                                     <tr>
                                         <th style="width: 5%;">#</th>
-                                        <th>Fee Type</th>
+                                        <th>Fee Name</th>
                                         <th>Category</th>
-                                        <th class="text-right">Original/Main Fees</th>
-                                        <th class="text-right">Student Actual Fees</th>
+                                        <th class="text-center">Admission Status</th>
+                                        <th class="text-right">Standard Fee</th>
+                                        <th class="text-right">Student Fee</th>
                                         <th class="text-right">Discount Amount</th>
                                     </tr>
                                 </thead>
@@ -101,29 +138,41 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                 <td><?php echo $count; ?></td>
                                                 <td><?php echo $detail['fee_type']; ?></td>
                                                 <td><?php echo ((int) $detail['is_monthly'] === 1) ? 'Monthly' : 'Admission'; ?></td>
+                                                <td class="text-center">
+                                                    <?php if ($detail['is_admission_skipped'] === true) { ?>
+                                                        <span class="label label-skipped">Skipped</span>
+                                                    <?php } elseif ($detail['is_admission_skipped'] === false) { ?>
+                                                        <span class="label label-active">Active</span>
+                                                    <?php } ?>
+                                                </td>
                                                 <td class="text-right"><?php echo $currency_symbol . amountFormat($detail['standard_fee']); ?></td>
-                                                <td class="text-right"><?php echo $currency_symbol . amountFormat($detail['student_fee']); ?></td>
-                                                <td class="text-right"><?php echo $currency_symbol . amountFormat($detail['discount_amount']); ?></td>
+                                                <td class="text-right">
+                                                    <?php echo ($detail['display_student_fee'] === null) ? '&mdash;' : $currency_symbol . amountFormat($detail['display_student_fee']); ?>
+                                                </td>
+                                                <td class="text-right">
+                                                    <?php echo ($detail['display_discount_amount'] === null) ? '&mdash;' : $currency_symbol . amountFormat($detail['display_discount_amount']); ?>
+                                                </td>
                                             </tr>
                                             <?php $count++; ?>
                                         <?php } ?>
                                     <?php } else { ?>
                                         <tr>
-                                            <td colspan="6" class="text-center">
-                                                <?php echo !empty($fully_free) ? 'Fully Free' : (!empty($admission_free) ? 'Admission Free' : 'No active concession fees found.'); ?>
-                                            </td>
+                                            <td colspan="7" class="text-center">No concession fee items found.</td>
                                         </tr>
                                     <?php } ?>
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th colspan="3" class="text-right">Grand Total</th>
+                                        <th colspan="4" class="text-right">Grand Total</th>
                                         <th class="text-right"><?php echo $currency_symbol . amountFormat($total_standard_fee); ?></th>
                                         <th class="text-right"><?php echo $currency_symbol . amountFormat($total_student_fee); ?></th>
                                         <th class="text-right"><?php echo $currency_symbol . amountFormat($total_discount_amount); ?></th>
                                     </tr>
                                 </tfoot>
                             </table>
+                            <?php if (!empty($has_skipped_monthly)) { ?>
+                                <div class="fee-note text-muted">Some monthly fee items for this student are fully skipped and are not listed individually above; they are reflected in the overall "<?php echo html_escape($free_status_label); ?>" status and "<?php echo html_escape($concession_reason); ?>" reason.</div>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
