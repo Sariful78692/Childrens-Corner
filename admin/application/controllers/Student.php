@@ -3846,6 +3846,17 @@ class Student extends Admin_Controller
 
         $students = $this->student_model->getFilteredStudents($params);
 
+        $sch_setting = $this->sch_setting_detail;
+        foreach ($students as &$student) {
+            $student['student_name'] = $this->customlib->getFullName(
+                $student['firstname'],
+                $student['middlename'],
+                $student['lastname'],
+                $sch_setting->middlename,
+                $sch_setting->lastname
+            );
+        }
+
         header('Content-Type: application/json');
         echo json_encode($students);
     }
