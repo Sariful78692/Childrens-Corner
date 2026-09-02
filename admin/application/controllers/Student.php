@@ -26,6 +26,16 @@ class Student extends Admin_Controller
         $this->staff_attendance = $this->config->item('staffattendance');
     }
 
+    private function canHardDeleteStudents()
+    {
+        if ($this->rbac->hasPrivilege('superadmin', 'can_view')) {
+            return true;
+        }
+
+        $admin = $this->session->userdata('admin');
+        return !empty($admin['id']) && $this->staff_model->is_temp_superadmin($admin['id']);
+    }
+
     public function index()
     {
         $data['title']       = 'Student List';
@@ -86,10 +96,25 @@ class Student extends Admin_Controller
 
         $data['marks_division'] = $this->marksdivision_model->get();
 
-        $data['title']     = $this->lang->line('student_details');
-        $student           = $this->student_model->get($id);
+        $data['title'] = $this->lang->line('student_details');
+        $student       = ctype_digit((string) $id) ? $this->student_model->get((int) $id) : array();
+
+        // A hard-deleted student (or a malformed/non-existent ID) must not
+        // continue into the profile's dependent fee, attendance, and exam queries.
+        if (empty($student) || empty($student['student_session_id'])) {
+            $this->session->set_flashdata('student_notice', 'Student profile was deleted permanently.');
+            redirect('student/search');
+            return;
+        }
+
+        $studentSession = $this->student_model->getStudentSession((int) $id);
+        if (empty($studentSession)) {
+            $this->session->set_flashdata('student_notice', 'Student profile was deleted permanently.');
+            redirect('student/search');
+            return;
+        }
+
         $data['gradeList'] = $this->grade_model->get();
-        $studentSession    = $this->student_model->getStudentSession($id);
 
         $data["timeline_list"] = $this->timeline_model->getStudentTimeline($id, $status = '');
 
@@ -259,7 +284,7 @@ class Student extends Admin_Controller
 
         $data['reason'] = $this->disable_reason_model->get();
 
-        if ($student['is_active'] = 'no') {
+        if ($student['is_active'] === 'no') {
             $data['reason_data'] = $this->disable_reason_model->get($student['dis_reason']);
         }
 
@@ -441,11 +466,28 @@ class Student extends Admin_Controller
 
     public function delete($id)
     {
-        if (!$this->rbac->hasPrivilege('student', 'can_delete')) {
+        if ($this->input->method(true) !== 'POST') {
+            show_error('Method Not Allowed', 405);
+        }
+
+        if (!$this->canHardDeleteStudents()) {
             access_denied();
         }
-        $this->student_model->remove($id);
-        $this->session->set_flashdata('msg', '<i class="fa fa-check-square-o" aria-hidden="true"></i> ' . $this->lang->line('delete_message') . '');
+
+        $id          = (int) $id;
+        $confirmation = trim($this->input->post('confirm_reg_no', true));
+        $student      = $this->student_model->getHardDeleteEligibility($id);
+
+        if (empty($student) || $confirmation !== (string) $id) {
+            $this->session->set_flashdata('error_msg', 'Deletion cancelled: the Reg no. confirmation did not match.');
+        } elseif ($student['collected_fees'] > 0) {
+            $this->session->set_flashdata('error_msg', 'Deletion is blocked because this student has collected fees.');
+        } elseif ($this->student_model->hardDelete($id)) {
+            $this->session->set_flashdata('success_msg', 'Student and related records were permanently deleted.');
+        } else {
+            $this->session->set_flashdata('error_msg', 'Student could not be deleted. No data was removed.');
+        }
+
         redirect('student/search');
     }
 
@@ -2732,6 +2774,7 @@ class Student extends Admin_Controller
         $data['currentSession'] = $this->setting_model->getCurrentSession();
 
         $data['sessionlist'] = $this->session_model->get();
+        $data['can_hard_delete_students'] = $this->canHardDeleteStudents();
 
         /* print_r($data['currentSession']);
         die; */
@@ -3267,6 +3310,7 @@ class Student extends Admin_Controller
 
         $dt_data = array();
         $fields  = $this->customfield_model->get_custom_fields('students', 1);
+        $is_superadmin = $this->canHardDeleteStudents();
         /* echo "<pre>";
         print_r($students->data);
         die; */
@@ -3282,6 +3326,8 @@ class Student extends Admin_Controller
                     ? "<i class='fa fa-wifi text-success' title='Online Register'></i>"
                     : "<i class='fa fa-plug text-danger' title='Offline Register'></i>";
 
+                $student_name = $this->customlib->getFullName($student->firstname, $student->middlename, $student->lastname, $sch_setting->middlename, $sch_setting->lastname);
+
                 $viewbtn = "<a href='" . base_url("student/view/" . $student->id) . "' class='btn btn-primary btn-xs btn-rounded mr-3' data-toggle='tooltip' title='" . $this->lang->line('view') . "'><i class='fa fa-eye'></i></a>";
 
                 $editbtn = "";
@@ -3294,11 +3340,13 @@ class Student extends Admin_Controller
                     $collectbtn = "<a href='" . base_url("studentfee/addfees/" . $student->id . "?session_id=" . $student->session_id) . "' class='btn btn-success btn-xs btn-rounded' data-toggle='tooltip' title='" . $this->lang->line('add_fees') . "'><i class='fa fa-money'></i></a>";
                 }
 
+                if ($is_superadmin && (float) $student->collected_fees === 0.0) {
+                    $deletebtn = "<button type='button' class='btn btn-danger btn-xs btn-rounded hard-delete-student' data-student-id='" . (int) $student->id . "' data-reg-no='" . (int) $student->id . "' data-student-name='" . html_escape($student_name) . "' title='Permanently delete student' data-toggle='tooltip'><i class='fa fa-trash'></i></button>";
+                }
+
 
                 $row   = array();
                 $row[] = $student->id;
-
-                $student_name = $this->customlib->getFullName($student->firstname, $student->middlename, $student->lastname, $sch_setting->middlename, $sch_setting->lastname);
 
                 $row[] = "<a href='" . base_url("student/view/" . $student->id) . "'>" . $online_icon . " " . $student_name . "</a>";
 
@@ -3341,7 +3389,7 @@ class Student extends Admin_Controller
                     $row[] = $display_field;
                 }
 
-                $row[] = $viewbtn . '' . $editbtn . '' . $collectbtn;
+                $row[] = $viewbtn . '' . $editbtn . '' . $collectbtn . '' . $deletebtn;
 
                 $dt_data[] = $row;
             }

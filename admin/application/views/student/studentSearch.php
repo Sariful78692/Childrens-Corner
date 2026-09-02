@@ -87,6 +87,13 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                     </div>
                     <div class="box-body">
 
+                        <?php if ($this->session->flashdata('student_notice')) { ?>
+                            <div class="alert alert-danger alert-dismissible">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <i class="fa fa-info-circle"></i> <?php echo html_escape($this->session->flashdata('student_notice')); ?>
+                            </div>
+                        <?php } ?>
+
                         <?php if ($this->session->flashdata('msg')) {
                             echo '<div class="alert alert-success">' . $this->session->flashdata('msg') . '</div>';
                             $this->session->unset_userdata('msg');
@@ -318,6 +325,34 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
         </div>
     </section>
 </div>
+
+<?php if (!empty($can_hard_delete_students)) { ?>
+<div class="modal fade" id="hardDeleteStudentModal" tabindex="-1" role="dialog" aria-labelledby="hardDeleteStudentModalLabel">
+    <div class="modal-dialog" role="document">
+        <form id="hardDeleteStudentForm" method="post">
+            <div class="modal-content">
+                <div class="modal-header bg-red">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="hardDeleteStudentModalLabel"><i class="fa fa-warning"></i> Permanently delete student</h4>
+                </div>
+                <div class="modal-body">
+                    <p>This permanently deletes the student and related records. This cannot be undone.</p>
+                    <p><strong id="hardDeleteStudentName"></strong></p>
+                    <p>To continue, type this exact <strong>Reg no.</strong>: <strong id="hardDeleteRegNo"></strong></p>
+                    <div class="form-group">
+                        <label for="hardDeleteRegNoInput">Reg no. confirmation</label>
+                        <input type="text" class="form-control" id="hardDeleteRegNoInput" name="confirm_reg_no" autocomplete="off" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" id="hardDeleteSubmit" class="btn btn-danger" disabled>Permanently Delete</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<?php } ?>
 
 <script type="text/javascript">
     function getSectionByClass(class_id, section_id) {
@@ -673,4 +708,23 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
             $('#search_text').val("");
         }
     }
+</script>
+
+<script type="text/javascript">
+    $(document).on('click', '.hard-delete-student', function () {
+        var button = $(this);
+        var regNo = String(button.data('reg-no'));
+
+        $('#hardDeleteStudentName').text(button.data('student-name'));
+        $('#hardDeleteRegNo').text(regNo);
+        $('#hardDeleteRegNoInput').val('');
+        $('#hardDeleteSubmit').prop('disabled', true);
+        $('#hardDeleteStudentForm').attr('action', '<?php echo site_url('student/delete'); ?>/' + encodeURIComponent(button.data('student-id')));
+        $('#hardDeleteStudentModal').modal('show');
+    });
+
+    $('#hardDeleteRegNoInput').on('input', function () {
+        var expectedRegNo = $.trim($('#hardDeleteRegNo').text());
+        $('#hardDeleteSubmit').prop('disabled', $.trim($(this).val()) !== expectedRegNo);
+    });
 </script>

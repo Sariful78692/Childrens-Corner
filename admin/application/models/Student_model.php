@@ -1132,6 +1132,97 @@ class Student_model extends MY_Model
         return $query->result();
     }
 
+    public function getHardDeleteEligibility($student_id)
+    {
+        $student = $this->db->select('id, admission_no, firstname, middlename, lastname')
+            ->where('id', $student_id)
+            ->get('students')
+            ->row_array();
+
+        if (empty($student)) {
+            return null;
+        }
+
+        // Pending approvals are still money collected from the student, so they
+        // also block a hard deletion. Refunded payments do not.
+        $student['collected_fees'] = (float) $this->db
+            ->select_sum('paid_amount', 'total')
+            ->where('student_id', $student_id)
+            ->where('is_refunded', 0)
+            ->get('student_fees_collections')
+            ->row()
+            ->total;
+
+        return $student;
+    }
+
+    public function hardDelete($student_id)
+    {
+        $eligibility = $this->getHardDeleteEligibility($student_id);
+        if (empty($eligibility) || $eligibility['collected_fees'] > 0) {
+            return false;
+        }
+
+        $this->db->trans_begin();
+
+        $this->db->query('CREATE TEMPORARY TABLE tmp_student_sessions AS SELECT id FROM student_session WHERE student_id = ' . (int) $student_id);
+        $this->db->query('CREATE TEMPORARY TABLE tmp_fee_masters AS SELECT id FROM student_fees_master WHERE student_session_id IN (SELECT id FROM tmp_student_sessions)');
+        $this->db->query('CREATE TEMPORARY TABLE tmp_transport_fees AS SELECT id FROM student_transport_fees WHERE student_session_id IN (SELECT id FROM tmp_student_sessions)');
+        $this->db->query('CREATE TEMPORARY TABLE tmp_fee_management AS SELECT id FROM student_fees_management WHERE student_id = ' . (int) $student_id . ' OR student_session_id IN (SELECT id FROM tmp_student_sessions)');
+        $this->db->query('CREATE TEMPORARY TABLE tmp_online_exam_students AS SELECT id FROM onlineexam_students WHERE student_session_id IN (SELECT id FROM tmp_student_sessions)');
+        $this->db->query('CREATE TEMPORARY TABLE tmp_exam_batch_students AS SELECT id FROM exam_group_class_batch_exam_students WHERE student_id = ' . (int) $student_id . ' OR student_session_id IN (SELECT id FROM tmp_student_sessions)');
+        $this->db->query('CREATE TEMPORARY TABLE tmp_exam_group_students AS SELECT id FROM exam_group_students WHERE student_id = ' . (int) $student_id . ' OR student_session_id IN (SELECT id FROM tmp_student_sessions)');
+        $this->db->query('CREATE TEMPORARY TABLE tmp_parent_users AS SELECT DISTINCT u.id FROM users u LEFT JOIN students s ON s.parent_id = u.id WHERE s.id = ' . (int) $student_id . ' OR FIND_IN_SET(' . (int) $student_id . ", REPLACE(u.childs, ' ', ''))");
+
+        $this->db->query('DELETE FROM onlineexam_attempts WHERE onlineexam_student_id IN (SELECT id FROM tmp_online_exam_students)');
+        $this->db->query('DELETE FROM onlineexam_student_results WHERE onlineexam_student_id IN (SELECT id FROM tmp_online_exam_students)');
+        $this->db->query('DELETE FROM onlineexam_students WHERE id IN (SELECT id FROM tmp_online_exam_students)');
+        $this->db->query('DELETE r FROM exam_group_exam_results r LEFT JOIN tmp_exam_batch_students b ON b.id = r.exam_group_class_batch_exam_student_id LEFT JOIN tmp_exam_group_students g ON g.id = r.exam_group_student_id WHERE b.id IS NOT NULL OR g.id IS NOT NULL');
+        $this->db->query('DELETE FROM exam_group_class_batch_exam_students WHERE id IN (SELECT id FROM tmp_exam_batch_students)');
+        $this->db->query('DELETE FROM exam_group_students WHERE id IN (SELECT id FROM tmp_exam_group_students)');
+
+        $this->db->query('DELETE FROM student_fees_processing WHERE student_fees_master_id IN (SELECT id FROM tmp_fee_masters) OR student_transport_fee_id IN (SELECT id FROM tmp_transport_fees)');
+        $this->db->query('DELETE FROM student_fees_deposite WHERE student_fees_master_id IN (SELECT id FROM tmp_fee_masters) OR student_transport_fee_id IN (SELECT id FROM tmp_transport_fees)');
+        $this->db->query('DELETE FROM offline_fees_payments WHERE student_session_id IN (SELECT id FROM tmp_student_sessions) OR student_fees_master_id IN (SELECT id FROM tmp_fee_masters) OR student_transport_fee_id IN (SELECT id FROM tmp_transport_fees)');
+        $this->db->query('DELETE FROM student_fees_collections WHERE student_id = ' . (int) $student_id . ' OR student_session_id IN (SELECT id FROM tmp_student_sessions) OR student_fees_management_id IN (SELECT id FROM tmp_fee_management)');
+        $this->db->query('DELETE FROM student_fees_management WHERE id IN (SELECT id FROM tmp_fee_management)');
+        $this->db->query('DELETE FROM student_fees_master WHERE id IN (SELECT id FROM tmp_fee_masters)');
+        $this->db->query('DELETE FROM student_transport_fees WHERE id IN (SELECT id FROM tmp_transport_fees)');
+        $this->db->query('DELETE FROM student_fees WHERE student_session_id IN (SELECT id FROM tmp_student_sessions)');
+        $this->db->query('DELETE FROM student_fees_discounts WHERE student_session_id IN (SELECT id FROM tmp_student_sessions)');
+
+        $session_tables = array('student_attendences', 'student_subject_attendances', 'student_applyleave', 'daily_assignment', 'visitors_book');
+        foreach ($session_tables as $table) {
+            $this->db->query('DELETE FROM ' . $table . ' WHERE student_session_id IN (SELECT id FROM tmp_student_sessions)');
+        }
+
+        $this->db->query('DELETE FROM homework_evaluation WHERE student_id = ' . (int) $student_id . ' OR student_session_id IN (SELECT id FROM tmp_student_sessions)');
+        foreach (array('submit_assignment', 'marks', 'lesson_plan_forum', 'read_notification', 'share_content_for', 'alumni_students', 'student_doc') as $table) {
+            $this->db->query('DELETE FROM ' . $table . ' WHERE student_id = ' . (int) $student_id);
+        }
+        $this->db->query('DELETE FROM chat_users WHERE student_id = ' . (int) $student_id . ' OR create_student_id = ' . (int) $student_id);
+        $this->db->query('DELETE FROM student_timeline WHERE student_id = ' . (int) $student_id . ' OR created_student_id = ' . (int) $student_id);
+        $this->db->query("DELETE cfv FROM custom_field_values cfv INNER JOIN custom_fields cf ON cf.id = cfv.custom_field_id WHERE cf.belong_to = 'students' AND cfv.belong_table_id = " . (int) $student_id);
+
+        $this->db->query("UPDATE users SET childs = TRIM(BOTH ',' FROM REPLACE(CONCAT(',', childs, ','), CONCAT(',', " . (int) $student_id . ", ','), ',')) WHERE FIND_IN_SET(" . (int) $student_id . ", REPLACE(childs, ' ', ''))");
+        $this->db->query('DELETE FROM student_session WHERE id IN (SELECT id FROM tmp_student_sessions)');
+        $this->db->query("DELETE FROM users WHERE user_id = " . (int) $student_id . " AND role = 'student'");
+        $this->db->query('DELETE u FROM users u INNER JOIN tmp_parent_users p ON p.id = u.id LEFT JOIN students s ON s.parent_id = u.id AND s.id != ' . (int) $student_id . ' WHERE s.id IS NULL');
+        $this->db->where('id', $student_id)->delete('students');
+
+        foreach (array('tmp_parent_users', 'tmp_exam_group_students', 'tmp_exam_batch_students', 'tmp_online_exam_students', 'tmp_fee_management', 'tmp_transport_fees', 'tmp_fee_masters', 'tmp_student_sessions') as $table) {
+            $this->db->query('DROP TEMPORARY TABLE IF EXISTS ' . $table);
+        }
+
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $this->db->trans_commit();
+        return true;
+    }
+
     public function remove($id)
     {
         $this->db->trans_start();
@@ -2392,7 +2483,7 @@ class Student_model extends MY_Model
             $this->datatables->where('students.recommendationNumber IS NOT NULL');
         }
 
-        $this->datatables->select('classes.id AS `class_id`,student_session.id as student_session_id,student_session.session_id,students.id,classes.class,sections.id AS `section_id`,sections.section,students.id,student_session.admission_no, student_session.roll_no,IFNULL(student_session.recommendationNumber, students.recommendationNumber) as recommendationNumber,students.govt_school,students.govt_school_id,students.admission_date,students.firstname,students.middlename,  students.lastname,students.image,students.mobileno,students.email ,students.state,students.city, students.pincode,students.religion,DATE(students.dob) as dob,students.current_address,students.permanent_address,IFNULL(students.category_id, 0) as `category_id`,IFNULL(categories.category, "") as `category`,students.adhar_no,students.samagra_id,students.bank_account_no,students.bank_name,students.ifsc_code , students.guardian_name, students.guardian_relation,students.guardian_phone,students.guardian_address,students.is_active,students.created_at ,students.updated_at,students.father_name,students.app_key,students.parent_app_key,students.rte,students.gender,students.is_online' . $field_variable);
+        $this->datatables->select('classes.id AS `class_id`,student_session.id as student_session_id,student_session.session_id,students.id,classes.class,sections.id AS `section_id`,sections.section,students.id,student_session.admission_no, student_session.roll_no,IFNULL(student_session.recommendationNumber, students.recommendationNumber) as recommendationNumber,students.govt_school,students.govt_school_id,students.admission_date,students.firstname,students.middlename,  students.lastname,students.image,students.mobileno,students.email ,students.state,students.city, students.pincode,students.religion,DATE(students.dob) as dob,students.current_address,students.permanent_address,IFNULL(students.category_id, 0) as `category_id`,IFNULL(categories.category, "") as `category`,students.adhar_no,students.samagra_id,students.bank_account_no,students.bank_name,students.ifsc_code , students.guardian_name, students.guardian_relation,students.guardian_phone,students.guardian_address,students.is_active,students.created_at ,students.updated_at,students.father_name,students.app_key,students.parent_app_key,students.rte,students.gender,students.is_online,(SELECT COALESCE(SUM(sfc.paid_amount), 0) FROM student_fees_collections sfc WHERE sfc.student_id = students.id AND sfc.is_refunded = 0) AS collected_fees' . $field_variable);
         $this->datatables->searchable('students.id,student_session.admission_no,students.full_name,classes.class,students.father_name,students.dob,students.gender,categories.category,students.mobileno,students.govt_school,students.govt_school_id' . $field_variable);
         $this->datatables->join('student_session', 'student_session.student_id = students.id');
         $this->datatables->join('classes', 'student_session.class_id = classes.id');
@@ -2446,7 +2537,7 @@ class Student_model extends MY_Model
         $field_variable = (empty($field_var_array)) ? "" : "," . implode(',', $field_var_array);
         $field_name     = (empty($field_var_array_name)) ? "" : "," . implode(',', $field_var_array_name);
 
-        $this->datatables->select('students.id,classes.id AS `class_id`,student_session.id as student_session_id,classes.class,sections.id AS `section_id`,sections.section,student_session.admission_no, student_session.roll_no,IFNULL(student_session.recommendationNumber, students.recommendationNumber) as recommendationNumber,students.govt_school,students.govt_school_id,students.admission_date,students.firstname,students.middlename,students.lastname,students.image,students.mobileno, students.email ,students.state,students.city,students.pincode,students.religion,DATE(students.dob) as dob ,students.current_address,students.permanent_address,IFNULL(students.category_id, 0) as `category_id`,IFNULL(categories.category, "") as `category`,students.adhar_no,students.samagra_id,students.bank_account_no,students.bank_name, students.ifsc_code ,students.father_name,students.guardian_name, students.guardian_relation,students.guardian_phone,students.guardian_address,students.is_active ,students.created_at ,students.updated_at,students.gender,students.rte,student_session.session_id,students.is_online' . $field_variable);
+        $this->datatables->select('students.id,classes.id AS `class_id`,student_session.id as student_session_id,classes.class,sections.id AS `section_id`,sections.section,student_session.admission_no, student_session.roll_no,IFNULL(student_session.recommendationNumber, students.recommendationNumber) as recommendationNumber,students.govt_school,students.govt_school_id,students.admission_date,students.firstname,students.middlename,students.lastname,students.image,students.mobileno, students.email ,students.state,students.city,students.pincode,students.religion,DATE(students.dob) as dob ,students.current_address,students.permanent_address,IFNULL(students.category_id, 0) as `category_id`,IFNULL(categories.category, "") as `category`,students.adhar_no,students.samagra_id,students.bank_account_no,students.bank_name, students.ifsc_code ,students.father_name,students.guardian_name, students.guardian_relation,students.guardian_phone,students.guardian_address,students.is_active ,students.created_at ,students.updated_at,students.gender,students.rte,student_session.session_id,students.is_online,(SELECT COALESCE(SUM(sfc.paid_amount), 0) FROM student_fees_collections sfc WHERE sfc.student_id = students.id AND sfc.is_refunded = 0) AS collected_fees' . $field_variable);
         $this->datatables->join('student_session', 'student_session.student_id = students.id');
         $this->datatables->join('classes', 'student_session.class_id = classes.id');
         $this->datatables->join('sections', 'sections.id = student_session.section_id');

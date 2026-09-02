@@ -156,22 +156,18 @@ if ($language_name != 'en') {
         if ($this->session->flashdata('success_msg')) {
         ?>
             successMsg("<?php echo $this->session->flashdata('success_msg'); ?>");
-            $this - > session - > unset_userdata('success_msg');
         <?php
         } else if ($this->session->flashdata('error_msg')) {
         ?>
             errorMsg("<?php echo $this->session->flashdata('error_msg'); ?>");
-            $this - > session - > unset_userdata('error_msg');
         <?php
         } else if ($this->session->flashdata('warning_msg')) {
         ?>
             infoMsg("<?php echo $this->session->flashdata('warning_msg'); ?>");
-            $this - > session - > unset_userdata('warning_msg');
         <?php
         } else if ($this->session->flashdata('info_msg')) {
         ?>
             warningMsg("<?php echo $this->session->flashdata('info_msg'); ?>");
-            $this - > session - > unset_userdata('info_msg');
         <?php
         }
         ?>

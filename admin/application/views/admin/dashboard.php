@@ -388,10 +388,12 @@
 
     .concession-widget__table-wrap .dataTables_scrollBody {
         border-top: 0 !important;
+        overflow-x: auto !important;
     }
 
     .concession-widget__table {
         margin-bottom: 0;
+        min-width: 1200px;
     }
 
     .concession-widget__table thead th {
@@ -1783,6 +1785,7 @@ if ($this->rbac->hasPrivilege('fees_collection_and_expense_yearly_chart', 'can_v
             searching: false,
             ordering: false,
             info: false,
+            scrollX: true,
             scrollY: '360px',
             scrollCollapse: true
         });
