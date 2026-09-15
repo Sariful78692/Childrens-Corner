@@ -134,6 +134,7 @@
                                 $opening_cash = 0;
                                 $opening_bank = 0;
                                 $opening_fixed = 0;
+                                $opening_bank_balances = [];
 
                                 if (!empty($opening_balance)) {
                                     foreach ($opening_balance as $bal) {
@@ -141,6 +142,10 @@
                                             $opening_cash +=   $bal['balance'];
                                         } elseif ($bal['method_type_id'] == 2) {
                                             $opening_bank +=   $bal['balance'];
+                                            $opening_bank_balances[] = [
+                                                'name' => $bal['payment_method_name'],
+                                                'balance' => $bal['balance'],
+                                            ];
                                         } elseif ($bal['method_type_id'] == 3) {
                                             $opening_fixed +=   $bal['balance'];
                                         }
@@ -151,7 +156,10 @@
                                     $opening_balance_html .= "<li class='d-flex justify-content-between'><p>CASH: </p> <p class='text-right'>₹" . number_format($opening_cash, 2) . "</p></li>";
                                 endif;
                                 if ($opening_bank > 0) :
-                                    $opening_balance_html .= "<li class='d-flex justify-content-between'><p>BANK: </p> <p class='text-right'>₹" . number_format($opening_bank, 2) . "</p></li>";
+                                    $opening_balance_html .= "<li><p>BANK:</p></li>";
+                                    foreach ($opening_bank_balances as $bank_balance) {
+                                        $opening_balance_html .= "<li class='d-flex justify-content-between'><p>&nbsp;&nbsp;&nbsp;" . html_escape($bank_balance['name']) . ": </p> <p class='text-right'>₹" . number_format($bank_balance['balance'], 2) . "</p></li>";
+                                    }
                                 endif;
 
                                 //$opening_balance_html = "";
@@ -299,6 +307,7 @@
                                 $cash = 0;
                                 $bank = 0;
                                 $fixed = 0;
+                                $closing_bank_balances = [];
 
                                 if (!empty($closing_balance)) {
                                     foreach ($closing_balance as $bal) {
@@ -306,6 +315,10 @@
                                             $cash +=   $bal['balance'];
                                         } elseif ($bal['method_type_id'] == 2) {
                                             $bank +=   $bal['balance'];
+                                            $closing_bank_balances[] = [
+                                                'name' => $bal['payment_method_name'],
+                                                'balance' => $bal['balance'],
+                                            ];
                                         } elseif ($bal['method_type_id'] == 3) {
                                             $fixed +=   $bal['balance'];
                                         }
@@ -315,7 +328,10 @@
                                     $closing_balance_html .= "<li class='d-flex justify-content-between'><p>CASH: </p> <p class='text-right'>₹" . number_format($cash, 2) . "</p></li>";
                                 endif;
                                 if ($bank > 0) :
-                                    $closing_balance_html .= "<li class='d-flex justify-content-between'><p>BANK: </p> <p class='text-right'>₹" . number_format($bank, 2) . "</p></li>";
+                                    $closing_balance_html .= "<li><p>BANK:</p></li>";
+                                    foreach ($closing_bank_balances as $bank_balance) {
+                                        $closing_balance_html .= "<li class='d-flex justify-content-between'><p>&nbsp;&nbsp;&nbsp;" . html_escape($bank_balance['name']) . ": </p> <p class='text-right'>₹" . number_format($bank_balance['balance'], 2) . "</p></li>";
+                                    }
                                 endif;
                                 //if ($payroll_total > 0) :
                                 $net_paid_payroll = $payroll_total - $payroll_refunded;
