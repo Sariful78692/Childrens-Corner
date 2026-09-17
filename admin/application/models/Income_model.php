@@ -94,7 +94,7 @@ class Income_model extends My_Model
 
     public function get($id = null)
     {
-        $this->db->select('income.id,income.date,income.name,income.invoice_no,income.amount,income.payment_method_id,income.documents,income.note,income.created_by,income.is_refunded,income.refund_date,income.refund_note,income_head.income_category,income.income_head_id')->from('income');
+        $this->db->select('income.id,income.date,income.name,income.invoice_no,income.amount,income.payment_method_id,income.documents,income.note,income.created_by,income.account_department_id,income.is_refunded,income.refund_date,income.refund_note,income_head.income_category,income.income_head_id')->from('income');
         $this->db->join('income_head', 'income.income_head_id = income_head.id');
         if ($id != null) {
             $this->db->where('income.id', $id);

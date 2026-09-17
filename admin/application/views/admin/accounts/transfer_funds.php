@@ -13,6 +13,10 @@
                             <div class='alert alert-success'><?php echo $this->session->flashdata('msg'); ?></div>
                             <?php $this->session->unset_userdata('msg'); ?>
                         <?php endif; ?>
+                        <?php if ($this->session->flashdata('error')) : ?>
+                            <div class='alert alert-danger'><?php echo $this->session->flashdata('error'); ?></div>
+                            <?php $this->session->unset_userdata('error'); ?>
+                        <?php endif; ?>
                         <?php if (isset($error_message)) : ?>
                             <div class='alert alert-danger'><?php echo $error_message; ?></div>
                         <?php endif; ?>
@@ -198,7 +202,15 @@
                                                     <td><?= $transfer['to_method']; ?></td>
                                                     <td><?= amountFormat($transfer['amount']); ?></td>
                                                     <td><?= $transfer['description']; ?></td>
-                                                    <td><a class="btn btn-outline-success btn-sm" href="<?php echo base_url('admin/accounts/edit_fund_transfer/') . $transfer['id']; ?>">Edit</a></td>
+                                                    <td>
+                                                        <a class="btn btn-outline-success btn-sm" href="<?php echo base_url('admin/accounts/edit_fund_transfer/') . $transfer['id']; ?>">Edit</a>
+                                                        <?php if ($this->rbac->hasPrivilege('transfer_funds', 'can_delete')) : ?>
+                                                            <form action="<?php echo base_url('admin/accounts/delete_fund_transfer/' . $transfer['id']); ?>" method="post" style="display:inline-block;">
+                                                                <?php echo $this->customlib->getCSRF(); ?>
+                                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('<?php echo $this->lang->line('delete_confirm'); ?>');">Delete</button>
+                                                            </form>
+                                                        <?php endif; ?>
+                                                    </td>
                                                 </tr>
                                             <?php
                                             endforeach;

@@ -85,6 +85,15 @@
                                             <td><strong><?= number_format($opening_balance['cash'], 2) ?></strong></td>
                                             <td><strong><?= number_format($opening_balance['bank'], 2) ?></strong></td>
                                         </tr>
+                                        <?php foreach ($bank_opening_balances as $bank_balance) : ?>
+                                            <tr>
+                                                <td></td>
+                                                <td><strong>Opening Bank - <?= html_escape($bank_balance['name']) ?></strong></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td><strong><?= number_format($bank_balance['balance'], 2) ?></strong></td>
+                                            </tr>
+                                        <?php endforeach; ?>
 
                                         <?php
                                         $previous_date = null;
@@ -296,6 +305,13 @@
                                                 </strong>
                                             </td>
                                         </tr>
+                                        <?php foreach ($bank_closing_balances as $bank_balance) : ?>
+                                            <tr style="background: #efefef;">
+                                                <td colspan="3" style="text-align:right;"><strong>Closing Bank - <?= html_escape($bank_balance['name']) ?>:</strong></td>
+                                                <td></td>
+                                                <td><strong><?= number_format($bank_balance['balance'], 2) ?></strong></td>
+                                            </tr>
+                                        <?php endforeach; ?>
                                     </tfoot>
                                 </table>
                             </div>

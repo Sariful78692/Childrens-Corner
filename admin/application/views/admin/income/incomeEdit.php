@@ -49,7 +49,6 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                         ?>
                                             <option value="<?php echo $inchead['id'] ?>" <?php echo set_select('inc_head_id', $inchead['id'], (set_value('inc_head_id', $income['income_head_id']) ==  $inchead['id'])); ?>><?php echo $inchead['income_category'] ?></option>
                                         <?php
-                                            $count++;
                                         }
                                         ?>
                                     </select>

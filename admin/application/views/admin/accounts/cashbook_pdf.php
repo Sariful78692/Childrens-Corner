@@ -74,6 +74,15 @@
                                     <td><strong><?php echo number_format($opening_balance['cash'], 2) ?></strong></td>
                                     <td><strong><?php echo number_format($opening_balance['bank'], 2) ?></strong></td>
                                 </tr>
+                                <?php foreach ($bank_opening_balances as $bank_balance) : ?>
+                                    <tr>
+                                        <td></td>
+                                        <td><strong>Opening Bank - <?php echo html_escape($bank_balance['name']) ?></strong></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td><strong><?php echo number_format($bank_balance['balance'], 2) ?></strong></td>
+                                    </tr>
+                                <?php endforeach; ?>
 
                                 <?php
                                 $previous_date = null;
@@ -247,6 +256,13 @@
                         <td width="12.5%"><strong><?php echo number_format($closing_cash, 2) ?></strong></td>
                         <td width="12.5%"><strong><?php echo number_format($closing_bank, 2) ?></strong></td>
                     </tr>
+                    <?php foreach ($bank_closing_balances as $bank_balance) : ?>
+                        <tr style="background: #efefef;">
+                            <td width="75%" style="text-align:right;"><strong>Closing Bank - <?php echo html_escape($bank_balance['name']) ?>:</strong></td>
+                            <td width="12.5%"></td>
+                            <td width="12.5%"><strong><?php echo number_format($bank_balance['balance'], 2) ?></strong></td>
+                        </tr>
+                    <?php endforeach; ?>
                 </table>
             </td>
         </tr>

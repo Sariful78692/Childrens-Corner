@@ -93,6 +93,7 @@
                     </div>
                     <div class="col-sm-6 text-right">
                         <button data-date_from="<?php echo $date_from ?>" data-date_to="<?php echo $date_to ?>" class="btn btn-primary" id="printSheet">Print</button>
+                        <a href="<?php echo site_url('admin/accounts/balance_sheet_new?export=excel&date_from=' . urlencode($date_from) . '&date_to=' . urlencode($date_to)); ?>" class="btn btn-success">Export to Excel</a>
                     </div>
                 </div>
             </div>
@@ -324,10 +325,10 @@
                                         }
                                     }
                                 }
-                                if ($cash > 0) :
+                                if ($cash != 0) :
                                     $closing_balance_html .= "<li class='d-flex justify-content-between'><p>CASH: </p> <p class='text-right'>₹" . number_format($cash, 2) . "</p></li>";
                                 endif;
-                                if ($bank > 0) :
+                                if ($bank != 0) :
                                     $closing_balance_html .= "<li><p>BANK:</p></li>";
                                     foreach ($closing_bank_balances as $bank_balance) {
                                         $closing_balance_html .= "<li class='d-flex justify-content-between'><p>&nbsp;&nbsp;&nbsp;" . html_escape($bank_balance['name']) . ": </p> <p class='text-right'>₹" . number_format($bank_balance['balance'], 2) . "</p></li>";
@@ -394,11 +395,11 @@
                                 echo "<ul class='spcl'><li class='d-flex justify-content-between'><p>TOTAL EXPENSES: </p> <p class='text-right'>₹" . number_format($total_expense + $net_paid_payroll + $total_staff_loan - $expense_refunded_amount, 2) . "</p></li></ul>";
 
 
-                                if ($total_closing_balance > 0) {
+                                if ($total_closing_balance != 0) {
                                     $closing_html .= "<h4>By Closing Balance: </h4>";
 
                                     $closing_html .= "<ul>";
-                                    if ($fixed > 0) {
+                                    if ($fixed != 0) {
                                         $closing_html .=  "<li class='d-flex justify-content-between'><p>BY FIXED DOPOSIT: </p> <p class='text-right'>₹" . number_format($fixed, 2) . "</p></li>";
                                     }
                                     $closing_html .= $closing_balance_html;

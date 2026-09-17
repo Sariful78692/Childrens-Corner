@@ -1002,6 +1002,73 @@ class Studentfee_model extends MY_Model
         }
     }
 
+    /**
+     * Keep a fee collection and its approved credit transaction in sync when
+     * dates are corrected from the student fee screen.
+     */
+    public function updateCollectionDates($collection_id, $student_id, $session_id, $collection_date, $refund_date, $approved_date)
+    {
+        $this->db->trans_begin();
+
+        $collection = $this->db->get_where('student_fees_collections', array(
+            'id'         => $collection_id,
+            'student_id' => $student_id,
+            'session_id' => $session_id,
+        ))->row_array();
+
+        if (!$collection) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        // An approved collection must continue to have an approval date; this
+        // prevents its accounting transaction from becoming ambiguous.
+        if ((int) $collection['status'] === 1 && $approved_date === null) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $approval_date_changed = substr((string) $collection['approved_date'], 0, 10) !== (string) $approved_date;
+
+        if ($approval_date_changed && $approved_date !== null) {
+            // Do not allow an approval date to be introduced without the
+            // accounting entry it is meant to represent.
+            $approved_transaction_exists = $this->db->where('table_id', $collection_id)
+                ->where('transaction_for_table', 'student_fees_collections')
+                ->where('trans_type', 1)
+                ->count_all_results('transactions') > 0;
+
+            if (!$approved_transaction_exists) {
+                $this->db->trans_rollback();
+                return false;
+            }
+        }
+
+        $this->db->where('id', $collection_id);
+        $this->db->update('student_fees_collections', array(
+            'collection_date' => $collection_date,
+            'refund_date'     => $refund_date,
+            'approved_date'   => $approved_date,
+        ));
+
+        // A refund produces a debit transaction as well.  Only the credit
+        // transaction created on approval represents the approve date.
+        if ($approval_date_changed && $approved_date !== null) {
+            $this->db->where('table_id', $collection_id);
+            $this->db->where('transaction_for_table', 'student_fees_collections');
+            $this->db->where('trans_type', 1);
+            $this->db->update('transactions', array('trans_date' => $approved_date));
+        }
+
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $this->db->trans_commit();
+        return true;
+    }
+
     public function bulkApproveFees($fee_ids, $approved_date, $note)
     {
         $this->db->trans_start();

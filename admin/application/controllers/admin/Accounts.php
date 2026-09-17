@@ -398,6 +398,29 @@ class Accounts extends Admin_Controller
         $this->load->view('layout/footer', $data);
     }
 
+    public function delete_fund_transfer($id = null)
+    {
+        if (!$this->rbac->hasPrivilege('transfer_funds', 'can_delete')) {
+            access_denied();
+        }
+
+        if ($this->input->method(TRUE) !== 'POST' || empty($id)) {
+            show_404();
+        }
+
+        if (empty($this->accounts_model->getFundTransferById($id))) {
+            show_404();
+        }
+
+        if ($this->accounts_model->deleteFundTransfer($id)) {
+            $this->session->set_flashdata('msg', 'Fund transfer deleted successfully.');
+        } else {
+            $this->session->set_flashdata('error', 'Failed to delete fund transfer.');
+        }
+
+        redirect('admin/accounts/transfer_funds');
+    }
+
 
 
     public function balance_sheet_old()
@@ -543,8 +566,8 @@ class Accounts extends Admin_Controller
         $this->session->set_userdata('sub_menu', 'admin/accounts/balance_sheet');
 
         // Get date range input
-        $date_from = $this->input->post('date_from');
-        $date_to = $this->input->post('date_to');
+        $date_from = $this->input->post('date_from') ?: $this->input->get('date_from');
+        $date_to = $this->input->post('date_to') ?: $this->input->get('date_to');
 
         // Default date range
         if (!$date_from) {
@@ -636,6 +659,11 @@ class Accounts extends Admin_Controller
         // Repayments received from staff (for Received column)
         $data['staff_loan_repayments'] = $this->accounts_model->get_staff_loan_repayments($date_from, $date_to);
         $data['sch_setting'] = $this->sch_setting_detail;
+
+        if ($this->input->get('export') === 'excel') {
+            $this->load->view('admin/accounts/balance_sheet_new_excel', $data);
+            return;
+        }
 
         // Load view
         $this->load->view('layout/header', $data);
@@ -851,6 +879,8 @@ class Accounts extends Admin_Controller
             'cash' => 0,
             'bank' => 0
         ]; // Initialize opening balances for Cash and Bank
+        $data['bank_opening_balances'] = [];
+        $data['bank_closing_balances'] = [];
 
         $paymentMethods = $this->accounts_model->getPaymentMethods();
 
@@ -867,6 +897,16 @@ class Accounts extends Admin_Controller
                 if ($paymentMethod['method_type_id'] == 2) {
                     // Bank Balance
                     $data['opening_balance']['bank'] += $balanceData['balance'];
+                    $data['bank_opening_balances'][] = [
+                        'name' => $paymentMethod['title'],
+                        'balance' => $balanceData['balance'],
+                    ];
+
+                    $closingBalanceData = $this->accounts_model->getBalanceByTransDate($paymentMethod['id'], "", $date_to);
+                    $data['bank_closing_balances'][] = [
+                        'name' => $paymentMethod['title'],
+                        'balance' => $closingBalanceData['balance'],
+                    ];
                 }
             }
         }
@@ -931,6 +971,8 @@ class Accounts extends Admin_Controller
             'cash' => 0,
             'bank' => 0
         ]; // Initialize opening balances for Cash and Bank
+        $data['bank_opening_balances'] = [];
+        $data['bank_closing_balances'] = [];
 
         $paymentMethods = $this->accounts_model->getPaymentMethods();
 
@@ -947,6 +989,16 @@ class Accounts extends Admin_Controller
                 if ($paymentMethod['method_type_id'] == 2) {
                     // Bank Balance
                     $data['opening_balance']['bank'] += $balanceData['balance'];
+                    $data['bank_opening_balances'][] = [
+                        'name' => $paymentMethod['title'],
+                        'balance' => $balanceData['balance'],
+                    ];
+
+                    $closingBalanceData = $this->accounts_model->getBalanceByTransDate($paymentMethod['id'], "", $date_to);
+                    $data['bank_closing_balances'][] = [
+                        'name' => $paymentMethod['title'],
+                        'balance' => $closingBalanceData['balance'],
+                    ];
                 }
             }
         }
@@ -994,10 +1046,10 @@ class Accounts extends Admin_Controller
         $this->session->set_userdata('sub_menu', 'admin/accounts/ledger');
 
         // Get input values
-        $date_from = $this->input->post('date_from') ?? date('Y') . '-01-01';
-        $date_to = $this->input->post('date_to') ?? date('Y-m-d');
-        $head_id = $this->input->post('head_id');
-        $department_id = $this->input->post('department_id'); // New
+        $date_from = $this->input->post('date_from') ?: $this->input->get('date_from') ?: date('Y') . '-01-01';
+        $date_to = $this->input->post('date_to') ?: $this->input->get('date_to') ?: date('Y-m-d');
+        $head_id = $this->input->post('head_id') ?: $this->input->get('head_id');
+        $department_id = $this->input->post('department_id') ?: $this->input->get('department_id'); // New
 
         // Store values for the view
         $data['date_from'] = $date_from;
@@ -1025,6 +1077,11 @@ class Accounts extends Admin_Controller
         // Fetch ledger data
         $data['head_data'] = $this->accounts_model->getHeadEntries($date_from, $date_to, $head_id, $department_id); // Modified
         $data['sch_setting'] = $this->sch_setting_detail;
+
+        if ($this->input->get('export') === 'excel') {
+            $this->load->view('admin/accounts/ledger_excel', $data);
+            return;
+        }
 
         // Load views
         $this->load->view('layout/header', $data);
@@ -1092,10 +1149,10 @@ class Accounts extends Admin_Controller
         $this->session->set_userdata('top_menu', 'Income Ledger');
         $this->session->set_userdata('sub_menu', 'admin/accounts/income_ledger');
 
-        $date_from = $this->input->post('date_from') ?? date('Y') . '-01-01';
-        $date_to = $this->input->post('date_to') ?? date('Y-m-d');
-        $department_id = $this->input->post('department_id');
-        $income_head = $this->input->post('income_head');
+        $date_from = $this->input->post('date_from') ?: $this->input->get('date_from') ?: date('Y') . '-01-01';
+        $date_to = $this->input->post('date_to') ?: $this->input->get('date_to') ?: date('Y-m-d');
+        $department_id = $this->input->post('department_id') ?: $this->input->get('department_id');
+        $income_head = $this->input->post('income_head') ?: $this->input->get('income_head');
 
         $data['date_from'] = $date_from;
         $data['date_to'] = $date_to;
@@ -1116,6 +1173,11 @@ class Accounts extends Admin_Controller
 
         $data['head_data'] = $head_data;
         $data['sch_setting'] = $this->sch_setting_detail;
+
+        if ($this->input->get('export') === 'excel') {
+            $this->load->view('admin/accounts/income_ledger_excel', $data);
+            return;
+        }
 
         $this->load->view('layout/header', $data);
         $this->load->view('admin/accounts/income_ledger', $data);

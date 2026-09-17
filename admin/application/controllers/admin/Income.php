@@ -275,6 +275,7 @@ class Income extends Admin_Controller
         $expnseHead          = $this->incomehead_model->get();
         $data['incheadlist'] = $expnseHead;
         $this->form_validation->set_rules('inc_head_id', $this->lang->line('income_head'), 'trim|required|xss_clean');
+        $this->form_validation->set_rules('account_department_id', 'Account Department', 'trim|required|xss_clean');
         $this->form_validation->set_rules('amount', $this->lang->line('amount'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('name', $this->lang->line('name'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('income_date', $this->lang->line('date'), 'trim|required|xss_clean');
@@ -290,7 +291,10 @@ class Income extends Admin_Controller
                 'income_head_id' => $this->input->post('inc_head_id'),
                 'account_department_id' => $this->input->post('account_department_id'),
                 'name'        => $this->input->post('name'),
-                'date'        => date('Y-m-d', $this->customlib->datetostrtotime($this->input->post('date'))),
+                // income_date is an HTML date input (Y-m-d). Using the wrong
+                // field and passing a formatted string to date() caused PHP 8
+                // to throw a TypeError and return HTTP 500 on every edit.
+                'date'        => $income_date,
                 'amount'      => convertCurrencyFormatToBaseAmount($this->input->post('amount')),
                 'payment_method_id'  => $this->input->post('payment_method_id'),
                 'invoice_no'  => $this->input->post('invoice_no'),

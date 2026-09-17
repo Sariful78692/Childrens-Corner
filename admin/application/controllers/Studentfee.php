@@ -901,6 +901,14 @@ class Studentfee extends Admin_Controller
             access_denied();
         }
 
+        $collection_date = substr((string) $fees_data['collection_date'], 0, 10);
+        $today = date('Y-m-d');
+        if (!$this->valid_date_format($refund_date) || !$this->valid_date_format($collection_date) || $refund_date < $collection_date || $refund_date > $today) {
+            $this->session->set_flashdata('msg', '<div class="alert alert-danger text-left">Refund date must be between the collection date and today.</div>');
+            redirect('studentfee/addfees/' . $fees_data['student_id'] . '/?session_id=' . $session_id);
+            return;
+        }
+
         /* echo "<pre>";
         print_r($fees_data);
         die; */
@@ -943,6 +951,52 @@ class Studentfee extends Admin_Controller
         redirect('studentfee/addfees/' . $student_id . '/?session_id=' . $session_id);
     }
     /** End of Fees Refund  */
+
+    /**
+     * Updates the dates recorded against one fee collection.  The matching
+     * approved-payment transaction is updated in the same database transaction
+     * when the approval date changes.
+     */
+    public function update_collection_dates()
+    {
+        if (!$this->rbac->hasPrivilege('collect_fees', 'can_edit')) {
+            access_denied();
+        }
+
+        $collection_id = (int) $this->input->post('collection_id');
+        $student_id    = (int) $this->input->post('student_id');
+        $session_id    = (int) $this->input->post('session_id');
+        $collection_date = trim((string) $this->input->post('collection_date'));
+        $refund_date     = trim((string) $this->input->post('refund_date'));
+        $approved_date   = trim((string) $this->input->post('approved_date'));
+
+        if ($collection_id <= 0 || $student_id <= 0 || $session_id <= 0 || !$this->valid_date_format($collection_date)) {
+            $this->session->set_flashdata('msg', '<div class="alert alert-danger text-left">Please provide a valid collection date.</div>');
+            redirect('studentfee/addfees/' . $student_id . '/?session_id=' . $session_id);
+            return;
+        }
+
+        if (($refund_date !== '' && !$this->valid_date_format($refund_date)) || ($approved_date !== '' && !$this->valid_date_format($approved_date))) {
+            $this->session->set_flashdata('msg', '<div class="alert alert-danger text-left">Refund and approve dates must be valid dates.</div>');
+            redirect('studentfee/addfees/' . $student_id . '/?session_id=' . $session_id);
+            return;
+        }
+
+        $result = $this->studentfee_model->updateCollectionDates(
+            $collection_id,
+            $student_id,
+            $session_id,
+            $collection_date,
+            $refund_date === '' ? null : $refund_date,
+            $approved_date === '' ? null : $approved_date
+        );
+
+        $message = $result
+            ? '<div class="alert alert-success text-left">Fee collection dates updated successfully.</div>'
+            : '<div class="alert alert-danger text-left">The fee collection dates could not be updated. No changes were saved.</div>';
+        $this->session->set_flashdata('msg', $message);
+        redirect('studentfee/addfees/' . $student_id . '/?session_id=' . $session_id);
+    }
 
 
     public function getProcessingfees($id)

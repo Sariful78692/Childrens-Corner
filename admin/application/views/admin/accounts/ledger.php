@@ -57,6 +57,7 @@
         <div class="box">
             <div class="print_button" style="position: relative; top:5px; right:10px; text-align: right;z-index:10">
                 <a href="<?php echo site_url('admin/accounts/ledger_pdf?date_from=' . $date_from . '&date_to=' . $date_to . '&head_id=' . $head_id . '&department_id=' . $department_id) ?>" class="btn btn-primary" target="_blank">Print</a>
+                <a href="<?php echo site_url('admin/accounts/ledger?export=excel&date_from=' . urlencode($date_from) . '&date_to=' . urlencode($date_to) . '&head_id=' . urlencode($head_id) . '&department_id=' . urlencode($department_id)); ?>" class="btn btn-success">Export to Excel</a>
             </div>
 
             <div id="printableArea" style="margin-top: -50px;">

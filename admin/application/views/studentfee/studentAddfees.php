@@ -103,7 +103,9 @@ $language_name   = $language["short_code"];
                                         <th class="text-right"><?php echo $this->lang->line('balance'); ?></th>
                                         <th class="text-center">Payment ID</th>
                                         <th>Payment Mode</th>
-                                        <th>Date</th>
+                                        <th>Collection Date</th>
+                                        <th>Refund Date</th>
+                                        <th>Approve Date</th>
                                         <!-- <th class="text-right"><?php echo $this->lang->line('discount'); ?></th> -->
                                         <th class="text-right"><?php echo $this->lang->line('action'); ?></th>
                                     </tr>
@@ -162,7 +164,7 @@ $language_name   = $language["short_code"];
                                             <td class="text-right"><?php echo $currency_symbol . number_format($fee->discounted_fees, 2); ?></td>
                                             <td class="text-right"><?php echo $currency_symbol . number_format($total_paid, 2); ?></td>
                                             <td class="text-right <?php echo $balance_class; ?>"><?php echo $currency_symbol . number_format($balance, 2); ?></td>
-                                            <td colspan="4" class="text-right">
+                                            <td colspan="6" class="text-right">
                                                 <?php if ($balance == 0) : ?>
                                                     <span class="label label-success">Paid</span>
                                                 <?php elseif ($fee->has_pending_payment) : ?>
@@ -179,7 +181,7 @@ $language_name   = $language["short_code"];
                                         </tr>
                                         <!-- Additional row to display paid amount -->
                                         <?php
-                                        $paid_amount_rows = $this->db->select('id, paid_amount, discount_amount, payment_hash, payment_method_id, collection_date, is_refunded, refund_date, refund_note, status') // Added status to select
+                                        $paid_amount_rows = $this->db->select('id, paid_amount, discount_amount, payment_hash, payment_method_id, collection_date, is_refunded, refund_date, refund_note, approved_date, status') // Added status to select
                                             ->where('student_id', $student['id'])
                                             ->where('session_id', $fee->session_id)
                                             ->where('feetype_id', $fee->feetype_id)
@@ -199,6 +201,7 @@ $language_name   = $language["short_code"];
                                                 $is_refunded = $paid_amount_row->is_refunded;
                                                 $refund_date = $paid_amount_row->refund_date;
                                                 $refund_note = $paid_amount_row->refund_note;
+                                                $approved_date = $paid_amount_row->approved_date;
 
                                                 // Color classes based on payment status
                                                 $payment_status_class = ($balance < 0) ? 'text-danger' : '';
@@ -210,12 +213,12 @@ $language_name   = $language["short_code"];
                                                 if ($paid_amount_row->status == 2) {
                                                     $row_class = 'pending-row';
                                                     $action_content = '<span class="label label-warning">' . $this->lang->line('pending') . '</span>';
-                                                    $action_content .= "<a href='javascript:void(0);' class='btn btn-default btn-xs refund-button' data-refund-id='" . $paid_amount_row->id . "' data-url='" . base_url() . "studentfee/refund' title='Refund' data-toggle='tooltip'><i class='fa fa-undo'></i></a>"; // Use $paid_amount_row->id
+                                                    $action_content .= "<a href='javascript:void(0);' class='btn btn-default btn-xs refund-button' data-refund-id='" . $paid_amount_row->id . "' data-collection-date='" . html_escape(substr((string) $collection_date, 0, 10)) . "' data-url='" . base_url() . "studentfee/refund' title='Refund' data-toggle='tooltip'><i class='fa fa-undo'></i></a>"; // Use $paid_amount_row->id
 
                                                 } else {
                                                     if (!$paid_amount_row->is_refunded) { // Use $paid_amount_row->is_refunded
                                                         if ($current_user_id == 1) {
-                                                            $action_content .= "<a href='javascript:void(0);' class='btn btn-default btn-xs refund-button' data-refund-id='" . $paid_amount_row->id . "' data-url='" . base_url() . "studentfee/refund' title='Refund' data-toggle='tooltip'><i class='fa fa-undo'></i></a>"; // Use $paid_amount_row->id
+                                                            $action_content .= "<a href='javascript:void(0);' class='btn btn-default btn-xs refund-button' data-refund-id='" . $paid_amount_row->id . "' data-collection-date='" . html_escape(substr((string) $collection_date, 0, 10)) . "' data-url='" . base_url() . "studentfee/refund' title='Refund' data-toggle='tooltip'><i class='fa fa-undo'></i></a>"; // Use $paid_amount_row->id
                                                         }
                                                     } else {
                                                         $action_content .= $paid_amount_row->refund_note; // Use $paid_amount_row->refund_note
@@ -224,6 +227,9 @@ $language_name   = $language["short_code"];
                                                 if (!$paid_amount_row->is_refunded) {
                                                     $action_content .= '<button class="btn btn-xs btn-default printDoc" data-payment_hash="' . $paid_amount_row->payment_hash . '" title="' . $this->lang->line('print') . '"><i class="fa fa-print"></i> </button>'; // Use $paid_amount_row->payment_hash
                                                 }
+                                                if ($this->rbac->hasPrivilege('collect_fees', 'can_edit')) {
+                                                    $action_content .= '<button type="button" class="btn btn-xs btn-primary edit-collection-dates" title="Edit dates" data-toggle="tooltip" data-collection-id="' . (int) $paid_amount_row->id . '" data-collection-date="' . html_escape(substr((string) $collection_date, 0, 10)) . '" data-refund-date="' . html_escape(substr((string) $refund_date, 0, 10)) . '" data-approved-date="' . html_escape(substr((string) $approved_date, 0, 10)) . '"><i class="fa fa-pencil"></i> Edit</button>';
+                                                }
 
                                         ?>
                                                 <tr class="dark-gray <?php echo $paid_amount_row->is_refunded ? "refunded" : ""; ?> <?php echo $row_class; ?>">
@@ -231,7 +237,9 @@ $language_name   = $language["short_code"];
                                                     <td class="text-right"><?php echo $currency_symbol . number_format($paid_amount_row->paid_amount, 2); ?></td>
                                                     <td class="text-center"><?php echo $paid_amount_row->payment_hash; ?></td>
                                                     <td class="text-center"><?php echo get_payment_mode($paid_amount_row->payment_method_id); ?></td>
-                                                    <td><?php echo ($paid_amount_row->is_refunded) ? $paid_amount_row->refund_date : $paid_amount_row->collection_date; ?></td>
+                                                    <td><?php echo $paid_amount_row->collection_date; ?></td>
+                                                    <td><?php echo $paid_amount_row->refund_date; ?></td>
+                                                    <td><?php echo $paid_amount_row->approved_date; ?></td>
 
                                                     <!-- <td class="text-right"><?php echo $currency_symbol . number_format($discount_amount, 2); ?></td> -->
                                                     <td>
@@ -435,6 +443,43 @@ $language_name   = $language["short_code"];
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Refund</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="editCollectionDatesModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editCollectionDatesForm" method="POST" action="<?php echo site_url('studentfee/update_collection_dates'); ?>">
+                <input type="hidden" name="collection_id" id="edit_collection_id">
+                <input type="hidden" name="student_id" value="<?php echo (int) $student['id']; ?>">
+                <input type="hidden" name="session_id" value="<?php echo (int) $selected_session; ?>">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Fee Collection Dates</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="edit_collection_date">Collection Date:</label>
+                        <input type="date" id="edit_collection_date" name="collection_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_refund_date">Refund Date:</label>
+                        <input type="date" id="edit_refund_date" name="refund_date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_approved_date">Approve Date:</label>
+                        <input type="date" id="edit_approved_date" name="approved_date" class="form-control">
+                    </div>
+                    <p class="help-block">Changing the approve date also updates the related approved-payment transaction date.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -833,19 +878,40 @@ $language_name   = $language["short_code"];
 
 
 <script>
+    $(document).on('click', '.edit-collection-dates', function() {
+        $('#edit_collection_id').val($(this).data('collection-id'));
+        $('#edit_collection_date').val($(this).data('collection-date'));
+        $('#edit_refund_date').val($(this).data('refund-date'));
+        $('#edit_approved_date').val($(this).data('approved-date'));
+        $('#editCollectionDatesModal').modal('show');
+    });
+
+    $('#editCollectionDatesForm').on('submit', function(e) {
+        if (!$('#edit_collection_date').val()) {
+            e.preventDefault();
+            alert('Collection date is required.');
+            return;
+        }
+        $(this).find('button[type="submit"]').prop('disabled', true);
+    });
+
     $(document).on('click', '.refund-button', function() {
 
         // Get refund ID and URL
         const refundId = $(this).data("refund-id");
         const actionUrl = $(this).data("url");
+        const collectionDate = $(this).data("collection-date");
 
         // Populate the modal form
         $("#refund_id").val(refundId);
         $("#refundForm").attr("action", actionUrl);
 
-        // Set max date to today
+        // Refunds may be dated from the collection date through today.
         var today = new Date().toISOString().split('T')[0];
-        $("#refund_date").attr('max', today);
+        $("#refund_date").attr({
+            min: collectionDate,
+            max: today
+        }).val(collectionDate);
 
         // Show the modal
         $("#refundModal").modal("show");
@@ -855,9 +921,13 @@ $language_name   = $language["short_code"];
     $("#refundForm").on("submit", function(e) {
         const refundDate = $("#refund_date").val();
         const refundNote = $("#refund_note").val();
+        const collectionDate = $("#refund_date").attr('min');
 
         if (!refundDate || !refundNote) {
             alert("All fields are required!");
+            e.preventDefault();
+        } else if (refundDate < collectionDate || refundDate > $("#refund_date").attr('max')) {
+            alert("Refund date must be between the collection date and today.");
             e.preventDefault();
         } else {
             // Disable the submit button to prevent multiple submissions

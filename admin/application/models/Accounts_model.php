@@ -1800,6 +1800,23 @@ class Accounts_model extends MY_Model
         return $this->db->get()->row_array();
     }
 
+    public function deleteFundTransfer($id)
+    {
+        $this->db->trans_start();
+
+        // A fund transfer creates one debit and one credit transaction. Remove
+        // both entries together with the transfer record so balances recalculate correctly.
+        $this->db->where('transaction_for_table', 'fund_transfers')
+            ->where('table_id', $id)
+            ->delete('transactions');
+
+        $this->db->where('id', $id)->delete('fund_transfers');
+
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
+    }
+
     public function get_grouped_income_by_department($date_from, $date_to, $department_id = null)
     {
         $this->db->select("
