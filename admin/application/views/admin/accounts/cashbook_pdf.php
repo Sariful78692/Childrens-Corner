@@ -221,8 +221,8 @@
 
                                 <?php
                                 // Calculate Closing Balances
-                                $closing_cash = ($opening_balance['cash'] + $total_cash_received) - $total_cash_spent;
-                                $closing_bank = ($opening_balance['bank'] + $total_bank_received) - $total_bank_spent;
+                                $closing_cash = $ledger_closing_balance['cash'];
+                                $closing_bank = $ledger_closing_balance['bank'];
                                 ?>
                             </tbody>
                         </table>

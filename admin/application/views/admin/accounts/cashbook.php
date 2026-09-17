@@ -270,9 +270,11 @@
                                         <?php endif; ?>
 
                                         <?php
-                                        // Calculate Closing Balances
-                                        $closing_cash = ($opening_balance['cash'] + $total_cash_received) - $total_cash_spent;
-                                        $closing_bank = ($opening_balance['bank'] + $total_bank_received) - $total_bank_spent;
+                                        // Closing balances must come from the transaction ledger.
+                                        // The receipt/payment display is grouped from source records
+                                        // and may omit adjustment entries.
+                                        $closing_cash = $ledger_closing_balance['cash'];
+                                        $closing_bank = $ledger_closing_balance['bank'];
                                         ?>
                                     </tbody>
 

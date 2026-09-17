@@ -46,7 +46,9 @@ class Accounts extends Admin_Controller
 
             if (!empty($paymentMethods)) {
                 foreach ($paymentMethods as $paymentMethod) {
-                    $balanceData = $this->accounts_model->getBalanceByTransDate($paymentMethod['id'], $from_date, $to_date);
+                    // A balance is a point-in-time figure. Include all entries
+                    // through the selected end date, not just period movement.
+                    $balanceData = $this->accounts_model->getBalanceByTransDate($paymentMethod['id'], "", $to_date);
 
                     // Add each payment method name and balance to statements
                     $data['statements'][] = [
@@ -879,6 +881,10 @@ class Accounts extends Admin_Controller
             'cash' => 0,
             'bank' => 0
         ]; // Initialize opening balances for Cash and Bank
+        $data['ledger_closing_balance'] = [
+            'cash' => 0,
+            'bank' => 0,
+        ];
         $data['bank_opening_balances'] = [];
         $data['bank_closing_balances'] = [];
 
@@ -887,22 +893,24 @@ class Accounts extends Admin_Controller
         if (!empty($paymentMethods)) {
             foreach ($paymentMethods as $paymentMethod) {
                 $balanceData = $this->accounts_model->getBalanceByTransDate($paymentMethod['id'], "", $previous_date);
+                $closingBalanceData = $this->accounts_model->getBalanceByTransDate($paymentMethod['id'], "", $date_to);
 
                 // Separate balances for Cash and Bank
                 if ($paymentMethod['method_type_id'] == 1) {
                     // Cash Balance
                     $data['opening_balance']['cash'] += $balanceData['balance'];
+                    $data['ledger_closing_balance']['cash'] += $closingBalanceData['balance'];
                 }
 
                 if ($paymentMethod['method_type_id'] == 2) {
                     // Bank Balance
                     $data['opening_balance']['bank'] += $balanceData['balance'];
+                    $data['ledger_closing_balance']['bank'] += $closingBalanceData['balance'];
                     $data['bank_opening_balances'][] = [
                         'name' => $paymentMethod['title'],
                         'balance' => $balanceData['balance'],
                     ];
 
-                    $closingBalanceData = $this->accounts_model->getBalanceByTransDate($paymentMethod['id'], "", $date_to);
                     $data['bank_closing_balances'][] = [
                         'name' => $paymentMethod['title'],
                         'balance' => $closingBalanceData['balance'],
@@ -971,6 +979,10 @@ class Accounts extends Admin_Controller
             'cash' => 0,
             'bank' => 0
         ]; // Initialize opening balances for Cash and Bank
+        $data['ledger_closing_balance'] = [
+            'cash' => 0,
+            'bank' => 0,
+        ];
         $data['bank_opening_balances'] = [];
         $data['bank_closing_balances'] = [];
 
@@ -979,22 +991,24 @@ class Accounts extends Admin_Controller
         if (!empty($paymentMethods)) {
             foreach ($paymentMethods as $paymentMethod) {
                 $balanceData = $this->accounts_model->getBalanceByTransDate($paymentMethod['id'], "", $previous_date);
+                $closingBalanceData = $this->accounts_model->getBalanceByTransDate($paymentMethod['id'], "", $date_to);
 
                 // Separate balances for Cash and Bank
                 if ($paymentMethod['method_type_id'] == 1) {
                     // Cash Balance
                     $data['opening_balance']['cash'] += $balanceData['balance'];
+                    $data['ledger_closing_balance']['cash'] += $closingBalanceData['balance'];
                 }
 
                 if ($paymentMethod['method_type_id'] == 2) {
                     // Bank Balance
                     $data['opening_balance']['bank'] += $balanceData['balance'];
+                    $data['ledger_closing_balance']['bank'] += $closingBalanceData['balance'];
                     $data['bank_opening_balances'][] = [
                         'name' => $paymentMethod['title'],
                         'balance' => $balanceData['balance'],
                     ];
 
-                    $closingBalanceData = $this->accounts_model->getBalanceByTransDate($paymentMethod['id'], "", $date_to);
                     $data['bank_closing_balances'][] = [
                         'name' => $paymentMethod['title'],
                         'balance' => $closingBalanceData['balance'],

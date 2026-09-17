@@ -66,7 +66,7 @@
                 <h3 class="box-title">Select Period</h3>
             </div>
             <div class="box-body">
-                <form method="post" action="<?= site_url('admin/accounts/balance_sheet2') ?>">
+                <form method="post" action="<?= site_url('admin/accounts/balance_sheet') ?>">
                     <div class="row">
                         <div class="col-md-5">
                             <label>From Date</label>
@@ -133,9 +133,11 @@
 
                                 if ($total_opening_balance > 0) {
                                     echo "<h4>BY OPENING BALANCE:</h4><ul>";
-                                    if ($opening_fixed > 0) echo "<li class='d-flex justify-content-between'><p>FIXED DEPOSIT:</p><p>₹" . number_format($opening_fixed, 2) . "</p></li>";
-                                    if ($opening_cash > 0) echo "<li class='d-flex justify-content-between'><p>CASH:</p><p>₹" . number_format($opening_cash, 2) . "</p></li>";
-                                    if ($opening_bank > 0) echo "<li class='d-flex justify-content-between'><p>BANK:</p><p>₹" . number_format($opening_bank, 2) . "</p></li>";
+                                    foreach ($opening_balance as $bal) {
+                                        if ((float) $bal['balance'] != 0) {
+                                            echo "<li class='d-flex justify-content-between'><p>" . html_escape($bal['payment_method_name']) . ":</p><p>&#8377;" . number_format($bal['balance'], 2) . "</p></li>";
+                                        }
+                                    }
                                     echo "<li class='text-right'><b>₹" . number_format($total_opening_balance, 2) . "</b></li></ul>";
                                 }
 
@@ -285,9 +287,11 @@
                                     }
 
                                     echo "<h4>By Closing Balance:</h4><ul>";
-                                    if ($fixed > 0) echo "<li class='d-flex justify-content-between'><p>FIXED DEPOSIT:</p><p>₹" . number_format($fixed, 2) . "</p></li>";
-                                    if ($cash > 0) echo "<li class='d-flex justify-content-between'><p>CASH:</p><p>₹" . number_format($cash, 2) . "</p></li>";
-                                    if ($bank > 0) echo "<li class='d-flex justify-content-between'><p>BANK:</p><p>₹" . number_format($bank, 2) . "</p></li>";
+                                    foreach ($closing_balance as $bal) {
+                                        if ((float) $bal['balance'] != 0) {
+                                            echo "<li class='d-flex justify-content-between'><p>" . html_escape($bal['payment_method_name']) . ":</p><p>&#8377;" . number_format($bal['balance'], 2) . "</p></li>";
+                                        }
+                                    }
                                     echo "<li class='text-right'><b>₹" . number_format($total_closing_balance, 2) . "</b></li></ul>";
                                 }
                                 ?>
