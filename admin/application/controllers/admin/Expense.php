@@ -40,7 +40,7 @@ class Expense extends Admin_Controller
         $this->form_validation->set_rules('account_department_id', "Account Department", 'trim|required|numeric|xss_clean');
         $this->form_validation->set_rules('amount', $this->lang->line('amount'), 'trim|required|numeric|xss_clean');
         $this->form_validation->set_rules('name', $this->lang->line('name'), 'trim|required|xss_clean');
-        $this->form_validation->set_rules('date', $this->lang->line('date'), 'trim|required|xss_clean');
+        $this->form_validation->set_rules('date', $this->lang->line('date'), 'trim|required|callback_valid_expense_date|xss_clean');
         $this->form_validation->set_rules('documents', $this->lang->line('documents'), 'callback_handle_upload');
 
         if ($this->form_validation->run()) {
@@ -49,7 +49,7 @@ class Expense extends Admin_Controller
             $trans_date = date('Y-m-d H:i:s');
             $admin_data = $this->session->userdata('admin');
 
-            $expense_date = date('Y-m-d H:i:s', $this->customlib->datetostrtotime($this->input->post('date')));
+            $expense_date = $this->parseExpenseDate($this->input->post('date'));
 
             $data = [
                 'exp_head_id'       => $this->input->post('exp_head_id'),
@@ -113,8 +113,18 @@ class Expense extends Admin_Controller
             access_denied();
         }
 
-        $refund_date = $_POST['refund_date'];
-        $refund_note = $_POST['refund_note'];
+        $expense = $this->expense_model->get($expense_id);
+        $refund_date = $this->parseExpenseDate($this->input->post('refund_date'));
+        $refund_note = trim($this->input->post('refund_note'));
+        $payment_date = isset($expense['date']) ? substr($expense['date'], 0, 10) : null;
+        $payment_date_display = $this->formatExpenseDate($payment_date);
+        $today = date('Y-m-d');
+
+        if (empty($expense) || $expense['is_refunded'] == 1 || $refund_date === null || $refund_note === '' || $payment_date_display === '' || $refund_date < $payment_date || $refund_date > $today) {
+            $this->session->set_flashdata('msg', '<div class="alert alert-danger text-left">The refund date must be between the original payment date and today.</div>');
+            redirect('admin/expense/index');
+        }
+
         $data = array(
             'id'          => $expense_id,
             'is_refunded' => 1,
@@ -123,8 +133,6 @@ class Expense extends Admin_Controller
         );
 
         if ($this->expense_model->add($data)) {
-
-            $expense  = $this->expense_model->get($expense_id);
 
             $amount = $expense['amount'];
             $payment_method_id = $expense['payment_method_id'];
@@ -201,6 +209,7 @@ class Expense extends Admin_Controller
         $data['title']   = 'Fees Master List';
         $expense         = $this->expense_model->get($id);
         $data['expense'] = $expense;
+        $data['expense_date'] = $this->formatExpenseDate($expense['date']);
         $this->load->view('layout/header', $data);
         $this->load->view('expense/expenseShow', $data);
         $this->load->view('layout/footer', $data);
@@ -280,6 +289,7 @@ class Expense extends Admin_Controller
         $data['account_departments'] = $this->account_department_model->get();
         $expense         = $this->expense_model->get($id);
         $data['expense'] = $expense;
+        $data['expense_date'] = $this->formatExpenseDate($expense['date']);
         $expense_result      = $this->expense_model->get();
         $data['expenselist'] = $expense_result;
         $expnseHead          = $this->expensehead_model->get();
@@ -290,13 +300,13 @@ class Expense extends Admin_Controller
         $this->form_validation->set_rules('documents', $this->lang->line('documents'), 'callback_handle_upload');
         $this->form_validation->set_rules('amount', $this->lang->line('amount'), 'trim|required|numeric|xss_clean');
         $this->form_validation->set_rules('name', $this->lang->line('name'), 'trim|required|xss_clean');
-        $this->form_validation->set_rules('date', $this->lang->line('date'), 'trim|required|xss_clean');
+        $this->form_validation->set_rules('date', $this->lang->line('date'), 'trim|required|callback_valid_expense_date|xss_clean');
         if ($this->form_validation->run() == false) {
             $this->load->view('layout/header', $data);
             $this->load->view('admin/expense/expenseEdit', $data);
             $this->load->view('layout/footer', $data);
         } else {
-            $expense_date = date('Y-m-d', $this->customlib->datetostrtotime($this->input->post('date')));
+            $expense_date = $this->parseExpenseDate($this->input->post('date'));
             $data = array(
                 'id'          => $id,
                 'exp_head_id' => $this->input->post('exp_head_id'),
@@ -397,11 +407,11 @@ class Expense extends Admin_Controller
                     $deletebtn = '';
                     if ($value->is_refunded == 1) {
                         $deletebtn = '<span class="badge">Refunded</span>';
-                        $deletebtn .= '<p>' . $value->refund_note . ' on ' . $value->refund_date . '</p>';
+                        $deletebtn .= '<p>' . $value->refund_note . ' on ' . $this->formatExpenseDate($value->refund_date) . '</p>';
                     } else {
                         //$deletebtn = "<a onclick='return confirm(" . '"Want to refund the amount?"' . "  )' href='" . base_url() . "admin/expense/refund/" . $value->id . "' class='btn btn-default btn-xs' title='Refund' data-toggle='tooltip'><i class='fa fa-undo'></i></a>";
 
-                        $deletebtn = "<a href='javascript:void(0);' class='btn btn-default btn-xs refund-button' data-refund-id='" . $value->id . "' data-url='" . base_url() . "admin/expense/refund/" . $value->id . "' title='Refund' data-toggle='tooltip'><i class='fa fa-undo'></i></a>";
+                        $deletebtn = "<a href='javascript:void(0);' class='btn btn-default btn-xs refund-button' data-refund-id='" . $value->id . "' data-url='" . base_url() . "admin/expense/refund/" . $value->id . "' data-payment-date='" . substr($value->date, 0, 10) . "' data-payment-date-display='" . $this->formatExpenseDate($value->date) . "' title='Refund' data-toggle='tooltip'><i class='fa fa-undo'></i></a>";
                     }
                 }
 
@@ -421,7 +431,7 @@ class Expense extends Admin_Controller
                 }
 
                 $row[]     = $value->invoice_no;
-                $row[]     = date($this->customlib->getSchoolDateFormat(), $this->customlib->dateyyyymmddTodateformat($value->date));
+                $row[]     = $this->formatExpenseDate($value->date);
                 $row[]     = $value->exp_category;
                 $row[]     = $value->account_department_name;
                 $row[]     = $currency_symbol . amountFormat($value->amount);
@@ -566,7 +576,7 @@ class Expense extends Admin_Controller
                 }
                 $row   = array();
                 $row[] = $value->id;
-                $row[] = date($this->customlib->getSchoolDateFormat(), $this->customlib->dateyyyymmddTodateformat($value->date));
+                $row[] = $this->formatExpenseDate($value->date);
                 $row[] = $value->name;
                 $row[] = $value->invoice_no;
                 $row[] = $value->exp_category;
@@ -724,5 +734,44 @@ class Expense extends Admin_Controller
         $this->load->view('layout/header', $data);
         $this->load->view('admin/expense/purchase_order', $data);
         $this->load->view('layout/footer', $data);
+    }
+
+    /**
+     * Expense dates are entered in the UI as dd/mm/yyyy and stored as Y-m-d.
+     */
+    public function valid_expense_date($date)
+    {
+        if ($this->parseExpenseDate($date) === null) {
+            $this->form_validation->set_message('valid_expense_date', 'The {field} must use the format dd/mm/yyyy.');
+            return false;
+        }
+
+        return true;
+    }
+
+    private function parseExpenseDate($date)
+    {
+        $date = trim((string) $date);
+        $parsed_date = DateTime::createFromFormat('!d/m/Y', $date);
+        $errors = DateTime::getLastErrors();
+
+        if ($parsed_date === false || ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
+            return null;
+        }
+
+        return $parsed_date->format('Y-m-d');
+    }
+
+    private function formatExpenseDate($date)
+    {
+        $date = substr((string) $date, 0, 10);
+        $parsed_date = DateTime::createFromFormat('!Y-m-d', $date);
+        $errors = DateTime::getLastErrors();
+
+        if ($parsed_date === false || ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
+            return '';
+        }
+
+        return $parsed_date->format('d/m/Y');
     }
 }

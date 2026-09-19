@@ -83,7 +83,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('date'); ?></label> <small class="req">*</small>
-                                    <input id="date" name="date" type="date" class="form-control" value="<?php echo set_value('date', date('Y-m-d')); ?>" />
+                                    <input id="date" name="date" type="text" autocomplete="off" placeholder="dd/mm/yyyy" class="form-control expense-date" value="<?php echo set_value('date', date('d/m/Y')); ?>" />
                                     <span class="text-danger"><?php echo form_error('date'); ?></span>
                                 </div>
 
@@ -185,9 +185,10 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <p>Original Payment Date: <strong id="original_payment_date"></strong></p>
                     <div class="form-group">
                         <label for="refund_date">Refund Date:</label>
-                        <input type="date" id="refund_date" name="refund_date" class="form-control" required>
+                        <input type="text" id="refund_date" name="refund_date" autocomplete="off" placeholder="dd/mm/yyyy" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="refund_note">Note:</label>
@@ -211,6 +212,15 @@
             $('#exp_head_id').select2({ width: '100%', placeholder: '-- Select --', allowClear: true });
         });
     }(jQuery))
+</script>
+<script>
+    $(function() {
+        $('#date.expense-date').datepicker({
+            format: 'dd/mm/yyyy',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
 </script>
 <script>
     $(function() {
@@ -253,14 +263,23 @@
         // Get refund ID and URL
         const refundId = $(this).data("refund-id");
         const actionUrl = $(this).data("url");
+        const paymentDate = $(this).attr("data-payment-date");
+        const paymentDateDisplay = $(this).attr("data-payment-date-display");
 
         // Populate the modal form
         $("#refund_id").val(refundId);
         $("#refundForm").attr("action", actionUrl);
+        $("#original_payment_date").text(paymentDateDisplay);
 
-        // Set max date to today
-        var today = new Date().toISOString().split('T')[0];
-        $("#refund_date").attr('max', today);
+        // Refunds can only be dated from the original payment through today.
+        var today = '<?php echo date('Y-m-d'); ?>';
+        $("#refund_date").datepicker('remove').datepicker({
+            format: 'dd/mm/yyyy',
+            autoclose: true,
+            todayHighlight: true,
+            startDate: paymentDate,
+            endDate: today
+        }).val('');
 
         // Show the modal
         $("#refundModal").modal("show");
@@ -271,8 +290,15 @@
         const refundDate = $("#refund_date").val();
         const refundNote = $("#refund_note").val();
 
+        const paymentDate = $(".refund-button[data-refund-id='" + $("#refund_id").val() + "']").attr("data-payment-date");
+        const refundDateIso = refundDate ? refundDate.split('/').reverse().join('-') : '';
+        const today = '<?php echo date('Y-m-d'); ?>';
+
         if (!refundDate || !refundNote) {
             alert("All fields are required!");
+            e.preventDefault();
+        } else if (refundDateIso < paymentDate || refundDateIso > today) {
+            alert("The refund date must be between the original payment date and today.");
             e.preventDefault();
         } else {
             // Disable the submit button to prevent multiple submissions
