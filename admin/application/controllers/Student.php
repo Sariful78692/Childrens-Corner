@@ -568,6 +568,7 @@ class Student extends Admin_Controller
         /* $this->form_validation->set_rules('dob', $this->lang->line('date_of_birth'), 'trim|required|xss_clean'); */
         $this->form_validation->set_rules('class_id', $this->lang->line('class'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('section_id', $this->lang->line('section'), 'trim|required|xss_clean');
+        $this->form_validation->set_rules('religion', $this->lang->line('religion'), 'trim|required|xss_clean');
 
         if ($this->sch_setting_detail->roll_no) {
             $this->form_validation->set_rules(
@@ -2158,6 +2159,7 @@ class Student extends Admin_Controller
         $this->form_validation->set_rules('class_id', $this->lang->line('class'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('section_id', $this->lang->line('section'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('gender', $this->lang->line('gender'), 'trim|required|xss_clean');
+        $this->form_validation->set_rules('religion', $this->lang->line('religion'), 'trim|required|xss_clean');
 
         if ($this->sch_setting_detail->roll_no) {
             $this->form_validation->set_rules(

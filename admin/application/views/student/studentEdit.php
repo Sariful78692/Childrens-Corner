@@ -153,7 +153,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                 <span class="text-danger"><?php echo form_error('gender'); ?></span>
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <div class="form-group">
                                                 <label for="exampleInputEmail1"><?php echo $this->lang->line('date_of_birth'); ?></label>
                                                 <?php
@@ -165,6 +165,18 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 
                                                 <input id="dob" name="dob" placeholder="" type="text" class="form-control date" oninput="this.value = this.value.replace(/[^0-9\/\-]/g, '')" value="<?php echo set_value('dob', $dob) ?>" />
                                                 <span class="text-danger"><?php echo form_error('dob'); ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="religion"><?php echo $this->lang->line('religion'); ?> <small class="req">*</small></label>
+                                                <select id="religion" name="religion" class="form-control" required>
+                                                    <option value=""><?php echo $this->lang->line('select'); ?></option>
+                                                    <?php foreach (array('Muslim', 'Hindu', 'Christian', 'Sikh', 'Buddhist', 'Jain') as $religion) { ?>
+                                                        <option value="<?php echo $religion; ?>" <?php echo set_value('religion', $student['religion']) === $religion ? 'selected' : ''; ?>><?php echo $religion; ?></option>
+                                                    <?php } ?>
+                                                </select>
+                                                <span class="text-danger"><?php echo form_error('religion'); ?></span>
                                             </div>
                                         </div>
                                     </div>
@@ -188,16 +200,8 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                     <span class="text-danger"><?php echo form_error('category_id'); ?></span>
                                                 </div>
                                             </div>
-                                        <?php }
-                                        /* if ($sch_setting->religion) { ?>
-                                            <div class="col-md-2">
-                                                <div class="form-group">
-                                                    <label for="exampleInputEmail1"><?php echo $this->lang->line('religion'); ?></label>
-                                                    <input id="religion" name="religion" placeholder="" type="text" class="form-control" value="<?php echo set_value('religion', $student['religion']); ?>" />
-                                                    <span class="text-danger"><?php echo form_error('religion'); ?></span>
-                                                </div>
-                                            </div>
-                                        <?php } */
+                                        <?php } ?>
+                                        <?php
                                         if ($sch_setting->cast) { ?>
                                             <div class="col-md-2">
                                                 <div class="form-group">

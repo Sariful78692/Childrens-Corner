@@ -203,16 +203,13 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                         </div>
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label for="religion"><?php echo $this->lang->line('religion'); ?></label>
-                                                <input id="religion" name="religion" list="religionOptions" placeholder="" type="text" class="form-control" value="<?php echo set_value('religion'); ?>" autocomplete="off" />
-                                                <datalist id="religionOptions">
-                                                    <option value="Muslim">
-                                                    <option value="Hindu">
-                                                    <option value="Christian">
-                                                    <option value="Sikh">
-                                                    <option value="Buddhist">
-                                                    <option value="Jain">
-                                                </datalist>
+                                                <label for="religion"><?php echo $this->lang->line('religion'); ?> <small class="req">*</small></label>
+                                                <select id="religion" name="religion" class="form-control" required>
+                                                    <option value=""><?php echo $this->lang->line('select'); ?></option>
+                                                    <?php foreach (array('Muslim', 'Hindu', 'Christian', 'Sikh', 'Buddhist', 'Jain') as $religion) { ?>
+                                                        <option value="<?php echo $religion; ?>" <?php echo set_value('religion') === $religion ? 'selected' : ''; ?>><?php echo $religion; ?></option>
+                                                    <?php } ?>
+                                                </select>
                                                 <span class="text-danger"><?php echo form_error('religion'); ?></span>
                                             </div>
                                         </div>
