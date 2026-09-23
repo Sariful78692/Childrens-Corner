@@ -3905,6 +3905,19 @@ class Student extends Admin_Controller
                 $sch_setting->middlename,
                 $sch_setting->lastname
             );
+
+            // The spreadsheet export must contain dates only. Normalise both
+            // fields here so a datetime value can never reach the XLSX writer.
+            foreach (array('dob', 'admission_date') as $date_field) {
+                if (!empty($student[$date_field]) && $student[$date_field] !== '0000-00-00') {
+                    $student[$date_field] = date(
+                        $this->customlib->getSchoolDateFormat(),
+                        strtotime($student[$date_field])
+                    );
+                } else {
+                    $student[$date_field] = '';
+                }
+            }
         }
 
         header('Content-Type: application/json');

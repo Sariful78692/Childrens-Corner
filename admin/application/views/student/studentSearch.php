@@ -614,7 +614,9 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                 // Columns that must stay plain text on export (long ID numbers)
                                                 // Excel auto-converts long numeric cells to scientific notation
                                                 // unless SheetJS is told to keep them as strings via data-t="s".
-                                                var forceTextColumns = ['aadhaar_no', 'govt_school_id'];
+                                                // Keep IDs and date-only fields as strings. Otherwise SheetJS
+                                                // infers date values and Excel displays an unwanted time portion.
+                                                var forceTextColumns = ['aadhaar_no', 'govt_school_id', 'dob', 'admission_date'];
 
                                                 // Populate temporary table body
                                                 $.each(response, function(i, student) {
