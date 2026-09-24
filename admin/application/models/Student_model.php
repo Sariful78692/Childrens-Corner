@@ -75,6 +75,10 @@ class Student_model extends MY_Model
 
     public function getFilteredStudents($params)
     {
+        $export_session_id = (!empty($params['session_id']) && $params['session_id'] != '1')
+            ? $params['session_id']
+            : $this->current_session;
+
         $this->db->select('
             students.id,
             student_session.id as student_session_id,
@@ -132,7 +136,18 @@ class Student_model extends MY_Model
         ');
 
         $this->db->from('students');
-        $this->db->join('student_session', 'student_session.student_id = students.id');
+        $this->db->join(
+            'student_session',
+            'student_session.student_id = students.id AND student_session.id = (
+                SELECT MAX(active_session.id)
+                FROM student_session AS active_session
+                WHERE active_session.student_id = students.id
+                  AND active_session.session_id = ' . $this->db->escape($export_session_id) . '
+                  AND active_session.status = 1
+            )',
+            'inner',
+            false
+        );
         $this->db->join('sessions', 'student_session.session_id = sessions.id', 'left');
         $this->db->join('classes', 'student_session.class_id = classes.id', 'left');
         $this->db->join('sections', 'student_session.section_id = sections.id', 'left');
@@ -144,13 +159,6 @@ class Student_model extends MY_Model
         $this->db->where('students.is_active', 'yes');
 
         // Apply filters based on parameters
-        if (!empty($params['session_id']) && $params['session_id'] != '1') { // Assuming '1' means 'All Sessions'
-            $this->db->where('student_session.session_id', $params['session_id']);
-        } else {
-            // If 'All Sessions' is selected, filter by the current session as a default if no specific session is chosen
-            $this->db->where('student_session.session_id', $this->current_session);
-        }
-
         if (!empty($params['class_id'])) {
             $this->db->where('student_session.class_id', $params['class_id']);
         }
@@ -179,6 +187,10 @@ class Student_model extends MY_Model
             // Add more fields for full-text search as needed
             $this->db->group_end();
         }
+
+        // Keep the all-data spreadsheet in registration-number order.
+        $this->db->order_by('students.id', 'ASC');
+        $this->db->order_by('student_session.id', 'ASC');
 
         if (isset($params['limit']) && isset($params['offset'])) {
             $this->db->limit((int)$params['limit'], (int)$params['offset']);
