@@ -547,6 +547,9 @@ class Studentfee extends Admin_Controller
         $this->db->where('sfm.student_id', $id);
         $this->db->where('sfm.status', 1);
         $this->db->where('sfm.session_id', $selected_session);
+        if (!empty($student['student_session_id'])) {
+            $this->db->where('sfm.student_session_id', $student['student_session_id']);
+        }
         $this->db->order_by('sfm.feetype_id', 'ASC');
         $query = $this->db->get();
         $fees_data = $query->result();
@@ -567,8 +570,8 @@ class Studentfee extends Admin_Controller
         $data['fees_data'] = $fees_data;
 
         // Calculate total due amount
-        $data['total_due_amount'] = $this->studentfee_model->getStudentDueFee($id, $selected_session);
-        $data['total_amount'] = $this->studentfee_model->getStudentTotalFeeAmount($id, $selected_session);
+        $data['total_due_amount'] = $this->studentfee_model->getStudentDueFee($id, $selected_session, $student['student_session_id']);
+        $data['total_amount'] = $this->studentfee_model->getStudentTotalFeeAmount($id, $selected_session, $student['student_session_id']);
         $data['total_concession_amount'] = $this->studentfee_model->getStudentConcessionAmount($student['student_session_id']);
         $data['total_pending_for_approval_amount'] = $this->studentfee_model->getStudentFeePendingApproval($id, $selected_session);
 

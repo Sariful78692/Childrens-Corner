@@ -376,6 +376,7 @@ class Student extends Admin_Controller
         $this->form_validation->set_rules('class_id', $this->lang->line('class'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('section_id', $this->lang->line('section'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('session_id', $this->lang->line('session'), 'trim|required|xss_clean');
+        $this->form_validation->set_rules('roll_no', $this->lang->line('roll_number'), 'trim|required|xss_clean');
 
         if ($this->form_validation->run() == false) {
             $this->load->view('layout/header', $data);
@@ -387,13 +388,9 @@ class Student extends Admin_Controller
             $student_id = $this->input->post('student_id');
             $account_department_id = $this->input->post('account_department_id');
             $selected_session_id = $this->input->post('session_id');
+            $roll_no = $this->input->post('roll_no', true);
             $same_class = $this->input->post('same_class');
             $current_date_time = date('Y-m-d H:i:s');
-
-            $this->db->where('student_id', $student_id);
-            /* $this->db->where('class_id', $student_session['class_id']);
-            $this->db->where('session_id', $student_session['session_id']); */
-            $this->db->update('student_session', ['updated_at' => $current_date_time, 'status' => 0]);
 
 
             $generatedAdmissionNumber = $this->student_model->generateAdmissionNumber($class_id, $selected_session_id);
@@ -404,12 +401,20 @@ class Student extends Admin_Controller
                 'section_id' => $section_id,
                 'session_id' => $selected_session_id,
                 'admission_no' => $generatedAdmissionNumber,
+                'roll_no' => $roll_no,
                 'account_department_id' => $account_department_id,
+                'status' => 1,
+                'updated_at' => $current_date_time,
                 'created_at' => $current_date_time
             );
 
-            $this->db->insert('student_session', $data_new);
+            // Preserve the old class row for fee/history links and make it
+            // inactive. A fresh row keeps new class fees tied to the new class.
+            $this->db->where('student_id', $student_id)
+                ->where('status', 1)
+                ->update('student_session', ['status' => 0, 'updated_at' => $current_date_time]);
 
+            $this->db->insert('student_session', $data_new);
             $new_student_session_id = $this->db->insert_id();
 
             if ($new_student_session_id) {

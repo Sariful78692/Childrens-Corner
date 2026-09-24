@@ -1997,6 +1997,10 @@ class Student_model extends MY_Model
         $this->db->join('sections', 'sections.id = student_session.section_id');
         $this->db->where('student_session.student_id', $student_id);
         $this->db->where('student_session.session_id', $session_id);
+        // Prefer the active row, but allow historical fee pages to load the
+        // latest row when the student has moved on to a later school session.
+        $this->db->order_by('student_session.status', 'DESC');
+        $this->db->order_by('student_session.id', 'DESC');
         $query = $this->db->get();
         return $query->row_array();
     }
@@ -2475,6 +2479,9 @@ class Student_model extends MY_Model
         } else if ($session_id == 1) {
             $this->datatables->where('student_session.status', 1);
         }
+        // Class updates retain older session rows for fee history; list only
+        // the active class row even when the search targets a specific session.
+        $this->datatables->where('student_session.status', 1);
         if ($gender != null) {
             $this->datatables->where('students.gender', $gender);
         }
@@ -2567,6 +2574,9 @@ class Student_model extends MY_Model
         } else if ($session_id == 1) {
             $this->datatables->where('student_session.status', 1);
         }
+        // Class updates retain older session rows for fee history; list only
+        // the active class row even when the search targets a specific session.
+        $this->datatables->where('student_session.status', 1);
         $this->datatables->searchable('students.id, student_session.admission_no,students.full_name,student_session.roll_no,classes.id,students.father_name,students.dob,students.gender,categories.category,students.mobileno,students.govt_school,students.govt_school_id' . $field_variable);
         $this->datatables->orderable('students.id,student_session.admission_no,students.firstname,student_session.roll_no,classes.id,students.father_name,students.dob,students.gender,categories.category,students.mobileno' . $field_name);
         $this->datatables->sort('students.id', 'desc');

@@ -409,28 +409,42 @@ class Studentfee_model extends MY_Model
         return $this->datatables->generate('json');
     } */
 
-    public function getStudentDueFee($student_id, $session_id)
+    public function getStudentDueFee($student_id, $session_id, $student_session_id = null)
     {
-        $paid_subquery = "(SELECT student_fees_management_id, SUM(paid_amount) as paid_amount FROM student_fees_collections WHERE is_refunded = 0 AND status = 1 GROUP BY student_fees_management_id) paid_sub";
+        // Payments stay linked to the fee row/class where they were collected.
+        // Credit them against the current class fee of the same type so a class
+        // update does not make already-paid months or re-admission due again.
+        $paid_subquery = "(SELECT sfm_paid.student_id, sfm_paid.session_id, sfm_paid.feetype_id,
+                                  SUM(sfc.paid_amount + COALESCE(sfc.discount_amount, 0)) as paid_amount
+                           FROM student_fees_management sfm_paid
+                           INNER JOIN student_fees_collections sfc ON sfc.student_fees_management_id = sfm_paid.id
+                           WHERE sfc.is_refunded = 0 AND sfc.status = 1
+                           GROUP BY sfm_paid.student_id, sfm_paid.session_id, sfm_paid.feetype_id) paid_sub";
 
-        $this->db->select('(SUM(sfm.discounted_fees) - SUM(IFNULL(paid_sub.paid_amount, 0))) as total_due');
+        $this->db->select('SUM(GREATEST(sfm.discounted_fees - IFNULL(paid_sub.paid_amount, 0), 0)) as total_due');
         $this->db->from('student_fees_management sfm');
-        $this->db->join($paid_subquery, 'paid_sub.student_fees_management_id = sfm.id', 'left');
+        $this->db->join($paid_subquery, 'paid_sub.student_id = sfm.student_id AND paid_sub.session_id = sfm.session_id AND paid_sub.feetype_id = sfm.feetype_id', 'left');
         $this->db->where('sfm.student_id', $student_id);
         $this->db->where('sfm.session_id', $session_id);
         $this->db->where('sfm.status', 1);
+        if (!empty($student_session_id)) {
+            $this->db->where('sfm.student_session_id', $student_session_id);
+        }
         $query = $this->db->get();
         $result = $query->row();
         return $result->total_due;
     }
 
-    public function getStudentTotalFeeAmount($student_id, $session_id)
+    public function getStudentTotalFeeAmount($student_id, $session_id, $student_session_id = null)
     {
         $this->db->select_sum('discounted_fees', 'total_amount');
         $this->db->from('student_fees_management');
         $this->db->where('student_id', $student_id);
         $this->db->where('session_id', $session_id);
         $this->db->where('status', 1);
+        if (!empty($student_session_id)) {
+            $this->db->where('student_session_id', $student_session_id);
+        }
 
         return $this->db->get()->row()->total_amount;
     }
@@ -453,7 +467,7 @@ class Studentfee_model extends MY_Model
         return $total_discount_amount;
     }
 
-    public function getStudentFeePendingApproval($student_id, $session_id)
+    public function getStudentFeePendingApproval($student_id, $session_id, $student_session_id = null)
     {
         $this->db->select_sum('paid_amount', 'total_paid');
         $this->db->from('student_fees_collections');
@@ -461,6 +475,9 @@ class Studentfee_model extends MY_Model
         $this->db->where('session_id', $session_id);
         $this->db->where('is_refunded', 0);
         $this->db->where('status', 2);
+        if (!empty($student_session_id)) {
+            $this->db->where('student_session_id', $student_session_id);
+        }
 
         return $this->db->get()->row()->total_paid;
     }

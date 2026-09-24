@@ -14,6 +14,11 @@
         /* Light yellow */
     }
 
+    .fees_collection .table-hover>tbody>tr:hover>td {
+        background-color: #d9efff;
+        transition: background-color 0.15s ease-in-out;
+    }
+
     .fees_collection hr {
         margin-top: 10px;
         margin-bottom: 0px;

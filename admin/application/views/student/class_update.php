@@ -124,6 +124,13 @@
                                         <span class="text-danger"><?php echo form_error('session_id'); ?></span>
                                     </div>
                                 </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="roll_no"><?php echo $this->lang->line('roll_number'); ?></label><small class="req"> *</small>
+                                        <input type="text" id="roll_no" name="roll_no" class="form-control" value="<?php echo set_value('roll_no', $student['roll_no']); ?>">
+                                        <span class="text-danger"><?php echo form_error('roll_no'); ?></span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
