@@ -66,7 +66,7 @@
                             <?php echo $this->customlib->getCSRF(); ?>
                             <input type="hidden" name="student_id" value="<?php echo $student['id']; ?>">
                             <div class="row">
-                                <div class="col-md-3">
+                                <div class="col-md-3" style="width: 20%;">
                                     <div class="form-group">
                                         <label for="exampleInputEmail1"><?php echo $this->lang->line('account_departments'); ?></label><small class="req"> *</small>
                                         <select id="account_department_id" name="account_department_id" class="form-control">
@@ -82,7 +82,7 @@
                                         <span class="text-danger"><?php echo form_error('account_department_id'); ?></span>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3" style="width: 20%;">
                                     <div class="form-group">
                                         <label for="exampleInputEmail1"><?php echo $this->lang->line('class'); ?></label><small class="req"> *</small>
                                         <select id="class_id" name="class_id" class="form-control">
@@ -99,7 +99,7 @@
                                         <span class="text-danger"><?php echo form_error('class_id'); ?></span>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3" style="width: 20%;">
                                     <div class="form-group">
                                         <label for="exampleInputEmail1"><?php echo $this->lang->line('section'); ?></label><small class="req"> *</small>
                                         <select id="section_id" name="section_id" class="form-control">
@@ -108,7 +108,7 @@
                                         <span class="text-danger"><?php echo form_error('section_id'); ?></span>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3" style="width: 20%;">
                                     <div class="form-group">
                                         <label for="exampleInputEmail1"><?php echo $this->lang->line('session'); ?></label><small class="req"> *</small>
                                         <select id="session_id" name="session_id" class="form-control">
@@ -124,7 +124,7 @@
                                         <span class="text-danger"><?php echo form_error('session_id'); ?></span>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3" style="width: 20%;">
                                     <div class="form-group">
                                         <label for="roll_no"><?php echo $this->lang->line('roll_number'); ?></label><small class="req"> *</small>
                                         <input type="text" id="roll_no" name="roll_no" class="form-control" value="<?php echo set_value('roll_no', $student['roll_no']); ?>">

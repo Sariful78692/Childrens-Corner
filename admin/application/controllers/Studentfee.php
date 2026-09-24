@@ -676,23 +676,7 @@ class Studentfee extends Admin_Controller
             if ($student_fees_collection_id > 0) {
 
                 // Generate next unique payment hash based on MAX existing hash
-                $last = $this->db->query("SELECT payment_hash FROM student_fees_collections WHERE payment_hash IS NOT NULL AND payment_hash != '' ORDER BY CAST(SUBSTRING(payment_hash, 2) AS UNSIGNED) DESC LIMIT 1")->row();
-                if ($last && $last->payment_hash) {
-                    $last_letter = substr($last->payment_hash, 0, 1);
-                    $last_num    = intval(substr($last->payment_hash, 1));
-                    if ($last_num >= 9999) {
-                        $batch_letter    = chr(ord($last_letter) + 1);
-                        $number_in_batch = 1;
-                    } else {
-                        $batch_letter    = $last_letter;
-                        $number_in_batch = $last_num + 1;
-                    }
-                } else {
-                    $batch_letter    = 'A';
-                    $number_in_batch = 1;
-                }
-                $padded_number = str_pad($number_in_batch, 4, '0', STR_PAD_LEFT);
-                $payment_hash  = $batch_letter . $padded_number;
+                $payment_hash = $this->getNextPaymentHash();
 
                 $this->db->where('id', $student_fees_collection_id)
                     ->update('student_fees_collections', [
@@ -747,23 +731,7 @@ class Studentfee extends Admin_Controller
             if (!empty($student_fees_management)) {
 
                 // Generate next unique payment hash based on MAX existing hash
-                $last = $this->db->query("SELECT payment_hash FROM student_fees_collections WHERE payment_hash IS NOT NULL AND payment_hash != '' ORDER BY CAST(SUBSTRING(payment_hash, 2) AS UNSIGNED) DESC LIMIT 1")->row();
-                if ($last && $last->payment_hash) {
-                    $last_letter = substr($last->payment_hash, 0, 1);
-                    $last_num    = intval(substr($last->payment_hash, 1));
-                    if ($last_num >= 9999) {
-                        $batch_letter    = chr(ord($last_letter) + 1);
-                        $number_in_batch = 1;
-                    } else {
-                        $batch_letter    = $last_letter;
-                        $number_in_batch = $last_num + 1;
-                    }
-                } else {
-                    $batch_letter    = 'A';
-                    $number_in_batch = 1;
-                }
-                $padded_number = str_pad($number_in_batch, 4, '0', STR_PAD_LEFT);
-                $payment_hash  = $batch_letter . $padded_number;
+                $payment_hash = $this->getNextPaymentHash();
 
                 foreach ($student_fees_management as $fee) {
                     $fees_id = $fee->fees_id;
@@ -1231,12 +1199,40 @@ class Studentfee extends Admin_Controller
         echo json_encode(array('status' => 1, 'page' => $page));
     }
 
+    private function getMaxPaymentHashSerial()
+    {
+        $rows = $this->db->select('payment_hash')
+            ->from('student_fees_collections')
+            ->where('payment_hash IS NOT NULL', null, false)
+            ->where('payment_hash !=', '')
+            ->get()
+            ->result();
+
+        $max_serial = 0;
+        foreach ($rows as $row) {
+            if (preg_match('/^([A-Z])(\d{4})$/', $row->payment_hash, $matches)) {
+                $serial = (ord($matches[1]) - ord('A')) * 9999 + intval($matches[2]);
+                $max_serial = max($max_serial, $serial);
+            }
+        }
+
+        return $max_serial;
+    }
+
+    private function getNextPaymentHash()
+    {
+        $serial = $this->getMaxPaymentHashSerial() + 1;
+        $letter = chr(ord('A') + intval(($serial - 1) / 9999));
+        $number = (($serial - 1) % 9999) + 1;
+
+        return $letter . str_pad($number, 4, '0', STR_PAD_LEFT);
+    }
+
     public function fix_duplicate_hashes()
     {
         if (!$this->session->userdata('admin')) { exit('Unauthorized'); }
 
-        $last = $this->db->query("SELECT payment_hash FROM student_fees_collections WHERE payment_hash IS NOT NULL AND payment_hash != '' ORDER BY CAST(SUBSTRING(payment_hash, 2) AS UNSIGNED) DESC LIMIT 1")->row();
-        $max_num = $last ? intval(substr($last->payment_hash, 1)) : 0;
+        $max_num = $this->getMaxPaymentHashSerial();
 
         $duplicates = $this->db->query("
             SELECT id FROM student_fees_collections
@@ -1253,13 +1249,15 @@ class Studentfee extends Admin_Controller
         foreach ($duplicates as $row) {
             $counter++;
             $num             = $max_num + $counter;
-            $batch_letter    = chr(65 + intval(($num - 1) / 9999));
+            $batch_letter    = chr(ord('A') + intval(($num - 1) / 9999));
             $number_in_batch = (($num - 1) % 9999) + 1;
             $new_hash        = $batch_letter . str_pad($number_in_batch, 4, '0', STR_PAD_LEFT);
             $this->db->where('id', $row['id'])->update('student_fees_collections', ['payment_hash' => $new_hash]);
         }
 
-        echo "Done. Fixed {$counter} duplicate hashes. New hashes start from A" . str_pad($max_num + 1, 4, '0', STR_PAD_LEFT);
+        $next_serial = $max_num + 1;
+        $next_hash = chr(ord('A') + intval(($next_serial - 1) / 9999)) . str_pad((($next_serial - 1) % 9999) + 1, 4, '0', STR_PAD_LEFT);
+        echo "Done. Fixed {$counter} duplicate hashes. New hashes start from {$next_hash}";
     }
 
     public function printFeesByPaymentID()

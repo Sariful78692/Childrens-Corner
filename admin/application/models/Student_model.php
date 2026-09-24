@@ -697,6 +697,7 @@ class Student_model extends MY_Model
             ->join('categories', 'students.category_id = categories.id', 'left')
             //->where('student_session.session_id', $this->current_session)
             ->where('students.is_active', "yes")
+            ->where('student_session.status', 1)
             ->sort('student_session.admission_no', 'asc');
         // **Fixed condition for class_id**
         if ($class_id !== null && $class_id !== 'all') {
@@ -711,6 +712,8 @@ class Student_model extends MY_Model
         if ($session_id != null && $session_id != 1) {
             $this->datatables->where('student_session.session_id', $session_id);
         }
+        // Keep historical class rows out of fee collection search results.
+        $this->datatables->where('student_session.status', 1);
 
         $this->datatables->from('students');
         return $this->datatables->generate('json');

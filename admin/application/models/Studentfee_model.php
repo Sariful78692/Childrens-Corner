@@ -1155,7 +1155,7 @@ class Studentfee_model extends MY_Model
             ->from('student_fees_collections sfc')
             ->join('students', 'students.id = sfc.student_id')
             ->join('classes', 'classes.id = sfc.class_id')
-            ->join('student_session', 'student_session.student_id = students.id AND student_session.session_id = sfc.session_id')
+            ->join('student_session', 'student_session.id = sfc.student_session_id')
             ->join('sections', 'sections.id = student_session.section_id')
             ->join('feetype', 'feetype.id = sfc.feetype_id')
             ->join('staff', 'staff.id = sfc.collection_by', 'left')
