@@ -1023,7 +1023,7 @@ class Studentfee_model extends MY_Model
      * Keep a fee collection and its approved credit transaction in sync when
      * dates are corrected from the student fee screen.
      */
-    public function updateCollectionDates($collection_id, $student_id, $session_id, $collection_date, $refund_date, $approved_date)
+    public function updateCollectionDates($collection_id, $student_id, $session_id, $collection_date, $refund_date, $approved_date, $payment_method_id)
     {
         $this->db->trans_begin();
 
@@ -1066,7 +1066,15 @@ class Studentfee_model extends MY_Model
             'collection_date' => $collection_date,
             'refund_date'     => $refund_date,
             'approved_date'   => $approved_date,
+            'payment_method_id' => $payment_method_id,
         ));
+
+        // Balance sheet balances are read from the transaction ledger. Keep
+        // this collection's credit and any refund debit under its current mode.
+        $this->db->where('table_id', $collection_id);
+        $this->db->where('transaction_for_table', 'student_fees_collections');
+        $this->db->where('status', 1);
+        $this->db->update('transactions', array('payment_method_id' => $payment_method_id));
 
         // A refund produces a debit transaction as well.  Only the credit
         // transaction created on approval represents the approve date.

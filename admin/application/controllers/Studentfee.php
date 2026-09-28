@@ -633,6 +633,10 @@ class Studentfee extends Admin_Controller
             $collection_by = $this->session->userdata('admin')['id'];
             /* $collection_date = $this->input->post('collection_date'); */
             $collection_date = $this->input->post('collection_date') ?: date('Y-m-d');
+            if (!$this->valid_date_format($collection_date) || $collection_date > date('Y-m-d')) {
+                echo json_encode(array('status' => 'fail', 'message' => 'Collection date must be a valid date up to today.'));
+                return;
+            }
             log_message('debug', 'Collection Date from POST: ' . $collection_date);
             $default_status = 2; //2 is for Pending and 1 is for Approved 
 
@@ -714,6 +718,10 @@ class Studentfee extends Admin_Controller
             $note = $this->input->post('note');
             $collection_by = $this->session->userdata('admin')['id'];
             $collection_date = $this->input->post('collection_date') ?: date('Y-m-d');
+            if (!$this->valid_date_format($collection_date) || $collection_date > date('Y-m-d')) {
+                echo json_encode(array('status' => 'fail', 'message' => 'Collection date must be a valid date up to today.'));
+                return;
+            }
 
             $current_user_id = $this->session->userdata['admin']['id'];
             $current_user_name = $this->session->userdata['admin']['username'];
@@ -873,9 +881,12 @@ class Studentfee extends Admin_Controller
         }
 
         $collection_date = substr((string) $fees_data['collection_date'], 0, 10);
+        $refund_start_date = (int) $fees_data['status'] === 1 && !empty($fees_data['approved_date'])
+            ? substr((string) $fees_data['approved_date'], 0, 10)
+            : $collection_date;
         $today = date('Y-m-d');
-        if (!$this->valid_date_format($refund_date) || !$this->valid_date_format($collection_date) || $refund_date < $collection_date || $refund_date > $today) {
-            $this->session->set_flashdata('msg', '<div class="alert alert-danger text-left">Refund date must be between the collection date and today.</div>');
+        if (!$this->valid_date_format($refund_date) || !$this->valid_date_format($refund_start_date) || $refund_date < $refund_start_date || $refund_date > $today) {
+            $this->session->set_flashdata('msg', '<div class="alert alert-danger text-left">Refund date must be between the approval (or collection) date and today.</div>');
             redirect('studentfee/addfees/' . $fees_data['student_id'] . '/?session_id=' . $session_id);
             return;
         }
@@ -940,8 +951,9 @@ class Studentfee extends Admin_Controller
         $collection_date = trim((string) $this->input->post('collection_date'));
         $refund_date     = trim((string) $this->input->post('refund_date'));
         $approved_date   = trim((string) $this->input->post('approved_date'));
+        $payment_method_id = (int) $this->input->post('payment_method_id');
 
-        if ($collection_id <= 0 || $student_id <= 0 || $session_id <= 0 || !$this->valid_date_format($collection_date)) {
+        if ($collection_id <= 0 || $student_id <= 0 || $session_id <= 0 || $payment_method_id <= 0 || !$this->valid_date_format($collection_date) || $collection_date > date('Y-m-d')) {
             $this->session->set_flashdata('msg', '<div class="alert alert-danger text-left">Please provide a valid collection date.</div>');
             redirect('studentfee/addfees/' . $student_id . '/?session_id=' . $session_id);
             return;
@@ -959,7 +971,8 @@ class Studentfee extends Admin_Controller
             $session_id,
             $collection_date,
             $refund_date === '' ? null : $refund_date,
-            $approved_date === '' ? null : $approved_date
+            $approved_date === '' ? null : $approved_date,
+            $payment_method_id
         );
 
         $message = $result

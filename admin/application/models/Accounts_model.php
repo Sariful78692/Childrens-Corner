@@ -213,32 +213,42 @@ class Accounts_model extends MY_Model
         $this->db->select("
                 SUM(
                     CASE 
-                        WHEN trans_type = 1 THEN amount
-                        WHEN trans_type = 2 THEN -amount
-                        WHEN trans_type = 3 THEN 
+                        WHEN t.trans_type = 1 THEN t.amount
+                        WHEN t.trans_type = 2 THEN -t.amount
+                        WHEN t.trans_type = 3 THEN 
                             CASE 
-                                WHEN transaction_for_table IN ('expenses', 'staff_payslip', 'staff_loans') THEN amount
-                                WHEN transaction_for_table IN ('income', 'student_fees_collections') THEN -amount
+                                WHEN t.transaction_for_table IN ('expenses', 'staff_payslip', 'staff_loans') THEN t.amount
+                                WHEN t.transaction_for_table IN ('income', 'student_fees_collections') THEN -t.amount
                                 ELSE 0
                             END
                         ELSE 0
                     END
                 ) AS balance", false);
 
-        $this->db->from('transactions');
+        $this->db->from('transactions t');
+        $this->db->join(
+            'student_fees_collections sfc',
+            "t.transaction_for_table = 'student_fees_collections' AND t.table_id = sfc.id",
+            'left',
+            false
+        );
 
         if (!empty($from_date) && !empty($to_date)) {
-            $this->db->where('transactions.trans_date >=', $from_date);
-            $this->db->where('transactions.trans_date <=', $to_date);
+            $this->db->where('t.trans_date >=', $from_date);
+            $this->db->where('t.trans_date <=', $to_date);
         } elseif (!empty($from_date)) {
-            $this->db->where('transactions.trans_date >=', $from_date);
+            $this->db->where('t.trans_date >=', $from_date);
         } elseif (!empty($to_date)) {
-            $this->db->where('transactions.trans_date <=', $to_date);
+            $this->db->where('t.trans_date <=', $to_date);
         }
         if ($payment_method_id) {
-            $this->db->where('payment_method_id', $payment_method_id);
+            $this->db->where(
+                "(CASE WHEN t.transaction_for_table = 'student_fees_collections' THEN sfc.payment_method_id ELSE t.payment_method_id END) = " . (int) $payment_method_id,
+                null,
+                false
+            );
         }
-        $this->db->where('transactions.status', 1);
+        $this->db->where('t.status', 1);
         $query = $this->db->get();
         $result = $query->row();
 

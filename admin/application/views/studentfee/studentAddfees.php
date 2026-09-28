@@ -218,12 +218,12 @@ $language_name   = $language["short_code"];
                                                 if ($paid_amount_row->status == 2) {
                                                     $row_class = 'pending-row';
                                                     $action_content = '<span class="label label-warning">' . $this->lang->line('pending') . '</span>';
-                                                    $action_content .= "<a href='javascript:void(0);' class='btn btn-default btn-xs refund-button' data-refund-id='" . $paid_amount_row->id . "' data-collection-date='" . html_escape(substr((string) $collection_date, 0, 10)) . "' data-url='" . base_url() . "studentfee/refund' title='Refund' data-toggle='tooltip'><i class='fa fa-undo'></i></a>"; // Use $paid_amount_row->id
+                                                    $action_content .= "<a href='javascript:void(0);' class='btn btn-default btn-xs refund-button' data-refund-id='" . $paid_amount_row->id . "' data-collection-date='" . html_escape(substr((string) $collection_date, 0, 10)) . "' data-approval-date='" . html_escape(substr((string) $approved_date, 0, 10)) . "' data-status='" . (int) $paid_amount_row->status . "' data-url='" . base_url() . "studentfee/refund' title='Refund' data-toggle='tooltip'><i class='fa fa-undo'></i></a>";
 
                                                 } else {
                                                     if (!$paid_amount_row->is_refunded) { // Use $paid_amount_row->is_refunded
                                                         if ($current_user_id == 1) {
-                                                            $action_content .= "<a href='javascript:void(0);' class='btn btn-default btn-xs refund-button' data-refund-id='" . $paid_amount_row->id . "' data-collection-date='" . html_escape(substr((string) $collection_date, 0, 10)) . "' data-url='" . base_url() . "studentfee/refund' title='Refund' data-toggle='tooltip'><i class='fa fa-undo'></i></a>"; // Use $paid_amount_row->id
+                                                            $action_content .= "<a href='javascript:void(0);' class='btn btn-default btn-xs refund-button' data-refund-id='" . $paid_amount_row->id . "' data-collection-date='" . html_escape(substr((string) $collection_date, 0, 10)) . "' data-approval-date='" . html_escape(substr((string) $approved_date, 0, 10)) . "' data-status='" . (int) $paid_amount_row->status . "' data-url='" . base_url() . "studentfee/refund' title='Refund' data-toggle='tooltip'><i class='fa fa-undo'></i></a>";
                                                         }
                                                     } else {
                                                         $action_content .= $paid_amount_row->refund_note; // Use $paid_amount_row->refund_note
@@ -233,7 +233,7 @@ $language_name   = $language["short_code"];
                                                     $action_content .= '<button class="btn btn-xs btn-default printDoc" data-payment_hash="' . $paid_amount_row->payment_hash . '" title="' . $this->lang->line('print') . '"><i class="fa fa-print"></i> </button>'; // Use $paid_amount_row->payment_hash
                                                 }
                                                 if ($this->rbac->hasPrivilege('collect_fees', 'can_edit')) {
-                                                    $action_content .= '<button type="button" class="btn btn-xs btn-primary edit-collection-dates" title="Edit dates" data-toggle="tooltip" data-collection-id="' . (int) $paid_amount_row->id . '" data-collection-date="' . html_escape(substr((string) $collection_date, 0, 10)) . '" data-refund-date="' . html_escape(substr((string) $refund_date, 0, 10)) . '" data-approved-date="' . html_escape(substr((string) $approved_date, 0, 10)) . '"><i class="fa fa-pencil"></i> Edit</button>';
+                                                    $action_content .= '<button type="button" class="btn btn-xs btn-primary edit-collection-dates" title="Edit payment" data-toggle="tooltip" data-collection-id="' . (int) $paid_amount_row->id . '" data-collection-date="' . html_escape(substr((string) $collection_date, 0, 10)) . '" data-refund-date="' . html_escape(substr((string) $refund_date, 0, 10)) . '" data-approved-date="' . html_escape(substr((string) $approved_date, 0, 10)) . '" data-payment-method-id="' . (int) $payment_method_id . '"><i class="fa fa-pencil"></i> Edit</button>';
                                                 }
 
                                         ?>
@@ -244,7 +244,7 @@ $language_name   = $language["short_code"];
                                                     <td class="text-center"><?php echo get_payment_mode($paid_amount_row->payment_method_id); ?></td>
                                                     <td><?php echo $paid_amount_row->collection_date; ?></td>
                                                     <td><?php echo $paid_amount_row->refund_date; ?></td>
-                                                    <td><?php echo $paid_amount_row->approved_date; ?></td>
+                                                    <td><?php echo !empty($paid_amount_row->approved_date) ? html_escape(substr((string) $paid_amount_row->approved_date, 0, 10)) : ''; ?></td>
 
                                                     <!-- <td class="text-right"><?php echo $currency_symbol . number_format($discount_amount, 2); ?></td> -->
                                                     <td>
@@ -272,7 +272,12 @@ $language_name   = $language["short_code"];
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title paymentModalLabel"><?php echo $this->customlib->getFullName($student['firstname'], $student['middlename'], $student['lastname'], $sch_setting->middlename, $sch_setting->lastname); ?> - <?php echo $student['class'] . " (" . $student['section'] . ")" ?> <span id="feetype-name"></span></h5>
+                <h5 class="modal-title paymentModalLabel" style="font-size:20px;font-weight:700;color:#17365d;background:#eef6ff;border-left:4px solid #1683d8;border-radius:4px;padding:10px 12px;line-height:1.45;">
+                    <i class="fa fa-user-circle" aria-hidden="true"></i>
+                    <?php echo html_escape($this->customlib->getFullName($student['firstname'], $student['middlename'], $student['lastname'], $sch_setting->middlename, $sch_setting->lastname)); ?>
+                    <span style="color:#52677d;font-weight:600;">- <?php echo html_escape($student['class'] . ' (' . $student['section'] . ')'); ?></span>
+                    <span id="feetype-name" style="display:inline-block;margin-left:4px;padding:2px 7px;background:#fff1c2;color:#725500;border-radius:3px;font-size:16px;font-weight:700;"></span>
+                </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -341,7 +346,11 @@ $language_name   = $language["short_code"];
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title paymentModalLabel"><?php echo $this->customlib->getFullName($student['firstname'], $student['middlename'], $student['lastname'], $sch_setting->middlename, $sch_setting->lastname); ?> - <?php echo $student['class'] . " (" . $student['section'] . ")" ?> </h5>
+                <h5 class="modal-title paymentModalLabel" style="font-size:20px;font-weight:700;color:#17365d;background:#eef6ff;border-left:4px solid #1683d8;border-radius:4px;padding:10px 12px;line-height:1.45;">
+                    <i class="fa fa-user-circle" aria-hidden="true"></i>
+                    <?php echo html_escape($this->customlib->getFullName($student['firstname'], $student['middlename'], $student['lastname'], $sch_setting->middlename, $sch_setting->lastname)); ?>
+                    <span style="color:#52677d;font-weight:600;">- <?php echo html_escape($student['class'] . ' (' . $student['section'] . ')'); ?></span>
+                </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -462,15 +471,23 @@ $language_name   = $language["short_code"];
                 <input type="hidden" name="student_id" value="<?php echo (int) $student['id']; ?>">
                 <input type="hidden" name="session_id" value="<?php echo (int) $selected_session; ?>">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Fee Collection Dates</h5>
+                    <h5 class="modal-title">Edit Fee Collection</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
+                        <label for="edit_payment_method_id">Payment Mode:</label>
+                        <select id="edit_payment_method_id" name="payment_method_id" class="form-control" required>
+                            <?php foreach ($paymentMethods as $method) : ?>
+                                <option value="<?php echo (int) $method['id']; ?>"><?php echo html_escape($method['title']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="edit_collection_date">Collection Date:</label>
-                        <input type="date" id="edit_collection_date" name="collection_date" class="form-control" required>
+                        <input type="date" id="edit_collection_date" name="collection_date" class="form-control" max="<?php echo date('Y-m-d'); ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="edit_refund_date">Refund Date:</label>
@@ -888,6 +905,7 @@ $language_name   = $language["short_code"];
         $('#edit_collection_date').val($(this).data('collection-date'));
         $('#edit_refund_date').val($(this).data('refund-date'));
         $('#edit_approved_date').val($(this).data('approved-date'));
+        $('#edit_payment_method_id').val($(this).data('payment-method-id'));
         $('#editCollectionDatesModal').modal('show');
     });
 
@@ -906,17 +924,20 @@ $language_name   = $language["short_code"];
         const refundId = $(this).data("refund-id");
         const actionUrl = $(this).data("url");
         const collectionDate = $(this).data("collection-date");
+        const approvalDate = $(this).data("approval-date");
+        const status = parseInt($(this).data("status"), 10);
 
         // Populate the modal form
         $("#refund_id").val(refundId);
         $("#refundForm").attr("action", actionUrl);
 
-        // Refunds may be dated from the collection date through today.
-        var today = new Date().toISOString().split('T')[0];
+        // Approved refunds start from approval; pending refunds start from collection.
+        var today = '<?php echo date('Y-m-d'); ?>';
+        const refundStartDate = status === 1 && approvalDate ? approvalDate : collectionDate;
         $("#refund_date").attr({
-            min: collectionDate,
+            min: refundStartDate,
             max: today
-        }).val(collectionDate);
+        }).val(refundStartDate);
 
         // Show the modal
         $("#refundModal").modal("show");
