@@ -728,8 +728,16 @@ class Studentfee extends Admin_Controller
 
             $this->db->where('student_id', $student_id);
             $this->db->where('session_id', $session_id);
+            // Match the fee rows shown on addfees() and keep collection order
+            // deterministic. Without these constraints, a lump-sum payment
+            // could be allocated to another session or to months in arbitrary
+            // database order (for example, skipping September for November).
+            if (!empty($student_session_id)) {
+                $this->db->where('student_session_id', $student_session_id);
+            }
             $this->db->where('status', 1);
             $this->db->select('id as fees_id, class_id, session_id, feetype_id, discounted_fees');
+            $this->db->order_by('feetype_id', 'ASC');
             $student_fees_management = $this->db->get('student_fees_management')->result();
 
             $current_inhand_amount = $enter_amount;
