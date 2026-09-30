@@ -372,6 +372,12 @@ $currency_symbol = $admin_session['currency_symbol'];
                                                     <td><?php echo $student['religion']; ?></td>
                                                 </tr>
                                             <?php }
+                                            ?>
+                                            <tr>
+                                                <td>Aadhaar Number</td>
+                                                <td><?php echo !empty($student['aadhaar_no']) ? $student['aadhaar_no'] : ''; ?></td>
+                                            </tr>
+                                            <?php
                                             if ($sch_setting->student_email) { ?>
                                                 <tr>
                                                     <td><?php echo $this->lang->line('email'); ?></td>
