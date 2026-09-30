@@ -1114,6 +1114,11 @@ class Student extends Admin_Controller
         $master_fees_query = $this->db->get();
         $masterFees = $master_fees_query->result_array();
 
+        // A class fee can be duplicated in fees_master_class_wise (usually
+        // after a fee setup was copied more than once). The editor identifies
+        // a fee by its session and fee type, so render only one canonical row.
+        $masterFees = $this->uniqueFeesBySessionAndType($masterFees);
+
         $studentFees = [];
         if ($student_id > 0) {
             // Query the database to fetch fees already assigned to the student (Student Fees)
@@ -1128,6 +1133,7 @@ class Student extends Admin_Controller
             }
             $student_fees_query = $this->db->get();
             $studentFees = $student_fees_query->result_array();
+            $studentFees = $this->uniqueFeesBySessionAndType($studentFees);
         }
 
         $mergedFees = [];
@@ -1168,6 +1174,19 @@ class Student extends Admin_Controller
         $this->output
             ->set_content_type('application/json')
             ->set_output(json_encode($response));
+    }
+
+    /** Keep one fee row per session and fee type for the student fee editor. */
+    private function uniqueFeesBySessionAndType($fees)
+    {
+        $unique = [];
+        foreach ($fees as $fee) {
+            $key = (int) $fee['session_id'] . ':' . (int) $fee['feetype_id'];
+            if (!isset($unique[$key])) {
+                $unique[$key] = $fee;
+            }
+        }
+        return array_values($unique);
     }
 
     public function update_discounted_fees()

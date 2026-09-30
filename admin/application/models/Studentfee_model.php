@@ -409,7 +409,7 @@ class Studentfee_model extends MY_Model
         return $this->datatables->generate('json');
     } */
 
-    public function getStudentDueFee($student_id, $session_id, $student_session_id = null)
+    public function getStudentDueFee($student_id, $session_id)
     {
         // Payments stay linked to the fee row/class where they were collected.
         // Credit them against the current class fee of the same type so a class
@@ -427,25 +427,18 @@ class Studentfee_model extends MY_Model
         $this->db->where('sfm.student_id', $student_id);
         $this->db->where('sfm.session_id', $session_id);
         $this->db->where('sfm.status', 1);
-        if (!empty($student_session_id)) {
-            $this->db->where('sfm.student_session_id', $student_session_id);
-        }
         $query = $this->db->get();
         $result = $query->row();
         return $result->total_due;
     }
 
-    public function getStudentTotalFeeAmount($student_id, $session_id, $student_session_id = null)
+    public function getStudentTotalFeeAmount($student_id, $session_id)
     {
         $this->db->select_sum('discounted_fees', 'total_amount');
         $this->db->from('student_fees_management');
         $this->db->where('student_id', $student_id);
         $this->db->where('session_id', $session_id);
         $this->db->where('status', 1);
-        if (!empty($student_session_id)) {
-            $this->db->where('student_session_id', $student_session_id);
-        }
-
         return $this->db->get()->row()->total_amount;
     }
 
