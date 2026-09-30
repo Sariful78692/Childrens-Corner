@@ -200,7 +200,7 @@
                     <input type="hidden" id="modal_fee_id" name="fee_id">
                     <div class="form-group">
                         <label for="approved_date"><?php echo $this->lang->line('approved_date'); ?></label>
-                        <input type="date" class="form-control" id="approved_date" name="approved_date" value="<?php echo date('Y-m-d'); ?>">
+                        <input type="date" class="form-control" id="approved_date" name="approved_date" value="<?php echo date('Y-m-d'); ?>" max="<?php echo date('Y-m-d'); ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="note"><?php echo $this->lang->line('note'); ?></label>
@@ -217,6 +217,17 @@
 </div>
 
 <script type="text/javascript">
+    var approvalDateMax = '<?php echo date('Y-m-d'); ?>';
+
+    // Enforce the date limit even when a date is typed instead of picked.
+    $(document).on('input change', '#approved_date', function() {
+        if (this.value && this.value > approvalDateMax) {
+            this.setCustomValidity('Approval date cannot be after today.');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
     $(document).on('click', '.approve_fee_btn', function() {
         var fee_id = $(this).data('fee-id');
         $('#modal_fee_id').val(fee_id);
@@ -256,6 +267,11 @@
             var approved_date = $('#approved_date').val();
             var note = $('#note').val();
             var $this = $(this);
+
+            if (!approved_date || approved_date > approvalDateMax) {
+                errorMsg('Approval date cannot be after today.');
+                return;
+            }
 
             var fee_ids;
             try {

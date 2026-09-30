@@ -604,6 +604,20 @@ class Studentfee extends Admin_Controller
         return false;
     }
 
+    public function valid_approval_date($date)
+    {
+        if (!$this->valid_date_format($date)) {
+            return false;
+        }
+
+        if ($date > date('Y-m-d')) {
+            $this->form_validation->set_message('valid_approval_date', 'The {field} field cannot be after today.');
+            return false;
+        }
+
+        return true;
+    }
+
     public function collect_single_payment()
     {
         $this->form_validation->set_rules('amount', 'Amount', 'required|numeric|greater_than[1]');
@@ -1853,7 +1867,7 @@ class Studentfee extends Admin_Controller
         }
 
         $this->form_validation->set_rules('fee_id', 'Fee ID', 'required|trim|xss_clean');
-        $this->form_validation->set_rules('approved_date', 'Approved Date', 'required|trim|xss_clean|callback_valid_date_format');
+        $this->form_validation->set_rules('approved_date', 'Approved Date', 'required|trim|xss_clean|callback_valid_approval_date');
         $this->form_validation->set_rules('note', 'Note', 'trim|xss_clean');
 
         if ($this->form_validation->run() == false) {
@@ -1896,7 +1910,7 @@ class Studentfee extends Admin_Controller
         }
 
         $this->form_validation->set_rules('fee_ids[]', 'Fee IDs', 'required'); // Ensure fee_ids is an array
-        $this->form_validation->set_rules('approved_date', 'Approved Date', 'required|trim|xss_clean|callback_valid_date_format');
+        $this->form_validation->set_rules('approved_date', 'Approved Date', 'required|trim|xss_clean|callback_valid_approval_date');
         $this->form_validation->set_rules('note', 'Note', 'trim|xss_clean');
 
         if ($this->form_validation->run() == false) {
