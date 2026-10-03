@@ -129,7 +129,14 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat(); ?>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1"><?php echo $this->lang->line('fees_type'); ?></label><small class="req"> *</small>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <label for="feetype_id"><?php echo $this->lang->line('fees_type'); ?></label><small class="req"> *</small>
+                                        </div>
+                                        <label for="select_all_feetypes" style="font-weight: normal; margin-bottom: 5px;">
+                                            <input type="checkbox" id="select_all_feetypes"> Select All
+                                        </label>
+                                    </div>
                                     <select id="feetype_id" name="feetype_id[]" class="form-control chosen" multiple="" required>
                                         <option value=""><?php echo $this->lang->line('select'); ?></option>
                                         <?php
@@ -272,6 +279,19 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat(); ?>
 </div>
 
 <script type="text/javascript">
+    $('#select_all_feetypes').on('change', function () {
+        var selectAll = $(this).is(':checked');
+        $('#feetype_id option').prop('selected', function () {
+            return selectAll && this.value !== '';
+        });
+        $('#feetype_id').trigger('chosen:updated').trigger('change');
+    });
+
+    $('#feetype_id').on('change', function () {
+        var selectableOptions = $('#feetype_id option').filter(function () { return this.value !== ''; });
+        $('#select_all_feetypes').prop('checked', selectableOptions.length > 0 && selectableOptions.filter(':selected').length === selectableOptions.length);
+    });
+
     $(document).ready(function() {
         toggleMonthlyFeesFields($('#is_monthly').val());
 
