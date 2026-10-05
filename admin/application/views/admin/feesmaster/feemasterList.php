@@ -129,11 +129,20 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat(); ?>
                                 </div>
 
                                 <div class="form-group">
-                                    <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex justify-content-between align-items-center" style="flex-wrap: wrap; gap: 4px 8px;">
                                         <div>
                                             <label for="feetype_id"><?php echo $this->lang->line('fees_type'); ?></label><small class="req"> *</small>
                                         </div>
-                                        <label for="select_all_feetypes" style="font-weight: normal; margin-bottom: 5px;">
+                                        <label for="select_new_admission" style="font-weight: normal; margin: 0 10px 5px 0; white-space: nowrap;">
+                                            <input type="checkbox" id="select_new_admission"> New Admission
+                                        </label>
+                                        <label for="select_re_admission" style="font-weight: normal; margin: 0 10px 5px 0; white-space: nowrap;">
+                                            <input type="checkbox" id="select_re_admission"> Re-Admission
+                                        </label>
+                                        <label for="select_tuition_fees" style="font-weight: normal; margin: 0 10px 5px 0; white-space: nowrap;">
+                                            <input type="checkbox" id="select_tuition_fees"> Tuition Fees
+                                        </label>
+                                        <label for="select_all_feetypes" style="font-weight: normal; margin-bottom: 5px; white-space: nowrap;">
                                             <input type="checkbox" id="select_all_feetypes"> Select All
                                         </label>
                                     </div>
@@ -279,6 +288,48 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat(); ?>
 </div>
 
 <script type="text/javascript">
+    function normalizedFeeType(text) {
+        return $.trim(text).toUpperCase().replace(/[\s-]+/g, '');
+    }
+
+    function syncAdmissionCheckboxes() {
+        var selectedTypes = $('#feetype_id option:selected').map(function() {
+            return normalizedFeeType($(this).text());
+        }).get();
+        $('#select_new_admission').prop('checked', selectedTypes.indexOf('NEWADMISSION') !== -1);
+        $('#select_re_admission').prop('checked', selectedTypes.indexOf('READMISSION') !== -1);
+        var months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+        $('#select_tuition_fees').prop('checked', months.every(function(month) { return selectedTypes.indexOf(month) !== -1; }));
+    }
+
+    function setAdmissionFeeType(typeKey, shouldSelect) {
+        $('#feetype_id option').each(function() {
+            if (normalizedFeeType($(this).text()) === typeKey) {
+                $(this).prop('selected', shouldSelect);
+            }
+        });
+        $('#feetype_id').trigger('chosen:updated').trigger('change');
+    }
+
+    $('#select_new_admission').on('change', function() {
+        setAdmissionFeeType('NEWADMISSION', $(this).is(':checked'));
+    });
+
+    $('#select_re_admission').on('change', function() {
+        setAdmissionFeeType('READMISSION', $(this).is(':checked'));
+    });
+
+    $('#select_tuition_fees').on('change', function() {
+        var shouldSelect = $(this).is(':checked');
+        var months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+        $('#feetype_id option').each(function() {
+            if (months.indexOf(normalizedFeeType($(this).text())) !== -1) {
+                $(this).prop('selected', shouldSelect);
+            }
+        });
+        $('#feetype_id').trigger('chosen:updated').trigger('change');
+    });
+
     $('#select_all_feetypes').on('change', function () {
         var selectAll = $(this).is(':checked');
         $('#feetype_id option').prop('selected', function () {
@@ -290,6 +341,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat(); ?>
     $('#feetype_id').on('change', function () {
         var selectableOptions = $('#feetype_id option').filter(function () { return this.value !== ''; });
         $('#select_all_feetypes').prop('checked', selectableOptions.length > 0 && selectableOptions.filter(':selected').length === selectableOptions.length);
+        syncAdmissionCheckboxes();
     });
 
     $(document).ready(function() {
