@@ -785,10 +785,18 @@ if ($this->rbac->hasPrivilege('student_count_widget', 'can_view')) {
 
 if ($this->rbac->hasPrivilege('govt_school', 'can_view')) {
     $govt_school_names    = array();
+    $govt_school_totals   = array();
     $govt_school_students = 0;
     foreach ($govt_school_class_counts as $school_count) {
         $govt_school_names[$school_count['govt_school_id']] = true;
         $govt_school_students += (int) $school_count['total_students'];
+        if (!isset($govt_school_totals[$school_count['govt_school_id']])) {
+            $govt_school_totals[$school_count['govt_school_id']] = array('name' => $school_count['govt_school'], 'total' => 0, 'classes' => array());
+        }
+        $govt_school_totals[$school_count['govt_school_id']]['total'] += (int) $school_count['total_students'];
+        if (!empty($school_count['class'])) {
+            $govt_school_totals[$school_count['govt_school_id']]['classes'][] = $school_count;
+        }
     }
     ?>
                     <div class="col-md-6 col-sm-6">
@@ -809,22 +817,30 @@ if ($this->rbac->hasPrivilege('govt_school', 'can_view')) {
                                         <thead>
                                             <tr>
                                                 <th>Government School</th>
-                                                <th>Class</th>
                                                 <th class="text-right">Students</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($govt_school_class_counts as $school_count) { ?>
+                                            <?php foreach ($govt_school_totals as $school_total) { ?>
                                                 <tr>
-                                                    <td><strong><?php echo html_escape($school_count['govt_school']); ?></strong></td>
-                                                    <td><?php echo !empty($school_count['class']) ? html_escape($school_count['class']) : '<span class="text-muted">No students enrolled</span>'; ?></td>
-                                                    <td class="text-right"><span class="govt-school-count"><?php echo (int) $school_count['total_students']; ?></span></td>
+                                                    <td><strong><?php echo html_escape($school_total['name']); ?> — Total</strong></td>
+                                                    <td class="text-right"><span class="govt-school-count"><?php echo $school_total['total']; ?></span></td>
                                                 </tr>
+                                                <?php if (!empty($school_total['classes'])) { ?>
+                                                    <?php foreach ($school_total['classes'] as $school_count) { ?>
+                                                        <tr>
+                                                            <td class="text-muted" style="padding-left: 24px"><?php echo html_escape($school_count['class']); ?></td>
+                                                            <td class="text-right"><?php echo (int) $school_count['total_students']; ?></td>
+                                                        </tr>
+                                                    <?php } ?>
+                                                <?php } else { ?>
+                                                    <tr><td class="text-muted" style="padding-left: 24px">No students enrolled</td><td class="text-right">0</td></tr>
+                                                <?php } ?>
                                             <?php } ?>
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td colspan="2">Total Students</td>
+                                                <td>Total Students</td>
                                                 <td class="text-right"><span class="govt-school-count"><?php echo $govt_school_students; ?></span></td>
                                             </tr>
                                         </tfoot>

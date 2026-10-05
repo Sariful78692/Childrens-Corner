@@ -523,11 +523,20 @@ class Admin extends Admin_Controller
 
         echo '<table border="1">';
         echo '<thead><tr><th>Government School</th><th>Class</th><th>Students</th></tr></thead><tbody>';
+        $school_totals = array();
         foreach ($school_counts as $school_count) {
             $school_name = html_escape($school_count['govt_school']);
-            $class_name  = !empty($school_count['class']) ? html_escape($school_count['class']) : '-';
-            $total       = (int) $school_count['total_students'];
-            echo '<tr><td>' . $school_name . '</td><td>' . $class_name . '</td><td>' . $total . '</td></tr>';
+            $school_id   = $school_count['govt_school_id'];
+            if (!isset($school_totals[$school_id])) {
+                $school_totals[$school_id] = array('name' => $school_name, 'total' => 0);
+            }
+            $school_totals[$school_id]['total'] += (int) $school_count['total_students'];
+            if (!empty($school_count['class'])) {
+                echo '<tr><td>' . $school_name . '</td><td>' . html_escape($school_count['class']) . '</td><td>' . (int) $school_count['total_students'] . '</td></tr>';
+            }
+        }
+        foreach ($school_totals as $school_total) {
+            echo '<tr><td><strong>' . $school_total['name'] . '</strong></td><td><strong>Total</strong></td><td><strong>' . $school_total['total'] . '</strong></td></tr>';
         }
         echo '</tbody></table>';
         exit;
