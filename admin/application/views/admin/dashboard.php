@@ -186,6 +186,9 @@
     }
 
     .govt-school-widget__table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
         padding: 11px 18px;
         background: #f8fafc;
         border-bottom: 1px solid #e5eaf1;
@@ -194,6 +197,16 @@
         font-weight: 700;
         letter-spacing: .04em;
         text-transform: uppercase;
+    }
+
+    .govt-school-widget__table thead th.govt-school-boys {
+        color: #2563eb;
+        background: #e8f2ff;
+    }
+
+    .govt-school-widget__table thead th.govt-school-girls {
+        color: #e83e75;
+        background: #fff0f5;
     }
 
     .govt-school-widget__table tbody td {
@@ -791,9 +804,11 @@ if ($this->rbac->hasPrivilege('govt_school', 'can_view')) {
         $govt_school_names[$school_count['govt_school_id']] = true;
         $govt_school_students += (int) $school_count['total_students'];
         if (!isset($govt_school_totals[$school_count['govt_school_id']])) {
-            $govt_school_totals[$school_count['govt_school_id']] = array('name' => $school_count['govt_school'], 'total' => 0, 'classes' => array());
+            $govt_school_totals[$school_count['govt_school_id']] = array('name' => $school_count['govt_school'], 'total' => 0, 'male' => 0, 'female' => 0, 'classes' => array());
         }
         $govt_school_totals[$school_count['govt_school_id']]['total'] += (int) $school_count['total_students'];
+        $govt_school_totals[$school_count['govt_school_id']]['male'] += (int) $school_count['male_students'];
+        $govt_school_totals[$school_count['govt_school_id']]['female'] += (int) $school_count['female_students'];
         if (!empty($school_count['class'])) {
             $govt_school_totals[$school_count['govt_school_id']]['classes'][] = $school_count;
         }
@@ -817,6 +832,8 @@ if ($this->rbac->hasPrivilege('govt_school', 'can_view')) {
                                         <thead>
                                             <tr>
                                                 <th>Government School</th>
+                                                <th class="text-right govt-school-boys">Boys</th>
+                                                <th class="text-right govt-school-girls">Girls</th>
                                                 <th class="text-right">Students</th>
                                             </tr>
                                         </thead>
@@ -824,23 +841,29 @@ if ($this->rbac->hasPrivilege('govt_school', 'can_view')) {
                                             <?php foreach ($govt_school_totals as $school_total) { ?>
                                                 <tr>
                                                     <td><strong><?php echo html_escape($school_total['name']); ?> — Total</strong></td>
+                                                    <td class="text-right"><?php echo $school_total['male']; ?></td>
+                                                    <td class="text-right"><?php echo $school_total['female']; ?></td>
                                                     <td class="text-right"><span class="govt-school-count"><?php echo $school_total['total']; ?></span></td>
                                                 </tr>
                                                 <?php if (!empty($school_total['classes'])) { ?>
                                                     <?php foreach ($school_total['classes'] as $school_count) { ?>
                                                         <tr>
                                                             <td class="text-muted" style="padding-left: 24px"><?php echo html_escape($school_count['class']); ?></td>
+                                                            <td class="text-right"><?php echo (int) $school_count['male_students']; ?></td>
+                                                            <td class="text-right"><?php echo (int) $school_count['female_students']; ?></td>
                                                             <td class="text-right"><?php echo (int) $school_count['total_students']; ?></td>
                                                         </tr>
                                                     <?php } ?>
                                                 <?php } else { ?>
-                                                    <tr><td class="text-muted" style="padding-left: 24px">No students enrolled</td><td class="text-right">0</td></tr>
+                                                    <tr><td class="text-muted" style="padding-left: 24px">No students enrolled</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td></tr>
                                                 <?php } ?>
                                             <?php } ?>
                                         </tbody>
                                         <tfoot>
                                             <tr>
                                                 <td>Total Students</td>
+                                                <td class="text-right"><?php echo array_sum(array_column($govt_school_totals, 'male')); ?></td>
+                                                <td class="text-right"><?php echo array_sum(array_column($govt_school_totals, 'female')); ?></td>
                                                 <td class="text-right"><span class="govt-school-count"><?php echo $govt_school_students; ?></span></td>
                                             </tr>
                                         </tfoot>
@@ -1726,6 +1749,11 @@ if ($this->rbac->hasPrivilege('fees_collection_and_expense_yearly_chart', 'can_v
         ordering: false
 
     });
+
+    var classWiseButtons = $('#classWiseStudentTable_wrapper .dt-buttons');
+    if (classWiseButtons.length) {
+        classWiseButtons.appendTo($('.classwise-widget-header').first());
+    }
 
     <?php if (!empty($concession_class_wise)) { ?>
     if ($('#concessionClassWiseTable').length) {

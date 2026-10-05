@@ -114,7 +114,7 @@ class Studentsession_model extends CI_Model
      */
     public function getGovtSchoolClassWiseStudentCounts()
     {
-        $this->db->select('govt_schools.id as govt_school_id, govt_schools.name as govt_school, classes.id as class_id, classes.class, COUNT(student_session.id) as total_students', false);
+        $this->db->select("govt_schools.id as govt_school_id, govt_schools.name as govt_school, classes.id as class_id, classes.class, COUNT(student_session.id) as total_students, SUM(CASE WHEN LOWER(students.gender) = 'male' AND student_session.id IS NOT NULL THEN 1 ELSE 0 END) as male_students, SUM(CASE WHEN LOWER(students.gender) = 'female' AND student_session.id IS NOT NULL THEN 1 ELSE 0 END) as female_students", false);
         $this->db->from('govt_schools');
         $this->db->join('students', "students.govt_school COLLATE utf8mb4_general_ci = govt_schools.name COLLATE utf8mb4_general_ci AND students.is_active = 'yes'", 'left', false);
         $this->db->join('student_session', 'student_session.student_id = students.id AND student_session.session_id = ' . $this->db->escape($this->current_session), 'left', false);
