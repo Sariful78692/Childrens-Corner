@@ -1,3 +1,79 @@
+<style>
+    /* Custom navigation palette, loaded with the sidebar so it overrides the selected skin. */
+    body .main-sidebar { background: #111a2b !important; }
+    body .main-sidebar .sidebar {
+        min-height: 100%;
+        padding: 14px 12px 20px;
+        background: linear-gradient(180deg, #1a293e 0%, #111827 100%) !important;
+    }
+    body .main-sidebar .sidebar-menu { padding-top: 8px; }
+    body .main-sidebar .sidebar-menu > li { margin: 4px 0; }
+    body .main-sidebar .sidebar-menu > li > a {
+        min-height: 42px;
+        padding: 11px 12px;
+        border-radius: 12px;
+        color: #9eacc0 !important;
+        font-size: 13px;
+        font-weight: 500;
+        transition: background-color .18s ease, color .18s ease;
+    }
+    body .main-sidebar .sidebar-menu > li > a > .fa,
+    body .main-sidebar .sidebar-menu > li > a > .ion {
+        width: 23px;
+        margin-right: 10px;
+        color: #8292a8;
+        font-size: 16px;
+        text-align: center;
+    }
+    body .main-sidebar .sidebar-menu > li:hover > a,
+    body .main-sidebar .sidebar-menu > li.active > a,
+    body .main-sidebar .sidebar-menu > li.menu-open > a {
+        color: #edf7ff !important;
+        background: #1d4058 !important;
+    }
+    body .main-sidebar .sidebar-menu > li:hover > a > .fa,
+    body .main-sidebar .sidebar-menu > li.active > a > .fa,
+    body .main-sidebar .sidebar-menu > li.menu-open > a > .fa { color: #45c9e8; }
+    body .main-sidebar .sidebar-menu > li > .treeview-menu {
+        margin: 5px 0 8px;
+        padding: 5px 0 5px 12px;
+        border-radius: 0 0 12px 12px;
+        background: rgba(9, 17, 30, .42) !important;
+    }
+    body .main-sidebar .treeview-menu > li > a {
+        padding: 9px 10px;
+        border-radius: 9px;
+        color: #9eacc0 !important;
+        font-size: 12px;
+    }
+    body .main-sidebar .treeview-menu > li > a > .fa { color: #48bad4; margin-right: 8px; }
+    body .main-sidebar .treeview-menu > li:hover > a,
+    body .main-sidebar .treeview-menu > li.active > a {
+        color: #e8f8ff !important;
+        background: rgba(41, 125, 153, .28) !important;
+    }
+    body .main-sidebar .search-form2 { padding: 12px 12px 4px; }
+    body .main-sidebar .search-form2 .form-control,
+    body .main-sidebar .search-form2 .btn {
+        color: #dce8f5;
+        background: #1c2b40 !important;
+        border-color: #2a3a50 !important;
+    }
+    /* In collapsed mode AdminLTE reduces the rail to about 50px; center icons in it. */
+    body.sidebar-collapse .main-sidebar .sidebar { padding-left: 5px; padding-right: 5px; }
+    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a {
+        padding: 12px 5px !important;
+        text-align: center;
+    }
+    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > .fa,
+    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > .ion {
+        width: auto;
+        margin: 0;
+        font-size: 16px;
+    }
+    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > .pull-right,
+    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > span { display: none !important; }
+</style>
 <aside class="main-sidebar" id="alert2">
     <?php if ($this->rbac->hasPrivilege('student', 'can_view')) { ?>
         <form class="navbar-form navbar-left search-form2" role="search" action="<?php echo site_url('admin/admin/search'); ?>" method="POST">
