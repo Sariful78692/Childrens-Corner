@@ -3911,3 +3911,304 @@ body {
     visibility: hidden;
   }
 }
+
+/* Site-wide responsive refinements */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+@media (max-width: 1199.98px) {
+  .main-nav .navbar-nav {
+    gap: 0;
+  }
+
+  .main-nav .navbar-nav .nav-link {
+    padding: 0.55rem 0.65rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .main-nav > .container-fluid {
+    min-height: 72px;
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  .main-nav .navbar-brand {
+    min-width: 0;
+    margin-right: auto;
+  }
+
+  .main-nav .logo img {
+    width: auto;
+    height: 52px;
+    margin-right: 0.65rem;
+  }
+
+  .main-nav .logo-text .school-name {
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    line-height: 1.2;
+  }
+
+  .main-nav .navbar-toggler {
+    flex: 0 0 auto;
+    padding: 0.4rem 0.55rem;
+    border-color: rgba(0, 119, 182, 0.35);
+  }
+
+  .main-nav .navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 119, 182, 0.2);
+  }
+
+  .main-nav .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0,119,182,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  }
+
+  .main-nav #navbarNav {
+    flex-basis: 100%;
+    width: 100%;
+    max-height: min(72vh, 560px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-top: 1px solid #edf1f4;
+    margin-top: 0.5rem;
+  }
+
+  .main-nav .navbar-nav {
+    align-items: stretch;
+    padding: 0.35rem 0 0.75rem;
+  }
+
+  .main-nav .navbar-nav .nav-item {
+    border-bottom: 1px solid #f0f2f4;
+  }
+
+  .main-nav .navbar-nav .nav-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.65rem 0.35rem;
+    color: #343a40;
+  }
+
+  .main-nav .navbar-nav .dropdown-menu {
+    position: static;
+    float: none;
+    width: 100%;
+    padding: 0.25rem 0 0.5rem 0.65rem;
+    border: 0;
+    border-left: 2px solid #0077b6;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .main-nav .dropdown-item {
+    white-space: normal;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .carousel-item img {
+    height: clamp(260px, 58vw, 430px);
+  }
+
+  .carousel-caption {
+    padding: 1.25rem 2.75rem;
+  }
+
+  .carousel-caption h3 {
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+  }
+
+  .carousel-caption p {
+    max-width: 100%;
+    font-size: 1rem;
+  }
+
+  .angled-banner {
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem;
+  }
+
+  .angled-item {
+    min-width: 150px;
+    max-width: 100%;
+  }
+
+  .container,
+  .container-fluid {
+    --bs-gutter-x: 1.5rem;
+  }
+
+  .table-responsive > table {
+    min-width: 560px;
+  }
+
+  .whatsapp-float-box {
+    bottom: max(16px, env(safe-area-inset-bottom));
+    left: 14px;
+    z-index: 1040;
+  }
+
+  .donation-float-box {
+    top: auto;
+    right: 14px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    width: 52px;
+    height: 52px;
+    font-size: 20px;
+    line-height: 1;
+    z-index: 1040;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body {
+    font-size: 0.95rem;
+  }
+
+  .main-nav > .container-fluid {
+    min-height: 64px;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .main-nav .logo img {
+    height: 44px;
+  }
+
+  .main-nav .logo-text .school-name {
+    max-width: 58vw;
+    font-size: clamp(0.9rem, 4vw, 1.1rem);
+    overflow-wrap: anywhere;
+  }
+
+  .carousel-item img {
+    height: 300px;
+  }
+
+  .carousel-caption {
+    padding: 1rem 2.25rem;
+  }
+
+  .carousel-caption h3 {
+    margin-bottom: 0.5rem;
+    font-size: clamp(1.25rem, 6vw, 1.75rem);
+  }
+
+  .carousel-caption p {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .carousel-caption .carousel-btn {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 10%;
+  }
+
+  .angled-banner {
+    align-items: stretch !important;
+    gap: 0.5rem;
+  }
+
+  .angled-item {
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .container,
+  .container-fluid {
+    --bs-gutter-x: 1.25rem;
+  }
+
+  section[class*="py-"] {
+    scroll-margin-top: 72px;
+  }
+
+  h1,
+  .h1 {
+    font-size: clamp(1.6rem, 7vw, 2.15rem);
+  }
+
+  h2,
+  .h2 {
+    font-size: clamp(1.4rem, 6vw, 1.9rem);
+  }
+
+  .table-responsive > table {
+    min-width: 520px;
+  }
+
+  .table-responsive th,
+  .table-responsive td {
+    padding: 0.55rem;
+    font-size: 0.88rem;
+    vertical-align: middle;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    max-width: 100%;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  .whatsapp-float-box {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .whatsapp-box-content .fab.fa-whatsapp {
+    margin: 0;
+    font-size: 26px;
+  }
+
+  .whatsapp-text {
+    display: none;
+  }
+
+  .donation-float-box {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

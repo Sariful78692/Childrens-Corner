@@ -1137,6 +1137,30 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 
     }
 </script>
+<script>
+    // Capitalize the first typed character in text fields on the student edit form.
+    (function() {
+        var studentEditForm = document.getElementById('employeeform');
+        if (!studentEditForm) return;
+
+        function capitalizeFirstCharacter(field) {
+            field.value = field.value.replace(/\b[a-z]/g, function(firstCharacter) {
+                return firstCharacter.toUpperCase();
+            });
+        }
+
+        document.addEventListener('input', function(event) {
+            var field = event.target;
+            if (studentEditForm.contains(field) && field.matches('input[name="firstname"], input[name="middlename"], input[name="lastname"]')) {
+                capitalizeFirstCharacter(field);
+            }
+        }, true);
+
+        studentEditForm.addEventListener('submit', function() {
+            studentEditForm.querySelectorAll('input[name="firstname"], input[name="middlename"], input[name="lastname"]').forEach(capitalizeFirstCharacter);
+        }, true);
+    })();
+</script>
 
 <script>
     $(function() {

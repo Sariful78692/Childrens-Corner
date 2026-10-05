@@ -162,7 +162,7 @@ if (!defined('base_url')) {
 
             <!-- ABOUT -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLinkAbout">
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false" id="navbarDropdownMenuLinkAbout">
                 ABOUT <i class="fas fa-caret-down"></i>
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLinkAbout">
@@ -176,7 +176,7 @@ if (!defined('base_url')) {
 
             <!-- STUDENTS ZONE -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLinkStudents">
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false" id="navbarDropdownMenuLinkStudents">
                 STUDENTS ZONE <i class="fas fa-caret-down"></i>
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLinkStudents">
@@ -191,7 +191,7 @@ if (!defined('base_url')) {
 
             <!-- FACULTY -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLinkFaculty">
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false" id="navbarDropdownMenuLinkFaculty">
                 FACULTY <i class="fas fa-caret-down"></i>
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLinkFaculty">
@@ -213,7 +213,7 @@ if (!defined('base_url')) {
 
             <!-- ADMISSION -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLinkAdmission">
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false" id="navbarDropdownMenuLinkAdmission">
                 ADMISSION <i class="fas fa-caret-down"></i>
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLinkAdmission">
@@ -226,7 +226,7 @@ if (!defined('base_url')) {
 
             <!-- HOSTEL -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLinkHostel">
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false" id="navbarDropdownMenuLinkHostel">
                 HOSTEL <i class="fas fa-caret-down"></i>
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLinkHostel">

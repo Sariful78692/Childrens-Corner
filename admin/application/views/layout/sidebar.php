@@ -1,5 +1,19 @@
 <style>
     /* Custom navigation palette, loaded with the sidebar so it overrides the selected skin. */
+    @media (min-width: 768px) {
+        body .main-sidebar { width: 220px !important; }
+        body .main-header .logo { width: 220px !important; }
+        body .main-header .navbar { margin-left: 220px !important; }
+        body .content-wrapper,
+        body .main-footer,
+        body .right-side { margin-left: 220px !important; }
+        body.sidebar-collapse .main-sidebar { width: 50px !important; }
+        body.sidebar-collapse .main-header .logo { width: 50px !important; }
+        body.sidebar-collapse .main-header .navbar { margin-left: 50px !important; }
+        body.sidebar-collapse .content-wrapper,
+        body.sidebar-collapse .main-footer,
+        body.sidebar-collapse .right-side { margin-left: 50px !important; }
+    }
     body .main-sidebar { background: #111a2b !important; }
     body .main-sidebar .sidebar {
         min-height: 100%;
@@ -9,6 +23,9 @@
     body .main-sidebar .sidebar-menu { padding-top: 8px; }
     body .main-sidebar .sidebar-menu > li { margin: 4px 0; }
     body .main-sidebar .sidebar-menu > li > a {
+        display: flex !important;
+        align-items: center !important;
+        position: relative;
         min-height: 42px;
         padding: 11px 12px;
         border-radius: 12px;
@@ -16,6 +33,28 @@
         font-size: 13px;
         font-weight: 500;
         transition: background-color .18s ease, color .18s ease;
+    }
+    body .main-sidebar .sidebar-menu > li > a > span {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    /* Place the arrow as a flex item so it stays at the row's right edge. */
+    body .main-sidebar .sidebar-menu > li > a > .pull-right {
+        position: static !important;
+        inset: auto !important;
+        float: none !important;
+        flex: 0 0 auto;
+        margin: 0 -8px 0 auto !important;
+        line-height: 1;
+        transform: none !important;
+        transition: transform .18s ease;
+    }
+    body .main-sidebar .sidebar-menu > li.menu-open > a > .pull-right,
+    body .main-sidebar .sidebar-menu > li.active > a > .pull-right {
+        transform: rotate(-90deg) !important;
     }
     body .main-sidebar .sidebar-menu > li > a > .fa,
     body .main-sidebar .sidebar-menu > li > a > .ion {
