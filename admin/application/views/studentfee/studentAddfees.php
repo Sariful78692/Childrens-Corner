@@ -150,7 +150,7 @@ $language_name   = $language["short_code"];
                                         }
 
                                         // Color classes based on balance
-                                        $balance_class = ($balance < 0) ? 'text-danger' : (($balance == 0) ? 'text-success' : '');
+                                        $balance_class = ($balance > 0) ? 'text-danger' : (($balance == 0) ? 'text-success' : '');
 
                                         if ($total_paid > 0) {
                                             if ($balance == 0) {
