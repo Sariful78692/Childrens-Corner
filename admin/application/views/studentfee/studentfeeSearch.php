@@ -205,6 +205,20 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 </script>
 <script type="text/javascript">
     $(document).ready(function() {
+        function focusStudentListSearch(attempt) {
+            var $search = $('.student-list').closest('.dataTables_wrapper').find('.dataTables_filter input');
+            if ($search.length) {
+                $search.trigger('focus');
+                return;
+            }
+            if (attempt < 50) {
+                setTimeout(function() {
+                    focusStudentListSearch(attempt + 1);
+                }, 100);
+            }
+        }
+        focusStudentListSearch(0);
+
         /* setTimeout(function() {
             $("form.class_search_form button[type=submit]").click();
         }, 1);*/
@@ -244,6 +258,9 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                         });
                     } else {
                         initDatatable('student-list', 'studentfee/ajaxSearch', response.params, [], 100);
+                        setTimeout(function() {
+                            focusStudentListSearch(0);
+                        }, 100);
                         /*if ($.fn.DataTable.isDataTable('.student-list')) {
                             $('.student-list').DataTable().destroy();
                         }
