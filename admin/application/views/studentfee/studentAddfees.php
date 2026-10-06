@@ -672,6 +672,21 @@ $language_name   = $language["short_code"];
 
 
 <script>
+    // Let Enter on the collection date run the same validation and AJAX flow as Collect.
+    $(document).on('keydown', '#collection_date', function(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+            $('.collect-btn-single').trigger('click');
+        }
+    });
+
+    $(document).on('keydown', '#lump_collection_date', function(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+            $('.collect-btn-lumpsum').trigger('click');
+        }
+    });
+
     $(document).on('input', '#amount', function() {
         var entered = parseFloat($(this).val()) || 0;
         var max = parseFloat($('#total_amount').val()) || 0;
