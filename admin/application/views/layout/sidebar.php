@@ -14,6 +14,14 @@
         body.sidebar-collapse .main-footer,
         body.sidebar-collapse .right-side { margin-left: 50px !important; }
     }
+    @media (max-width: 767px) {
+        /* A saved desktop collapse state must not turn the mobile drawer into an icon rail. */
+        body .main-sidebar { width: min(220px, 82vw) !important; }
+        body.sidebar-collapse .main-sidebar .sidebar { padding-left: 12px; padding-right: 12px; }
+        body.sidebar-collapse .main-sidebar .sidebar-menu > li > a { padding: 11px 12px !important; text-align: left; }
+        body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > span { display: block !important; }
+        body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > .pull-right { display: flex !important; }
+    }
     body .main-sidebar { background: #111a2b !important; }
     body .main-sidebar .sidebar {
         min-height: 100%;
@@ -98,20 +106,22 @@
         background: #1c2b40 !important;
         border-color: #2a3a50 !important;
     }
-    /* In collapsed mode AdminLTE reduces the rail to about 50px; center icons in it. */
-    body.sidebar-collapse .main-sidebar .sidebar { padding-left: 5px; padding-right: 5px; }
-    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a {
-        padding: 12px 5px !important;
-        text-align: center;
+    /* In collapsed desktop mode AdminLTE reduces the rail to about 50px; center icons in it. */
+    @media (min-width: 768px) {
+        body.sidebar-collapse .main-sidebar .sidebar { padding-left: 5px; padding-right: 5px; }
+        body.sidebar-collapse .main-sidebar .sidebar-menu > li > a {
+            padding: 12px 5px !important;
+            text-align: center;
+        }
+        body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > .fa,
+        body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > .ion {
+            width: auto;
+            margin: 0;
+            font-size: 16px;
+        }
+        body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > .pull-right,
+        body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > span { display: none !important; }
     }
-    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > .fa,
-    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > .ion {
-        width: auto;
-        margin: 0;
-        font-size: 16px;
-    }
-    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > .pull-right,
-    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > span { display: none !important; }
 </style>
 <aside class="main-sidebar" id="alert2">
     <?php if ($this->rbac->hasPrivilege('student', 'can_view')) { ?>

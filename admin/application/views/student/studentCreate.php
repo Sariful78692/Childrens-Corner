@@ -165,7 +165,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <div class="form-group">
                                                 <label for="exampleInputEmail1">Student Name</label><small class="req"> *</small>
                                                 <input id="firstname" name="firstname" placeholder="Enter Student Name" type="text" class="form-control" style="text-transform: capitalize;" required minlength="2" maxlength="100" pattern="[A-Za-z .'\-]+" title="Only letters, spaces, apostrophes and hyphens are allowed"
-                                                    oninput="this.value = this.value.replace(/[0-9]/g, '').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" value="<?php echo set_value('firstname'); ?>" />
+                                                    value="<?php echo set_value('firstname'); ?>" />
                                                 <span class="text-danger"><?php echo form_error('firstname'); ?></span>
                                             </div>
                                         </div>

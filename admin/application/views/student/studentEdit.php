@@ -123,7 +123,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="exampleInputEmail1">Student Name</label><small class="req"> *</small>
-                                                <input id="firstname" name="firstname" placeholder="" type="text" class="form-control" required minlength="2" maxlength="100" pattern="[A-Za-z .'\-]+" title="Only letters, spaces, apostrophes and hyphens are allowed" oninput="this.value = this.value.replace(/[0-9]/g, '')" value="<?php echo set_value('firstname', $student['firstname']); ?>" />
+                                                <input id="firstname" name="firstname" placeholder="" type="text" class="form-control" required minlength="2" maxlength="100" pattern="[A-Za-z .'\-]+" title="Only letters, spaces, apostrophes and hyphens are allowed" value="<?php echo set_value('firstname', $student['firstname']); ?>" />
                                                 <input type="hidden" name="studentid" value="<?php echo $student["id"] ?>">
                                                 <span class="text-danger"><?php echo form_error('firstname'); ?></span>
                                             </div>
@@ -1144,9 +1144,12 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
         if (!studentEditForm) return;
 
         function capitalizeFirstCharacter(field) {
+            var selectionStart = field.selectionStart;
+            var selectionEnd = field.selectionEnd;
             field.value = field.value.replace(/\b[a-z]/g, function(firstCharacter) {
                 return firstCharacter.toUpperCase();
             });
+            field.setSelectionRange(selectionStart, selectionEnd);
         }
 
         document.addEventListener('input', function(event) {
