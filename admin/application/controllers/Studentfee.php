@@ -975,9 +975,10 @@ class Studentfee extends Admin_Controller
         $refund_date     = trim((string) $this->input->post('refund_date'));
         $approved_date   = trim((string) $this->input->post('approved_date'));
         $payment_method_id = (int) $this->input->post('payment_method_id');
+        $paid_amount = $this->input->post('paid_amount');
 
-        if ($collection_id <= 0 || $student_id <= 0 || $session_id <= 0 || $payment_method_id <= 0 || !$this->valid_date_format($collection_date) || $collection_date > date('Y-m-d')) {
-            $this->session->set_flashdata('msg', '<div class="alert alert-danger text-left">Please provide a valid collection date.</div>');
+        if ($collection_id <= 0 || $student_id <= 0 || $session_id <= 0 || $payment_method_id <= 0 || !is_numeric($paid_amount) || (float) $paid_amount < 0 || !$this->valid_date_format($collection_date) || $collection_date > date('Y-m-d')) {
+            $this->session->set_flashdata('msg', '<div class="alert alert-danger text-left">Please provide a valid payment amount and collection date.</div>');
             redirect('studentfee/addfees/' . $student_id . '/?session_id=' . $session_id);
             return;
         }
@@ -995,7 +996,8 @@ class Studentfee extends Admin_Controller
             $collection_date,
             $refund_date === '' ? null : $refund_date,
             $approved_date === '' ? null : $approved_date,
-            $payment_method_id
+            $payment_method_id,
+            (float) $paid_amount
         );
 
         $message = $result
@@ -1004,7 +1006,6 @@ class Studentfee extends Admin_Controller
         $this->session->set_flashdata('msg', $message);
         redirect('studentfee/addfees/' . $student_id . '/?session_id=' . $session_id);
     }
-
 
     public function getProcessingfees($id)
     {

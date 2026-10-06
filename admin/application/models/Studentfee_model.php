@@ -1016,7 +1016,7 @@ class Studentfee_model extends MY_Model
      * Keep a fee collection and its approved credit transaction in sync when
      * dates are corrected from the student fee screen.
      */
-    public function updateCollectionDates($collection_id, $student_id, $session_id, $collection_date, $refund_date, $approved_date, $payment_method_id)
+    public function updateCollectionDates($collection_id, $student_id, $session_id, $collection_date, $refund_date, $approved_date, $payment_method_id, $paid_amount)
     {
         $this->db->trans_begin();
 
@@ -1027,6 +1027,25 @@ class Studentfee_model extends MY_Model
         ))->row_array();
 
         if (!$collection) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        if ((int) $collection['is_refunded'] === 1) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $fee = $this->db->select('discounted_fees')
+            ->where('id', $collection['student_fees_management_id'])
+            ->get('student_fees_management')->row_array();
+        $other_totals = $this->db->select('COALESCE(SUM(paid_amount + discount_amount), 0) AS total', false)
+            ->where('student_fees_management_id', $collection['student_fees_management_id'])
+            ->where('id !=', $collection_id)
+            ->where('is_refunded', 0)
+            ->where_in('status', [1, 2])
+            ->get('student_fees_collections')->row();
+        if (!$fee || round((float) $other_totals->total + (float) $paid_amount + (float) $collection['discount_amount'], 2) > round((float) $fee['discounted_fees'], 2)) {
             $this->db->trans_rollback();
             return false;
         }
@@ -1056,6 +1075,8 @@ class Studentfee_model extends MY_Model
 
         $this->db->where('id', $collection_id);
         $this->db->update('student_fees_collections', array(
+            'paid_amount'     => $paid_amount,
+            'balance_amount'  => max(0, (float) $fee['discounted_fees'] - (float) $other_totals->total - (float) $paid_amount - (float) $collection['discount_amount']),
             'collection_date' => $collection_date,
             'refund_date'     => $refund_date,
             'approved_date'   => $approved_date,
@@ -1068,6 +1089,12 @@ class Studentfee_model extends MY_Model
         $this->db->where('transaction_for_table', 'student_fees_collections');
         $this->db->where('status', 1);
         $this->db->update('transactions', array('payment_method_id' => $payment_method_id));
+
+        // Keep the approved fee credit in the ledger aligned with its collection.
+        $this->db->where('table_id', $collection_id);
+        $this->db->where('transaction_for_table', 'student_fees_collections');
+        $this->db->where('trans_type', 1);
+        $this->db->update('transactions', array('amount' => $paid_amount));
 
         // A refund produces a debit transaction as well.  Only the credit
         // transaction created on approval represents the approve date.

@@ -233,7 +233,7 @@ $language_name   = $language["short_code"];
                                                     $action_content .= '<button class="btn btn-xs btn-default printDoc" data-payment_hash="' . $paid_amount_row->payment_hash . '" title="' . $this->lang->line('print') . '"><i class="fa fa-print"></i> </button>'; // Use $paid_amount_row->payment_hash
                                                 }
                                                 if ($this->rbac->hasPrivilege('collect_fees', 'can_edit')) {
-                                                    $action_content .= '<button type="button" class="btn btn-xs btn-primary edit-collection-dates" title="Edit payment" data-toggle="tooltip" data-collection-id="' . (int) $paid_amount_row->id . '" data-collection-date="' . html_escape(substr((string) $collection_date, 0, 10)) . '" data-refund-date="' . html_escape(substr((string) $refund_date, 0, 10)) . '" data-approved-date="' . html_escape(substr((string) $approved_date, 0, 10)) . '" data-payment-method-id="' . (int) $payment_method_id . '"><i class="fa fa-pencil"></i> Edit</button>';
+                                                    $action_content .= '<button type="button" class="btn btn-xs btn-primary edit-collection-dates" title="Edit payment" data-toggle="tooltip" data-collection-id="' . (int) $paid_amount_row->id . '" data-paid-amount="' . number_format((float) $paid_amount_row->paid_amount, 2, '.', '') . '" data-collection-date="' . html_escape(substr((string) $collection_date, 0, 10)) . '" data-refund-date="' . html_escape(substr((string) $refund_date, 0, 10)) . '" data-approved-date="' . html_escape(substr((string) $approved_date, 0, 10)) . '" data-payment-method-id="' . (int) $payment_method_id . '"><i class="fa fa-pencil"></i> Edit</button>';
                                                 }
 
                                         ?>
@@ -478,6 +478,10 @@ $language_name   = $language["short_code"];
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
+                        <label for="edit_paid_amount">Payment Amount:</label>
+                        <input type="number" id="edit_paid_amount" name="paid_amount" class="form-control" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
                         <label for="edit_payment_method_id">Payment Mode:</label>
                         <select id="edit_payment_method_id" name="payment_method_id" class="form-control" required>
                             <?php foreach ($paymentMethods as $method) : ?>
@@ -497,7 +501,7 @@ $language_name   = $language["short_code"];
                         <label for="edit_approved_date">Approve Date:</label>
                         <input type="date" id="edit_approved_date" name="approved_date" class="form-control">
                     </div>
-                    <p class="help-block">Changing the approve date also updates the related approved-payment transaction date.</p>
+                    <p class="help-block">The approved accounting transaction will be updated with this amount.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -917,6 +921,7 @@ $language_name   = $language["short_code"];
 <script>
     $(document).on('click', '.edit-collection-dates', function() {
         $('#edit_collection_id').val($(this).data('collection-id'));
+        $('#edit_paid_amount').val($(this).data('paid-amount'));
         $('#edit_collection_date').val($(this).data('collection-date'));
         $('#edit_refund_date').val($(this).data('refund-date'));
         $('#edit_approved_date').val($(this).data('approved-date'));
@@ -925,6 +930,11 @@ $language_name   = $language["short_code"];
     });
 
     $('#editCollectionDatesForm').on('submit', function(e) {
+        if ($('#edit_paid_amount').val() === '' || Number($('#edit_paid_amount').val()) < 0) {
+            e.preventDefault();
+            alert('Please enter a valid payment amount.');
+            return;
+        }
         if (!$('#edit_collection_date').val()) {
             e.preventDefault();
             alert('Collection date is required.');
