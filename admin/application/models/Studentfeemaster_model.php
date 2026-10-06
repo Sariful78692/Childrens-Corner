@@ -1473,7 +1473,8 @@ class Studentfeemaster_model extends MY_Model
             ->join('staff', 'staff.id = student_fees_collections.collection_by', 'left')
             ->join('staff as approved_by_staff', 'approved_by_staff.id = student_fees_collections.approved_by', 'left')
             ->join('payment_methods', 'student_fees_collections.payment_method_id = payment_methods.id', 'left')
-            ->join('account_departments ad', 'ad.id = student_session.account_department_id', 'left')
+            ->join('student_session current_student_session', 'current_student_session.id = (SELECT MAX(current_session.id) FROM student_session AS current_session WHERE current_session.student_id = student_fees_collections.student_id AND current_session.status = 1)', 'left', false)
+            ->join('account_departments ad', 'ad.id = current_student_session.account_department_id', 'left')
             ->join('sessions', 'sessions.id = student_fees_collections.session_id', 'left')
             ->from('student_fees_collections');
 
@@ -1499,7 +1500,7 @@ class Studentfeemaster_model extends MY_Model
         }
 
         if ($account_department_id != null) {
-            $this->datatables->where('student_session.account_department_id', $account_department_id);
+            $this->datatables->where('current_student_session.account_department_id', $account_department_id);
         }
         if ($gender != null) {
             $this->datatables->where('students.gender', $gender);
@@ -1558,7 +1559,8 @@ class Studentfeemaster_model extends MY_Model
             ->join('staff', 'staff.id = student_fees_collections.collection_by', 'left')
             ->join('staff as approved_by_staff', 'approved_by_staff.id = student_fees_collections.approved_by', 'left')
             ->join('payment_methods', 'student_fees_collections.payment_method_id = payment_methods.id', 'left')
-            ->join('account_departments ad', 'ad.id = student_session.account_department_id', 'left')
+            ->join('student_session current_student_session', 'current_student_session.id = (SELECT MAX(current_session.id) FROM student_session AS current_session WHERE current_session.student_id = student_fees_collections.student_id AND current_session.status = 1)', 'left', false)
+            ->join('account_departments ad', 'ad.id = current_student_session.account_department_id', 'left')
             ->join('sessions', 'sessions.id = student_fees_collections.session_id', 'left')
             ->from('student_fees_collections');
 
@@ -1584,7 +1586,7 @@ class Studentfeemaster_model extends MY_Model
         }
 
         if ($account_department_id != null) {
-            $this->datatables->where('student_session.account_department_id', $account_department_id);
+            $this->datatables->where('current_student_session.account_department_id', $account_department_id);
         }
         if ($gender != null) {
             $this->datatables->where('students.gender', $gender);

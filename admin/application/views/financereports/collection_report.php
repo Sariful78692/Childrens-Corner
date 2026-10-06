@@ -43,10 +43,10 @@ $date_to = '';   // Initialize $date_to
                                         <div class="form-group">
                                             <label for="session_id">Session</label>
                                             <select id="session_id" name="session_id" class="form-control">
-                                                <option value=""><?php echo $this->lang->line('select'); ?></option>
+                                                <option value="all" <?php echo set_value('session_id') === 'all' || set_value('session_id') === '' ? 'selected="selected"' : ''; ?>>All</option>
                                                 <?php
                                                 foreach ($sessionList as $session) {
-                                                    $is_selected = set_value('session_id') != '' ? (set_value('session_id') == $session['id']) : ($session['id'] == $this->setting_model->getCurrentSession());
+                                                    $is_selected = set_value('session_id') != '' && set_value('session_id') == $session['id'];
                                                     $selected = $is_selected ? "selected=selected" : "";
                                                     echo '<option value="' . $session['id'] . '" ' . $selected . '>' . $session['session'] . '</option>';
                                                 }
