@@ -1,4 +1,71 @@
+<script>
+    document.documentElement.classList.add('student-fees-no-page-scroll');
+</script>
 <style type="text/css">
+    html.student-fees-no-page-scroll,
+    html.student-fees-no-page-scroll body {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    html.student-fees-no-page-scroll .content-wrapper {
+        height: calc(100vh - 50px);
+        min-height: 0 !important;
+        overflow: hidden;
+    }
+
+    html.student-fees-no-page-scroll .content-wrapper > .content {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    html.student-fees-no-page-scroll .content-wrapper > .content > .row,
+    html.student-fees-no-page-scroll .content-wrapper > .content > .row > .col-md-12,
+    html.student-fees-no-page-scroll .content-wrapper .box.box-primary {
+        height: 100%;
+    }
+
+    html.student-fees-no-page-scroll .box.box-primary {
+        display: flex;
+        flex-direction: column;
+    }
+
+    html.student-fees-no-page-scroll .box.box-primary > .box-header {
+        flex: 0 0 auto;
+        min-height: 0;
+        padding: 0 10px;
+    }
+
+    html.student-fees-no-page-scroll .box.box-primary > .box-header > .row {
+        display: flex;
+        align-items: center;
+        margin: 0;
+    }
+
+    html.student-fees-no-page-scroll .box.box-primary > .box-header > .row > [class*="col-"] {
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+
+    html.student-fees-no-page-scroll .box.box-primary > .box-header .box-title {
+        margin: 0;
+        font-size: 16px;
+        line-height: 26px;
+    }
+
+    html.student-fees-no-page-scroll .box.box-primary > .box-header #session_id {
+        height: 26px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+    }
+
+    html.student-fees-no-page-scroll .box.box-primary > .box-body.fees_collection {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        min-height: 0;
+    }
+
     .checkbox-inline+.checkbox-inline,
     .radio-inline+.radio-inline {
         margin-left: 8px;
@@ -23,6 +90,40 @@
         margin-top: 10px;
         margin-bottom: 0px;
     }
+
+    .fees_collection > .row:first-child img {
+        width: 90px !important;
+        height: 90px !important;
+    }
+
+    .fees_collection > .row:first-child .table > tbody > tr > th,
+    .fees_collection > .row:first-child .table > tbody > tr > td {
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    /* Keep the student summary and payment controls in view while fee rows scroll. */
+    .fees_collection .table-responsive {
+        flex: 1;
+        height: 0;
+        min-height: 0;
+        max-height: none;
+        overflow: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .fees_collection .table-responsive::-webkit-scrollbar {
+        display: none;
+    }
+
+    .fees_collection .table-fixed-header thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background-color: #fff;
+    }
+
 </style>
 <?php
 $current_user_id = $this->session->userdata['admin']['id'];
