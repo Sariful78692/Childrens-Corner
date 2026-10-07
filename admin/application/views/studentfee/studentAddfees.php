@@ -513,6 +513,23 @@ $language_name   = $language["short_code"];
 </div>
 
 <script>
+    // Keep Backspace usable for editing fields, but let it return to the
+    // previous page when pressed elsewhere on the fee collection page.
+    $(document).on('keydown', function(e) {
+        if (e.key !== 'Backspace' && e.keyCode !== 8) {
+            return;
+        }
+
+        var target = e.target;
+        var tagName = target.tagName ? target.tagName.toLowerCase() : '';
+        var isEditable = tagName === 'input' || tagName === 'textarea' || tagName === 'select' || target.isContentEditable;
+
+        if (!isEditable) {
+            e.preventDefault();
+            window.history.back();
+        }
+    });
+
     // Handle click event on "Add Payment" button
     $('.lumpsumPayment').click(function() {
         // Show the modal
