@@ -1027,9 +1027,9 @@ class Student extends Admin_Controller
                     $this->student_model->add($update_student);
                 }
 
-                $upload_dir_path  = $this->customlib->getFolderPath() . './uploads/student_documents/' . $insert_id . '/';
+                $upload_dir_path  = FCPATH . 'uploads/student_documents/' . $insert_id . DIRECTORY_SEPARATOR;
                 $upload_directory = './uploads/student_documents/' . $insert_id . '/';
-                if (!is_dir($upload_dir_path) && !mkdir($upload_dir_path)) {
+                if (!is_dir($upload_dir_path) && !mkdir($upload_dir_path, 0755, true) && !is_dir($upload_dir_path)) {
                     die("Error creating folder $upload_dir_path");
                 }
 
@@ -1274,9 +1274,9 @@ class Student extends Admin_Controller
         } else {
             $student_id = $this->input->post('student_id');
             if (isset($_FILES["first_doc"]) && !empty($_FILES['first_doc']['name'])) {
-                $upload_dir_path = $this->customlib->getFolderPath() . './uploads/student_documents/' . $student_id . '/';
+                $upload_dir_path = FCPATH . 'uploads/student_documents/' . $student_id . DIRECTORY_SEPARATOR;
 
-                if (!is_dir($upload_dir_path) && !mkdir($upload_dir_path)) {
+                if (!is_dir($upload_dir_path) && !mkdir($upload_dir_path, 0755, true) && !is_dir($upload_dir_path)) {
                     die("Error creating folder $upload_dir_path");
                 }
 
