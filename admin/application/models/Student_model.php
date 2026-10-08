@@ -1784,12 +1784,19 @@ class Student_model extends MY_Model
         $student_id = $this->input->post('student_id');
         $class_id   = $this->input->post('class_id');
         $section_id = $this->input->post('section_id');
+        $session_id = $this->input->post('selected_session_id');
+        if (!$session_id) {
+            $session_id = $this->input->post('session_id');
+        }
+        if (!$session_id) {
+            $session_id = $this->current_session;
+        }
         if (!$student_id) {
             $student_id = 0;
         }
 
         $this->db->where('student_session.roll_no', $roll_no);
-        $this->db->where('student_session.session_id', $this->current_session);
+        $this->db->where('student_session.session_id', $session_id);
         $this->db->where('student_session.class_id', $class_id);
         $this->db->where('student_session.section_id', $section_id);
         $this->db->where('student_session.status', 1);

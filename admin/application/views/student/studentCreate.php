@@ -475,7 +475,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                         if ($sch_setting->guardian_address) { ?>
                                             <div class="col-md-6">
                                                 <label for="exampleInputEmail1"><?php echo $this->lang->line('guardian_address'); ?></label>
-                                                <textarea id="guardian_address" name="guardian_address" placeholder="Enter Address" class="form-control" style="text-transform: capitalize;" oninput="this.value = this.value.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())" rows="2"><?php echo set_value('guardian_address'); ?></textarea>
+                                                <textarea id="guardian_address" name="guardian_address" placeholder="Enter Address" class="form-control" style="text-transform: capitalize;" rows="2"><?php echo set_value('guardian_address'); ?></textarea>
                                                 <span class="text-danger"><?php echo form_error('guardian_address'); ?></span>
                                             </div>
                                         <?php } ?>
@@ -759,6 +759,20 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 
 
     $(document).ready(function() {
+        $('#firstname, #middlename, #lastname').on('input', function() {
+            var field = this;
+            var start = field.selectionStart;
+            var end = field.selectionEnd;
+            var value = field.value.toLowerCase().replace(/\b\w/g, function(letter) {
+                return letter.toUpperCase();
+            });
+
+            if (field.value !== value) {
+                field.value = value;
+                field.setSelectionRange(start, end);
+            }
+        });
+
         var date_format = '<?php echo $result = strtr($this->customlib->getSchoolDateFormat(), ['d' => 'dd', 'm' => 'mm', 'Y' => 'yyyy']) ?>';
         var class_id = $('#class_id').val();
         var section_id = '<?php echo set_value('section_id', 0) ?>';
@@ -815,9 +829,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                     success: function(data) {
                         $.each(data, function(i, obj) {
                             var sel = "";
-                            if (section_id == obj.section_id) {
-                                sel = "selected";
-                            } else if (i == 0) {
+                            if (section_id == obj.section_id || (!section_id && i == 0)) {
                                 sel = "selected";
                             }
                             div_data += "<option value=" + obj.section_id + " " + sel + ">" + obj.section + "</option>";
@@ -830,6 +842,20 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                 });
             }
         }
+
+        $('#guardian_address').on('input', function() {
+            var field = this;
+            var start = field.selectionStart;
+            var end = field.selectionEnd;
+            var value = field.value.toLowerCase().replace(/\b\w/g, function(letter) {
+                return letter.toUpperCase();
+            });
+
+            if (field.value !== value) {
+                field.value = value;
+                field.setSelectionRange(start, end);
+            }
+        });
 
         $(document).on('change', '#vehroute_id', function() {
 

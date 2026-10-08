@@ -698,7 +698,7 @@ class Student extends Admin_Controller
             }
 
             $data_insert = array(
-                'firstname'         => $this->input->post('firstname'),
+                'firstname'         => ucwords(strtolower(trim($this->input->post('firstname')))),
                 'rte'               => $this->input->post('rte'),
                 'state'             => $this->input->post('state'),
                 'city'              => $this->input->post('city'),
@@ -765,10 +765,10 @@ class Student extends Admin_Controller
                 $data_insert['blood_group'] = $this->input->post('blood_group');
             }
             if (isset($lastname)) {
-                $data_insert['lastname'] = $this->input->post('lastname');
+                $data_insert['lastname'] = ucwords(strtolower(trim($lastname)));
             }
             if (isset($middlename)) {
-                $data_insert['middlename'] = $this->input->post('middlename');
+                $data_insert['middlename'] = ucwords(strtolower(trim($middlename)));
             }
             if (isset($category_id)) {
                 $data_insert['category_id'] = $this->input->post('category_id');
