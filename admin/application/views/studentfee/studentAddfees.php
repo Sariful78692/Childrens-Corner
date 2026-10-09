@@ -492,11 +492,11 @@ $language_name   = $language["short_code"];
                         <label for="collection_date">Collection Date:</label>
                         <input type="date" class="form-control" id="lump_collection_date" name="collection_date" min="2024-12-10" max="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" required>
                     </div>
-                    <!-- Previously used Lumpsum note and confirmation fields are disabled.
                     <div class="form-group">
                         <label for="note">Note:</label>
                         <textarea class="form-control" name="note"></textarea>
                     </div>
+                    <!-- Previously used Lumpsum confirmation field is disabled.
                     <label for="accept">
                         <input required type="checkbox" name="accept" id="accept">
                         I confirm that the payment will be made by me.
