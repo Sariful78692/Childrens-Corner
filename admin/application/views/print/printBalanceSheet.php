@@ -330,16 +330,19 @@
 
 <body>
     <div class="container">
-        <div class="row header">
-            <div align="center" class="col-sm-12">
-                <strong align="center" style="font-size: 24px;">Children's Corner</strong>
-                <p>Balance Sheet</p>
-                <strong style="font-size: 12px;margin-bottom: 20px;display: block;">
-                    <?= date('jS F, Y', strtotime($date_from)) ?> - <?= date('jS F, Y', strtotime($date_to)) ?>
+        <div class="row header" style="border-bottom: 1px solid #000; padding-bottom: 0; margin-bottom: 0;">
+            <div align="center" class="col-sm-12" style="line-height: 1.15;">
+                <strong align="center" style="font-size: 24px; font-weight: bold; margin: 0;">
+                    <?= html_escape($sch_setting->name) ?>
+                </strong>
+                <p style="margin: 0;"><?= html_escape($sch_setting->address) ?></p>
+                <p style="margin: 0;"><strong style="margin: 0;">Balance Sheet</strong></p>
+                <strong style="font-size: 12px; margin: 0; display: block;">
+                    <?= date('jS F Y', strtotime($date_from)) ?> - <?= date('jS F Y', strtotime($date_to)) ?>
                 </strong>
             </div>
         </div>
-        <div class="row">
+        <div class="row" style="margin-left: 0; margin-right: 0;">
             <!-- Income Section -->
             <div class="col-xs-6">
                 <div align="center" class="col-sm-12">
@@ -510,7 +513,7 @@
             </div>
 
             <!-- Expense Section -->
-            <div class="col-xs-6">
+            <div class="col-xs-6" style="box-sizing: border-box;">
                 <div align="center" class="col-sm-12">
                     <strong align="center" style="font-size: 20px;">Payments</strong>
                 </div>
@@ -632,12 +635,22 @@
                 ?>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-6">
-                <strong class="right" style="font-size: 30px;">₹<?= number_format(($total_opening_balance + $total_income + $student_fees_total + $staff_loan_repayments), 2) ?></strong>
+        <div class="row" style="margin-left: 0; margin-right: 0;">
+            <div class="col-sm-6" style="box-sizing: border-box; padding: 0 5px;">
+                <div style="position: relative; box-sizing: border-box; min-height: 70px; padding: 22px 14px;">
+                    <svg aria-hidden="true" viewBox="0 0 100 70" preserveAspectRatio="none" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                        <rect width="100" height="70" fill="#e6f7e8" />
+                    </svg>
+                    <strong class="right" style="position: relative; z-index: 1; font-size: 18px; color: #178522; margin: 0;">₹<?= number_format(($total_opening_balance + $total_income + $student_fees_total + $staff_loan_repayments), 2) ?></strong>
+                </div>
             </div>
-            <div class="col-sm-6">
-                <strong class="right" style="font-size: 30px;">₹<?= number_format(($total_expense + $net_paid_payroll + $total_staff_loan + $total_closing_balance), 2) ?></strong>
+            <div class="col-sm-6" style="box-sizing: border-box; padding: 0 5px;">
+                <div style="position: relative; box-sizing: border-box; min-height: 70px; padding: 22px 14px;">
+                    <svg aria-hidden="true" viewBox="0 0 100 70" preserveAspectRatio="none" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                        <rect width="100" height="70" fill="#fde7e7" />
+                    </svg>
+                    <strong class="right" style="position: relative; z-index: 1; font-size: 18px; color: #c81414; margin: 0;">₹<?= number_format(($total_expense + $net_paid_payroll + $total_staff_loan + $total_closing_balance), 2) ?></strong>
+                </div>
             </div>
         </div>
     </div>

@@ -45,7 +45,8 @@
 
         <div class="box">
             <div class="print_button" style="position: relative; top:5px;right:10px;text-align: right;z-index:10">
-                <a href="<?php echo site_url('admin/accounts/cashbook_pdf?date_from=' . $date_from . '&date_to=' . $date_to) ?>" class="btn btn-primary">Print</a>
+                <a href="<?php echo site_url('admin/accounts/cashbook_pdf?export=excel&date_from=' . urlencode($date_from) . '&date_to=' . urlencode($date_to)) ?>" class="btn btn-success">Excel</a>
+                <a href="<?php echo site_url('admin/accounts/cashbook_pdf?date_from=' . $date_from . '&date_to=' . $date_to) ?>" class="btn btn-primary" target="_blank" rel="noopener">Print</a>
             </div>
             <div id="printableArea" style="margin-top: -50px;">
                 <div class="row">

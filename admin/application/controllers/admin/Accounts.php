@@ -844,6 +844,7 @@ class Accounts extends Admin_Controller
 
         $data['date_from'] = $date_from;
         $data['date_to'] = $date_to;
+        $data['sch_setting'] = $this->sch_setting_detail;
 
         /* echo "<pre>";
         print_r($data);
@@ -1046,6 +1047,11 @@ class Accounts extends Admin_Controller
         $data['date_from'] = $date_from;
         $data['date_to'] = $date_to;
         $data['sch_setting'] = $this->sch_setting_detail;
+
+        if ($this->input->get('export') === 'excel') {
+            $this->load->view('admin/accounts/cashbook_excel', $data);
+            return;
+        }
 
         $this->load->view('admin/accounts/cashbook_pdf', $data);
     }
