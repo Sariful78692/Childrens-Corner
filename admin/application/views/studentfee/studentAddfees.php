@@ -202,18 +202,18 @@ $language_name   = $language["short_code"];
                             <table class="table table-striped table-bordered table-hover example table-fixed-header">
                                 <thead class="header">
                                     <tr>
-                                        <th>#</th>
-                                        <th><?php echo $this->lang->line('fee_type'); ?></th>
-                                        <th class="text-right">Payable Amount</th>
-                                        <th class="text-right"><?php echo $this->lang->line('paid_amount'); ?></th>
-                                        <th class="text-right"><?php echo $this->lang->line('balance'); ?></th>
-                                        <th class="text-center">Payment ID</th>
-                                        <th>Payment Mode</th>
-                                        <th>Collection Date</th>
-                                        <th>Refund Date</th>
-                                        <th>Approve Date</th>
+                                        <th style="background-color:#334155;color:#fff;">#</th>
+                                        <th style="background-color:#1d4ed8;color:#fff;"><?php echo $this->lang->line('fee_type'); ?></th>
+                                        <th class="text-right" style="background-color:#0f766e;color:#fff;">Payable Amount</th>
+                                        <th class="text-right" style="background-color:#15803d;color:#fff;"><?php echo $this->lang->line('paid_amount'); ?></th>
+                                        <th class="text-right" style="background-color:#6d28d9;color:#fff;"><?php echo $this->lang->line('balance'); ?></th>
+                                        <th class="text-center" style="background-color:#b45309;color:#fff;">Payment ID</th>
+                                        <th style="background-color:#0369a1;color:#fff;">Payment Mode</th>
+                                        <th style="background-color:#4338ca;color:#fff;">Collection Date</th>
+                                        <th style="background-color:#be123c;color:#fff;">Refund Date</th>
+                                        <th style="background-color:#0e7490;color:#fff;">Approve Date</th>
                                         <!-- <th class="text-right"><?php echo $this->lang->line('discount'); ?></th> -->
-                                        <th class="text-right"><?php echo $this->lang->line('action'); ?></th>
+                                        <th class="text-right" style="background-color:#475569;color:#fff;"><?php echo $this->lang->line('action'); ?></th>
                                     </tr>
                                 </thead>
                                 <tbody>

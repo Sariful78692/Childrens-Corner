@@ -9,14 +9,16 @@
                     <table class="table table-striped mb0 font15">
                         <tbody>
                             <tr>
-                                <th class="bozero">Reg No</th>
-                                <td class="bozero"><?php echo $student['id']; ?></td>
-                                <th class="bozero"><?php echo $this->lang->line('admission_no'); ?></th>
-                                <td class="bozero"><?php echo $student['admission_no']; ?></td>
+                                <th class="bozero" style="font-weight:700;color:#ec4899;">Reg No</th>
+                                <td class="bozero" style="font-weight:700;color:#ec4899;"><?php echo $student['id']; ?></td>
+                                <?php if (!empty($student['mobileno'])): ?>
+                                    <th class="bozero"><?php echo $this->lang->line('mobile_number'); ?></th>
+                                    <td class="bozero"><?php echo $student['mobileno']; ?></td>
+                                <?php endif; ?>
                             </tr>
                             <tr>
-                                <th class="bozero"><?php echo $this->lang->line('name'); ?></th>
-                                <td class="bozero"><?php echo $this->customlib->getFullName($student['firstname'], $student['middlename'], $student['lastname'], $sch_setting->middlename, $sch_setting->lastname); ?></td>
+                                <th class="bozero" style="font-weight:700;color:#7c3aed;"><?php echo $this->lang->line('name'); ?></th>
+                                <td class="bozero" style="font-weight:700;color:#1d4ed8;"><?php echo $this->customlib->getFullName($student['firstname'], $student['middlename'], $student['lastname'], $sch_setting->middlename, $sch_setting->lastname); ?></td>
                                 <th><?php echo $this->lang->line('father_name'); ?></th>
                                 <td><?php echo $student['father_name']; ?></td>
                             </tr>
@@ -38,8 +40,8 @@
                                         <button id="update-section-btn" class="btn btn-primary btn-xs" style="display: none;">Update</button>
                                     </div>
                                 </td>
-                                <th><?php echo $this->lang->line('roll_number'); ?></th>
-                                <td>
+                                <th style="font-weight:700;color:#d97706;"><?php echo $this->lang->line('roll_number'); ?></th>
+                                <td style="font-weight:700;color:#d97706;">
                                     <?php if (empty($student['roll_no'])) : ?>
                                         <input type="text" id="roll_no" name="roll_no" class="form-control" style="width:100px; display:inline">
                                         <button id="update-roll-btn" class="btn btn-primary btn-xs">Update Roll</button>
@@ -54,10 +56,6 @@
                                 <?php if (!empty($recommendationNumber)): ?>
                                     <th>Recommendation:</th>
                                     <td><?php echo $recommendationNumber; ?></td>
-                                <?php endif; ?>
-                                <?php if (!empty($student['mobileno'])): ?>
-                                    <th><?php echo $this->lang->line('mobile_number'); ?></th>
-                                    <td><?php echo $student['mobileno']; ?></td>
                                 <?php endif; ?>
                             </tr>
                         </tbody>
