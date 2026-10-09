@@ -492,6 +492,7 @@ $language_name   = $language["short_code"];
                         <label for="collection_date">Collection Date:</label>
                         <input type="date" class="form-control" id="lump_collection_date" name="collection_date" min="2024-12-10" max="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" required>
                     </div>
+                    <!-- Previously used Lumpsum note and confirmation fields are disabled.
                     <div class="form-group">
                         <label for="note">Note:</label>
                         <textarea class="form-control" name="note"></textarea>
@@ -501,6 +502,7 @@ $language_name   = $language["short_code"];
                         I confirm that the payment will be made by me.
                     </label>
                     <br>
+                    -->
                     <button type="button" class="btn btn-primary collect-btn-lumpsum">Collect</button>
                 </form>
             </div>
@@ -941,6 +943,7 @@ $language_name   = $language["short_code"];
             return;
         }
 
+        /* Previously used Lumpsum confirmation checkbox validation is disabled.
         if (!$('#accept').is(':checked')) {
             e.preventDefault(); // Prevent form submission
 
@@ -951,6 +954,7 @@ $language_name   = $language["short_code"];
             }, 500);
             return; // Stop execution
         }
+        */
 
         $.ajax({
             url: url,
