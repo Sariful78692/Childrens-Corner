@@ -39,6 +39,8 @@
                     <?php   }*/
                     if ($this->rbac->hasPrivilege('fees_collection_report', 'can_view')) {   ?>
 
+                        <li class="col-lg-3 col-md-3 col-sm-6 <?php echo set_SubSubmenu('Reports/finance/one_month_report'); ?>"><a href="<?php echo site_url('financereports/one_month_report'); ?>"><i class="fa fa-file-text-o"></i> One Month Report</a></li>
+
                         <li class="col-lg-3 col-md-3 col-sm-6 <?php echo set_SubSubmenu('Reports/finance/collection_report'); ?>"><a href="<?php echo base_url(); ?>financereports/collection_report"><i class="fa fa-file-text-o"></i> <?php echo $this->lang->line('fees_collection_report'); ?></a></li>
 
                     <?php }/* 

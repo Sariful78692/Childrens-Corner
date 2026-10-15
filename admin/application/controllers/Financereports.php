@@ -30,6 +30,194 @@ class Financereports extends Admin_Controller
         $this->load->view('layout/footer');
     }
 
+    /** Monthly class-wise summary; kept separate from the existing report actions. */
+    public function one_month_report()
+    {
+        if (!$this->rbac->hasPrivilege('fees_collection_report', 'can_view')) {
+            access_denied();
+        }
+        $this->session->set_userdata('top_menu', 'Reports');
+        $this->session->set_userdata('sub_menu', 'Reports/finance');
+        $this->session->set_userdata('subsub_menu', 'Reports/finance/one_month_report');
+
+        $from_date = $this->input->get_post('from_date');
+        $to_date = $this->input->get_post('to_date');
+        if (!$this->isOneMonthReportDate($from_date) || !$this->isOneMonthReportDate($to_date) || $from_date > $to_date) {
+            $from_date = date('Y-m-01');
+            $to_date = date('Y-m-t');
+        }
+        $start = $from_date;
+        $end = $to_date;
+        $end_exclusive = date('Y-m-d', strtotime($end . ' +1 day'));
+        $session_id = $this->setting_model->getCurrentSession();
+
+        $classes = $this->class_model->get();
+        $report = array();
+        $monthly_fee_rates = array();
+        $has_concession_report_rows = array();
+        $monthly_concession_student_counts = array();
+        foreach ($classes as $class) {
+            $class_id = is_array($class) ? $class['id'] : $class->id;
+            $class_name = is_array($class) ? $class['class'] : $class->class;
+            $students = $this->db->select('ss.id, ss.student_id, s.is_active')
+                ->from('student_session ss')->join('students s', 's.id = ss.student_id')
+                ->where('ss.class_id', $class_id)->where('ss.session_id', $session_id)
+                ->where('ss.status', 1)->get()->result();
+            $active_ids = array();
+            $dropouts = 0;
+            foreach ($students as $student) {
+                if ($student->is_active === 'yes') $active_ids[(int) $student->student_id] = true;
+                elseif ($this->db->field_exists('disable_at', 'students')) {
+                    $disabled = $this->db->select('disable_at')->where('id', $student->student_id)->get('students')->row();
+                    if ($disabled && $disabled->disable_at >= $start && $disabled->disable_at <= $end) $dropouts++;
+                }
+            }
+            $report[$class_id] = array('class' => $class_name, 'students' => count($active_ids), 'fees' => 0, 'total' => 0,
+                'dropouts' => $dropouts, 'full_count' => 0, 'full_collection' => 0, 'concession_count' => 0,
+                'concession_total' => 0, 'yearly_concession' => 0, 'monthly_concession' => 0,
+                'concession_collection' => 0, 'expected' => 0, 'received' => 0, 'due' => 0);
+            $discounts = $this->db->select('COUNT(DISTINCT sfd.student_session_id) AS student_count, SUM(fd.amount) AS amount')
+                ->from('student_fees_discounts sfd')->join('student_session ss', 'ss.id=sfd.student_session_id')
+                ->join('fees_discounts fd', 'fd.id=sfd.fees_discount_id')->where('ss.class_id', $class_id)
+                ->where('ss.session_id', $session_id)->where('sfd.status !=', 'rejected')->get()->row();
+            if ($discounts) {
+                $report[$class_id]['concession_count'] = (int) $discounts->student_count;
+                $report[$class_id]['yearly_concession'] = round((float) $discounts->amount, 2);
+                $report[$class_id]['concession_total'] = round((float) $discounts->amount, 2);
+                $report[$class_id]['monthly_concession'] = round(((float) $discounts->amount) / 12, 2);
+            }
+
+            // Keep the Total Concession Amount consistent with the existing
+            // Concession Student Report, which includes monthly and admission concessions.
+            $concession_rows = $this->studentfee_model->getConcessionStudentReport($session_id, $class_id);
+            $class_monthly_concession_total = 0;
+            $class_monthly_concession_students = 0;
+            foreach ($concession_rows as $concession_row) {
+                $monthly_discount = (float) ($concession_row['monthly_discount_amount'] ?? 0);
+                if ($monthly_discount > 0) {
+                    $class_monthly_concession_total += $monthly_discount;
+                    $class_monthly_concession_students++;
+                }
+            }
+            if ($concession_rows) {
+                $has_concession_report_rows[$class_id] = true;
+                $monthly_concession_student_counts[$class_id] = $class_monthly_concession_students;
+                $report[$class_id]['concession_count'] = $class_monthly_concession_students;
+                $report[$class_id]['concession_total'] = round($class_monthly_concession_total, 2);
+                $report[$class_id]['monthly_concession'] = round($class_monthly_concession_total, 2);
+            }
+        }
+
+        // This installation stores assigned fees and receipts in these management tables.
+        foreach ($classes as $class) {
+            $class_id = is_array($class) ? $class['id'] : $class->id;
+            // Use the class's canonical Fees Master rate (one row per fee type).
+            $master_rows = $this->db->select('feetype_id, fees_amount')->from('fees_master_class_wise')
+                ->where('class_id', $class_id)->where('session_id', $session_id)->where('is_monthly', 1)
+                ->order_by('id', 'ASC')->get()->result();
+            $seen_fee_types = array();
+            $monthly_fee_rate = 0;
+            foreach ($master_rows as $master_row) {
+                if (!isset($seen_fee_types[$master_row->feetype_id])) {
+                    $seen_fee_types[$master_row->feetype_id] = true;
+                    $monthly_fee_rate += (float) $master_row->fees_amount;
+                }
+            }
+            // Fees Master contains the twelve monthly installments for the session;
+            // convert their sum to one month's class rate.
+            $monthly_fee_rates[$class_id] = $monthly_fee_rate / 12;
+            $students = $this->db->select('sfm.student_session_id, SUM(fmcw.fees_amount) AS standard_fee, '
+                    . 'SUM(sfm.discounted_fees) AS expected_fee, '
+                    . 'SUM(fmcw.fees_amount - sfm.discounted_fees) AS concession_amount, '
+                    . 'SUM(IFNULL(payments.paid_amount, 0)) AS paid_amount')
+                ->from('student_fees_management sfm')
+                ->join('fees_master_class_wise fmcw', 'fmcw.class_id=sfm.class_id AND fmcw.session_id=sfm.session_id AND fmcw.feetype_id=sfm.feetype_id', 'inner')
+                ->join('(SELECT student_fees_management_id, SUM(paid_amount) AS paid_amount '
+                    . 'FROM student_fees_collections WHERE status IN (1, 2) AND is_refunded=0 '
+                    . 'AND collection_date >= ' . $this->db->escape($start) . ' AND collection_date < ' . $this->db->escape($end_exclusive)
+                    . ' GROUP BY student_fees_management_id) payments', 'payments.student_fees_management_id=sfm.id', 'left', false)
+                ->where('sfm.class_id', $class_id)->where('sfm.session_id', $session_id)
+                ->where('sfm.status', 1)->where('sfm.is_monthly', 1)->where('sfm.is_skipped', 0)
+                ->where('fmcw.is_monthly', 1)->where('(fmcw.status IS NULL OR fmcw.status = 1)', null, false)
+                ->group_by('sfm.student_session_id')->get()->result();
+            $full = $concession = $standard_total = $expected = $received = $discount_amount = $concession_paid = 0;
+            foreach ($students as $student) {
+                $standard_total += (float) $student->standard_fee;
+                $expected += (float) $student->expected_fee;
+                $received += (float) $student->paid_amount;
+                $discount_amount += (float) $student->concession_amount;
+                if ((float) $student->concession_amount > 0) {
+                    $concession++;
+                    $concession_paid += (float) $student->paid_amount;
+                } else {
+                    $full++;
+                }
+            }
+            $idx = $class_id;
+            $class_monthly_fee = isset($monthly_fee_rates[$class_id]) ? $monthly_fee_rates[$class_id] : 0;
+            $report[$idx]['fees'] = round($class_monthly_fee, 2);
+            $report[$idx]['total'] = round($class_monthly_fee * $report[$idx]['students'], 2);
+            $report[$idx]['full_count'] = max(0, (int) $report[$idx]['students'] - (int) $report[$idx]['concession_count']);
+            $report[$idx]['full_collection'] = round(
+                $class_monthly_fee * $report[$idx]['full_count'],
+                2
+            );
+            $report[$idx]['concession_count'] = isset($monthly_concession_student_counts[$idx])
+                ? $monthly_concession_student_counts[$idx]
+                : $concession;
+            // Keep admission-only concessions out of the monthly concession total.
+            if (empty($has_concession_report_rows[$idx])) {
+                $report[$idx]['concession_total'] = round($discount_amount, 2);
+            }
+            $report[$idx]['monthly_concession'] = round($report[$idx]['concession_total'] / 12, 2);
+            $report[$idx]['concession_collection'] = round(
+                ($class_monthly_fee * $report[$idx]['concession_count']) - $report[$idx]['monthly_concession'],
+                2
+            );
+            $report[$idx]['expected'] = round(
+                $report[$idx]['full_collection'] + $report[$idx]['concession_collection'],
+                2
+            );
+            $report[$idx]['received'] = round($received, 2);
+            $report[$idx]['due'] = round($report[$idx]['expected'] - $report[$idx]['received'], 2);
+        }
+
+        $total_fields = array('students', 'fees', 'total', 'dropouts', 'full_count', 'full_collection',
+            'concession_count', 'concession_total', 'monthly_concession', 'concession_collection',
+            'expected', 'received', 'due');
+        $report_totals = array_fill_keys($total_fields, 0);
+        foreach ($report as $report_row) {
+            foreach ($total_fields as $field) {
+                $report_totals[$field] += (float) $report_row[$field];
+            }
+        }
+        $data['report_totals'] = $report_totals;
+        $data['report'] = $report;
+        $data['from_date'] = $from_date;
+        $data['to_date'] = $to_date;
+        if ($this->input->get('export') === 'excel') {
+            $filename = 'one-month-report-' . $from_date . '-to-' . $to_date . '.xls';
+            header('Content-Type: application/vnd.ms-excel; charset=UTF-8');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+            $this->load->view('financereports/one_month_report_excel', $data);
+            return;
+        }
+        $this->load->view('layout/header');
+        $this->load->view('financereports/one_month_report', $data);
+        $this->load->view('layout/footer');
+    }
+
+    private function isOneMonthReportDate($date)
+    {
+        if (!is_string($date) || !preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $date)) {
+            return false;
+        }
+        $parsed = DateTime::createFromFormat('Y-m-d', $date);
+        return $parsed && $parsed->format('Y-m-d') === $date;
+    }
+
     public function reportduefees()
     {
         if (!$this->rbac->hasPrivilege('balance_fees_statement', 'can_view')) {
