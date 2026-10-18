@@ -114,6 +114,8 @@ class Financereports extends Admin_Controller
             // Use the class's canonical Fees Master rate (one row per fee type).
             $master_rows = $this->db->select('feetype_id, fees_amount')->from('fees_master_class_wise')
                 ->where('class_id', $class_id)->where('session_id', $session_id)->where('is_monthly', 1)
+                // fee type 0 is a setup placeholder, not a monthly installment.
+                ->where('feetype_id >', 0)
                 ->order_by('id', 'ASC')->get()->result();
             $seen_fee_types = array();
             $monthly_fee_rate = 0;
