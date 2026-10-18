@@ -153,10 +153,10 @@
                                     }
                                 }
 
-                                if ($opening_cash > 0) :
+                                if ($opening_cash != 0) :
                                     $opening_balance_html .= "<li class='d-flex justify-content-between'><p>CASH: </p> <p class='text-right'>₹" . number_format($opening_cash, 2) . "</p></li>";
                                 endif;
-                                if ($opening_bank > 0) :
+                                if ($opening_bank != 0) :
                                     $opening_balance_html .= "<li><p>BANK:</p></li>";
                                     foreach ($opening_bank_balances as $bank_balance) {
                                         $opening_balance_html .= "<li class='d-flex justify-content-between'><p>&nbsp;&nbsp;&nbsp;" . html_escape($bank_balance['name']) . ": </p> <p class='text-right'>₹" . number_format($bank_balance['balance'], 2) . "</p></li>";
@@ -193,18 +193,16 @@
                                     $student_fees_total += $dept['admission_total'] + $dept['tuition_total'];
                                 }
 
-                                if ($total_opening_balance > 0) {
+                                // Always show the opening balance section, including zero balances.
                                     $opening_html .= "<h4>BY OPENING BALANCE: </h4>";
                                     $opening_html .= "<ul>";
-                                    if ($opening_fixed > 0) {
+                                    if ($opening_fixed != 0) {
                                         $opening_html .=  "<li class='d-flex justify-content-between'><p>FIXED DOPOSIT: </p> <p class='text-right'>₹" . number_format($opening_fixed, 2) . "</p></li>";
                                     }
 
                                     $opening_html .= $opening_balance_html;
                                     $opening_html .= "<li class='text-right'><b>₹" . number_format($total_opening_balance, 2) . "</b></li>";
                                     $opening_html .= "</ul>";
-                                }
-
                                 if ($payroll_refunded > 0) {
                                     $payroll_refunded_html .= "<li class='d-flex justify-content-between'><p>STAFF HONORARIUM REFUND: </p> <p class='text-right'>₹" . number_format($payroll_refunded, 2) . "</p></li>";
                                 }
