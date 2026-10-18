@@ -117,6 +117,28 @@
         display: none;
     }
 
+    /* Keep the fee-payment rows scrollable and expose the scrollbar to users. */
+    html.student-fees-no-page-scroll .fees_collection .table-responsive {
+        scrollbar-width: thin;
+        scrollbar-color: #6b7280 #e5e7eb;
+        -ms-overflow-style: auto;
+    }
+
+    html.student-fees-no-page-scroll .fees_collection .table-responsive::-webkit-scrollbar {
+        display: block;
+        width: 10px;
+        height: 10px;
+    }
+
+    html.student-fees-no-page-scroll .fees_collection .table-responsive::-webkit-scrollbar-track {
+        background: #e5e7eb;
+    }
+
+    html.student-fees-no-page-scroll .fees_collection .table-responsive::-webkit-scrollbar-thumb {
+        background: #6b7280;
+        border-radius: 5px;
+    }
+
     .fees_collection .table-fixed-header thead th {
         position: sticky;
         top: 0;
