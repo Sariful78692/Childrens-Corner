@@ -41,7 +41,14 @@
 
                         <li class="col-lg-3 col-md-3 col-sm-6 <?php echo set_SubSubmenu('Reports/finance/one_month_report'); ?>"><a href="<?php echo site_url('financereports/one_month_report'); ?>"><i class="fa fa-file-text-o"></i> One Month Report</a></li>
 
+                        <li class="col-lg-3 col-md-3 col-sm-6 <?php echo set_SubSubmenu('Reports/finance/department_wise_concession'); ?>"><a href="<?php echo site_url('financereports/department_wise_concession'); ?>"><i class="fa fa-file-text-o"></i> Department Wise Concession</a></li>
+
                         <li class="col-lg-3 col-md-3 col-sm-6 <?php echo set_SubSubmenu('Reports/finance/collection_report'); ?>"><a href="<?php echo base_url(); ?>financereports/collection_report"><i class="fa fa-file-text-o"></i> <?php echo $this->lang->line('fees_collection_report'); ?></a></li>
+
+                    <?php }
+                    if ($this->rbac->hasPrivilege('student_report', 'can_view')) { ?>
+
+                        <li class="col-lg-3 col-md-3 col-sm-6 <?php echo set_SubSubmenu('Reports/finance/concession_student_report'); ?>"><a href="<?php echo site_url('report/concession_student_report'); ?>"><i class="fa fa-file-text-o"></i> Concession Student Report</a></li>
 
                     <?php }/* 
                     if ($this->rbac->hasPrivilege('online_fees_collection_report', 'can_view')) { ?>

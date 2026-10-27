@@ -74,7 +74,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 
 <div class="content-wrapper">
     <section class="content">
-        <?php $this->load->view('reports/_studentinformation'); ?>
+        <?php $this->load->view('financereports/_finance'); ?>
 
         <div class="row">
             <div class="col-md-12">

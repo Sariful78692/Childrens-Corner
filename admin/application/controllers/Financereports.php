@@ -30,6 +30,118 @@ class Financereports extends Admin_Controller
         $this->load->view('layout/footer');
     }
 
+    /** Department/class wise concession summary for the active session. */
+    public function department_wise_concession()
+    {
+        if (!$this->rbac->hasPrivilege('fees_collection_report', 'can_view')) {
+            access_denied();
+        }
+
+        $this->session->set_userdata('top_menu', 'Financereports');
+        $this->session->set_userdata('sub_menu', 'Financereports/finance');
+        $this->session->set_userdata('subsub_menu', 'Reports/finance/department_wise_concession');
+
+        $session_id = $this->setting_model->getCurrentSession();
+        $classes = $this->class_model->get();
+        $this->load->model('account_department_model');
+        $account_departments = $this->account_department_model->get();
+        $account_department_id = $this->input->get('account_department_id');
+        $account_department_id = ($account_department_id !== null && ctype_digit((string) $account_department_id))
+            ? (int) $account_department_id
+            : null;
+        $session_departments = $this->db->select('id, account_department_id')
+            ->from('student_session')->where('session_id', $session_id)->get()->result_array();
+        $department_by_student_session = array();
+        foreach ($session_departments as $session_department) {
+            $department_by_student_session[$session_department['id']] = $session_department['account_department_id'];
+        }
+        $report = array();
+        $totals = array('admission_students' => 0, 'admission_amount' => 0, 'monthly_students' => 0, 'monthly_amount' => 0);
+
+        foreach ($classes as $class) {
+            $class_id = is_array($class) ? $class['id'] : $class->id;
+            $class_name = is_array($class) ? $class['class'] : $class->class;
+            $row = array(
+                'class' => $class_name,
+                'admission_students' => 0,
+                'admission_amount' => 0,
+                'monthly_students' => 0,
+                'monthly_amount' => 0,
+            );
+            $students = $this->studentfee_model->getConcessionStudentReport($session_id, $class_id);
+            foreach ($students as $student) {
+                $student_department_id = isset($department_by_student_session[$student['student_session_id']])
+                    ? (int) $department_by_student_session[$student['student_session_id']]
+                    : 0;
+                if ($account_department_id !== null && $student_department_id !== $account_department_id) {
+                    continue;
+                }
+                $admission_amount = (float) $student['admission_discount_amount'];
+                // The stored monthly concession is the total across 12 months.
+                $monthly_amount = (float) $student['monthly_discount_amount'] / 12;
+                if (!empty($student['has_admission_concession'])) {
+                    $row['admission_students']++;
+                }
+                if (!empty($student['has_monthly_concession'])) {
+                    $row['monthly_students']++;
+                }
+                $row['admission_amount'] += $admission_amount;
+                $row['monthly_amount'] += $monthly_amount;
+            }
+            $row['monthly_yearly_amount'] = $row['monthly_amount'] * 12;
+            $row['yearly_total'] = $row['admission_amount'] + $row['monthly_yearly_amount'];
+            if ($account_department_id !== null && $row['admission_students'] === 0 && $row['monthly_students'] === 0) {
+                continue;
+            }
+            $report[] = $row;
+            $totals['admission_students'] += $row['admission_students'];
+            $totals['admission_amount'] += $row['admission_amount'];
+            $totals['monthly_students'] += $row['monthly_students'];
+            $totals['monthly_amount'] += $row['monthly_amount'];
+        }
+
+        $totals['monthly_yearly_amount'] = $totals['monthly_amount'] * 12;
+        $totals['yearly_total'] = $totals['admission_amount'] + $totals['monthly_yearly_amount'];
+        $selected_department_name = 'All Account Departments';
+        if ($account_department_id === 0) {
+            $selected_department_name = 'Not Assigned';
+        } elseif ($account_department_id !== null) {
+            foreach ($account_departments as $department) {
+                if ((int) $department['id'] === $account_department_id) {
+                    $selected_department_name = $department['name'];
+                    break;
+                }
+            }
+        }
+        $data = array(
+            'report' => $report,
+            'totals' => $totals,
+            'session_name' => $this->session_model->get($session_id)->session,
+            'currency_symbol' => $this->customlib->getSchoolCurrencyFormat(),
+            'account_departments' => $account_departments,
+            'account_department_id' => $account_department_id,
+            'selected_department_name' => $selected_department_name,
+            'excel_url' => site_url('financereports/department_wise_concession') . '?' . http_build_query(array(
+                'account_department_id' => $account_department_id,
+                'export' => 'excel',
+            )),
+        );
+
+        if ($this->input->get('export') === 'excel') {
+            $filename = 'department-wise-concession-' . date('Y-m-d') . '.xls';
+            header('Content-Type: application/vnd.ms-excel; charset=UTF-8');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+            $this->load->view('financereports/department_wise_concession_excel', $data);
+            return;
+        }
+
+        $this->load->view('layout/header');
+        $this->load->view('financereports/department_wise_concession', $data);
+        $this->load->view('layout/footer');
+    }
+
     /** Monthly class-wise summary; kept separate from the existing report actions. */
     public function one_month_report()
     {

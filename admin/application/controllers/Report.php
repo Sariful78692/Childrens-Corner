@@ -517,9 +517,9 @@ class Report extends Admin_Controller
             access_denied();
         }
 
-        $this->session->set_userdata('top_menu', 'Reports');
-        $this->session->set_userdata('sub_menu', 'Reports/student_information');
-        $this->session->set_userdata('subsub_menu', 'Reports/student_information/concession_student_report');
+        $this->session->set_userdata('top_menu', 'Financereports');
+        $this->session->set_userdata('sub_menu', 'Financereports/finance');
+        $this->session->set_userdata('subsub_menu', 'Reports/finance/concession_student_report');
 
         $filters = $this->getConcessionStudentReportFilters();
         $selected_session = $filters['selected_session'];
@@ -823,8 +823,8 @@ class Report extends Admin_Controller
         $admission_free = $free_status === 'admission_free';
         $monthly_free = $free_status === 'monthly_free';
 
-        $this->session->set_userdata('top_menu', 'Reports');
-        $this->session->set_userdata('sub_menu', 'Reports/student_information');
+        $this->session->set_userdata('top_menu', 'Financereports');
+        $this->session->set_userdata('sub_menu', 'Financereports/finance');
         $this->session->set_userdata('subsub_menu', '');
 
         $data['title'] = 'Concession Student Report Detail';
