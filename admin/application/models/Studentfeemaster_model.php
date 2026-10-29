@@ -1489,7 +1489,7 @@ class Studentfeemaster_model extends MY_Model
         if ($feetype_id != null && is_array($feetype_id) && !empty($feetype_id)) {
             $this->datatables->where_in('student_fees_collections.feetype_id', $feetype_id);
         }
-        if ($session_id != null) {
+        if ($session_id != null && $session_id !== '' && $session_id !== 'all') {
             $this->datatables->where('student_fees_collections.session_id', $session_id);
         }
         if ($payment_mode_id != null) {

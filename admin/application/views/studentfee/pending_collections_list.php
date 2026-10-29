@@ -230,7 +230,11 @@
 
     $(document).on('click', '.approve_fee_btn', function() {
         var fee_id = $(this).data('fee-id');
+        var collection_date = $(this).data('collection-date');
         $('#modal_fee_id').val(fee_id);
+        if (collection_date) {
+            $('#approved_date').val(collection_date).trigger('change');
+        }
         $('#approveFeeModal').modal('show');
     });
 
@@ -257,6 +261,10 @@
             if (selected_fees.length === 0) {
                 errorMsg('<?php echo $this->lang->line('no_fees_selected'); ?>'); // Need to add this language line
                 return;
+            }
+            var searched_date = $('#pendingCollectionsFilter [name="date_from"]').val();
+            if (searched_date) {
+                $('#approved_date').val(searched_date).trigger('change');
             }
             $('#modal_fee_id').val(JSON.stringify(selected_fees)); // Store as JSON string
             $('#approveFeeModal').modal('show');

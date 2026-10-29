@@ -2007,7 +2007,8 @@ class Studentfee extends Admin_Controller
                 if ((!($this->rbac->hasPrivilege('collect_fees', 'can_view') && !$this->rbac->hasPrivilege('superadmin', 'can_view'))) || $is_temp_superadmin) {
                     $row[] = $value->collected_by_name;
                 }
-                $row[] = '<button type="button" class="btn btn-success btn-xs approve_fee_btn" data-fee-id="' . $value->id . '" data-loading-text="<i class=\'fa fa-circle-o-notch fa-spin\'></i> Processing"><i class="fa fa-check"></i> ' . $this->lang->line('receive') . '</button>';
+                $collection_date = date('Y-m-d', strtotime($value->collection_date));
+                $row[] = '<button type="button" class="btn btn-success btn-xs approve_fee_btn" data-fee-id="' . $value->id . '" data-collection-date="' . $collection_date . '" data-loading-text="<i class=\'fa fa-circle-o-notch fa-spin\'></i> Processing"><i class="fa fa-check"></i> ' . $this->lang->line('receive') . '</button>';
 
                 $dt_data[] = $row;
             }
