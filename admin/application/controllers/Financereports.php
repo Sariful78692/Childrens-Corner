@@ -1613,7 +1613,12 @@ class Financereports extends Admin_Controller
             $feetype_id = $this->input->post('feetype_id');
             $session_id = $this->input->post('session_id');
             $payment_mode_id = $this->input->post('payment_mode_id');
-            $collected_by = $this->input->post('collected_by');
+            // The filter form names this field `collect_by`; also accept the
+            // DataTables/API spelling used by older callers.
+            $collected_by = $this->input->post('collect_by');
+            if ($collected_by === null || $collected_by === '') {
+                $collected_by = $this->input->post('collected_by');
+            }
             $account_department_id = $this->input->post('account_department_id');
             $gender = $this->input->post('gender');
             $status_filter = $this->input->post('status_filter');
@@ -1646,7 +1651,9 @@ class Financereports extends Admin_Controller
                 $row = array();
 
                 //$row[]      = $value->id;
-                $row[]      = $this->customlib->dateformat($value->approved_date);
+                $approved_date = $this->customlib->dateformat($value->approved_date);
+                $date_class = $is_refunded ? 'label-warning' : 'label-success';
+                $row[] = '<span class="label ' . $date_class . '">' . html_escape($approved_date) . '</span>';
                 $row[]      = $value->account_department_name;
                 $row[]      = $value->reg_id;
                 $row[]      = $value->student_name;

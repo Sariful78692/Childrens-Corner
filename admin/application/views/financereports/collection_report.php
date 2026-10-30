@@ -221,7 +221,7 @@ $date_to = '';   // Initialize $date_to
                                 <table class="table table-striped table-bordered table-hover collection-list">
                                     <thead>
                                         <tr>
-                                            <th><?php echo $this->lang->line('date'); ?></th>
+                                            <th>Approved Date</th>
                                             <th>Account Department</th>
                                             <th>RegId</th>
                                             <th><?php echo $this->lang->line('student_name'); ?></th>
