@@ -895,6 +895,44 @@ class Studentfeemaster_model extends MY_Model
         return $return_array;
     }
 
+    public function getCollectionAmountBetweenDate($start_date, $end_date)
+    {
+        $this->db->select_sum('paid_amount', 'total_amount');
+        $this->db->from('student_fees_collections');
+        $this->db->where('session_id', $this->current_session);
+        $this->db->where('collection_date >=', $start_date);
+        $this->db->where('collection_date <=', $end_date);
+        $this->db->where('status', 1);
+        $this->db->where('is_refunded', 0);
+
+        $result = $this->db->get()->row();
+        return $result ? (float) $result->total_amount : 0;
+    }
+
+    public function getFeesOverviewBySession()
+    {
+        $paid_subquery = "(SELECT student_fees_management_id, SUM(COALESCE(paid_amount, 0) + COALESCE(discount_amount, 0)) AS amount_paid
+                          FROM student_fees_collections
+                          WHERE status = 1 AND is_refunded = 0
+                          GROUP BY student_fees_management_id) paid";
+
+        $this->db->select("COUNT(CASE WHEN COALESCE(paid.amount_paid, 0) >= sfm.discounted_fees THEN 1 END) AS total_paid", false);
+        $this->db->select("COUNT(CASE WHEN COALESCE(paid.amount_paid, 0) > 0 AND COALESCE(paid.amount_paid, 0) < sfm.discounted_fees THEN 1 END) AS total_partial", false);
+        $this->db->select("COUNT(CASE WHEN COALESCE(paid.amount_paid, 0) = 0 THEN 1 END) AS total_unpaid", false);
+        $this->db->select("SUM(CASE WHEN COALESCE(paid.amount_paid, 0) >= sfm.discounted_fees THEN sfm.discounted_fees ELSE 0 END) AS amount_paid", false);
+        $this->db->select("SUM(CASE WHEN COALESCE(paid.amount_paid, 0) > 0 AND COALESCE(paid.amount_paid, 0) < sfm.discounted_fees THEN sfm.discounted_fees ELSE 0 END) AS amount_partial", false);
+        $this->db->select("SUM(CASE WHEN COALESCE(paid.amount_paid, 0) = 0 THEN sfm.discounted_fees ELSE 0 END) AS amount_unpaid", false);
+        $this->db->from('student_fees_management sfm');
+        $this->db->join($paid_subquery, 'paid.student_fees_management_id = sfm.id', 'left');
+        $this->db->where('sfm.session_id', $this->current_session);
+        $this->db->where('sfm.status', 1);
+        $this->db->where('sfm.is_skipped', 0);
+        $this->db->where('sfm.discounted_fees >', 0);
+
+        $result = $this->db->get()->row_array();
+        return $result ? $result : array();
+    }
+
     public function findObjectAmount($array, $st_date, $ed_date)
     {
         $ar     = json_decode($array->amount_detail);

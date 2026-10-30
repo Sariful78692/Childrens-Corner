@@ -1303,6 +1303,7 @@ $lang['month_year'] ="মাস বছর";
 $lang['monthly_expenses'] ="মাসিক খরচ";
 $lang['monthly_fees'] ="মাসিক ফি";
 $lang['monthly_fees_collection'] ="মাসিক ফি সংগ্রহ";
+$lang['fees_collection_today'] ="আজকের ফি সংগ্রহ";
 $lang['mother'] ="মা";
 $lang['mother_name'] ="মায়ের নাম";
 $lang['mother_occupation'] ="মায়ের পেশা";

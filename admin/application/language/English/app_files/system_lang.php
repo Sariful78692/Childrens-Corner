@@ -1308,6 +1308,7 @@ $lang['month_year'] = "Month - Year";
 $lang['monthly_expenses'] = "Monthly Expenses";
 $lang['monthly_fees'] = "Monthly Fees";
 $lang['monthly_fees_collection'] = "Monthly Fees Collection";
+$lang['fees_collection_today'] = "Fees Collection Today";
 $lang['mother'] = "Mother";
 $lang['mother_name'] = "Mother Name";
 $lang['mother_occupation'] = "Mother Occupation";

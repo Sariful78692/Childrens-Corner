@@ -77,13 +77,15 @@ class Admin extends Admin_Controller
 
         //======================Current Month Collection ==============================
         $first_day_this_month     = date('Y-m-01');
-        // $current_month_collection = $this->studentfeemaster_model->getDepositAmountBetweenDate($first_day_this_month, $current_date);
-        $month_collection         = $this->whatever($getDepositeAmount, $first_day_this_month, $current_date);
+        $month_collection         = $this->studentfeemaster_model->getCollectionAmountBetweenDate($first_day_this_month, $current_date);
         $month_transport_collection         = $this->whatever($student_transport_fee, $first_day_this_month, $current_date);
+        $today_fee_collection = $this->studentfeemaster_model->getCollectionAmountBetweenDate($current_date, $current_date);
+        $today_transport_collection = $this->whatever($student_transport_fee, $current_date, $current_date);
 
         $month_collection_total = $month_collection + $month_transport_collection;
         $data['month_collection'] = $month_collection_total;
-        $session_collection_till_date = $this->whatever($getDepositeAmount, $year_str_month, $current_date) + $this->whatever($student_transport_fee, $year_str_month, $current_date);
+        $data['today_fee_collection'] = $today_fee_collection + $today_transport_collection;
+        $session_collection_till_date = $this->studentfeemaster_model->getCollectionAmountBetweenDate($year_str_month, $current_date) + $this->whatever($student_transport_fee, $year_str_month, $current_date);
         $data['month_collection_progress'] = ($session_collection_till_date > 0) ? (($month_collection_total * 100) / $session_collection_till_date) : 0;
 
         $tot_students = $this->studentsession_model->getTotalStudentBySession();
@@ -249,7 +251,19 @@ class Admin extends Admin_Controller
             }
         }
 
-        if (!empty($data['fees_awaiting'])) {
+        $current_session_fees_overview = $this->studentfeemaster_model->getFeesOverviewBySession();
+        $modern_fee_count = (int) ($current_session_fees_overview['total_paid'] ?? 0)
+            + (int) ($current_session_fees_overview['total_partial'] ?? 0)
+            + (int) ($current_session_fees_overview['total_unpaid'] ?? 0);
+
+        if ($modern_fee_count > 0) {
+            $total_paid += (int) $current_session_fees_overview['total_paid'];
+            $total_partial += (int) $current_session_fees_overview['total_partial'];
+            $total_unpaid += (int) $current_session_fees_overview['total_unpaid'];
+            $amount_paid_total += (float) $current_session_fees_overview['amount_paid'];
+            $amount_partial_total += (float) $current_session_fees_overview['amount_partial'];
+            $amount_unpaid_total += (float) $current_session_fees_overview['amount_unpaid'];
+        } elseif (!empty($data['fees_awaiting'])) {
 
             foreach ($data['fees_awaiting'] as $awaiting_key => $awaiting_value) {
 

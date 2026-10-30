@@ -502,6 +502,17 @@
         --qs-accent: #4a3aa7;
         --qs-accent-tint: rgba(74, 58, 167, .12);
     }
+
+    .dashboard-quick-stats .topprograssstart--teal {
+        --qs-accent: #0891b2;
+        --qs-accent-tint: rgba(8, 145, 178, .12);
+    }
+
+    @media (min-width: 1200px) {
+        .dashboard-quick-stats--five > div {
+            width: 20%;
+        }
+    }
 </style>
 
 <div class="content-wrapper">
@@ -544,7 +555,14 @@ foreach ($notifications as $notice_key => $notice_value) {
 }
 ?>
         </div>
-        <div class="row dashboard-quick-stats">
+        <?php
+$quick_stat_count = 0;
+$quick_stat_count += $this->rbac->hasPrivilege('student_count_widget', 'can_view') ? 1 : 0;
+$quick_stat_count += ($this->module_lib->hasActive('fees_collection') && $this->rbac->hasPrivilege('Monthly fees_collection_widget', 'can_view')) ? 2 : 0;
+$quick_stat_count += $this->rbac->hasPrivilege('staff_present_today_widegts', 'can_view') ? 1 : 0;
+$quick_stat_count += ($this->module_lib->hasActive('student_attendance') && $sch_setting->attendence_type == 0 && $this->rbac->hasPrivilege('student_present_today_widegts', 'can_view')) ? 1 : 0;
+?>
+        <div class="row dashboard-quick-stats<?php echo ($quick_stat_count >= 5) ? ' dashboard-quick-stats--five' : ''; ?>">
             <?php
 /*
 if ($this->module_lib->hasActive('expense') && $this->rbac->hasPrivilege('monthly_expense_widget', 'can_view')) {
@@ -592,6 +610,22 @@ if ($this->module_lib->hasActive('fees_collection') && $this->rbac->hasPrivilege
                         </div>
                     </div><!--./topprograssstart-->
                 </div><!--./col-md-3-->
+<?php
+}
+
+if ($this->module_lib->hasActive('fees_collection') && $this->rbac->hasPrivilege('Monthly fees_collection_widget', 'can_view')) {
+    ?>
+                <div class="<?php echo $std_graphclass; ?>">
+                    <div class="topprograssstart topprograssstart--teal">
+                        <p class="text-uppercase mt5 clearfix"><i class="fa fa-money ftlayer"></i><?php echo $this->lang->line('fees_collection_today'); ?><span class="pull-right"><?php echo $currency_symbol . amountFormat((float) $today_fee_collection); ?></span>
+                        </p>
+                        <div class="progress-group">
+                            <div class="progress progress-minibar">
+                                <div class="progress-bar" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 <?php
 }
 

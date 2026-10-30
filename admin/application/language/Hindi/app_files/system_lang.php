@@ -1303,6 +1303,7 @@ $lang['month_year'] ="महीना वर्ष";
 $lang['monthly_expenses'] ="मासिक व्यय";
 $lang['monthly_fees'] ="मासिक पास";
 $lang['monthly_fees_collection'] ="मासिक शुल्क संग्रह";
+$lang['fees_collection_today'] ="आज का शुल्क संग्रह";
 $lang['mother'] ="माता";
 $lang['mother_name'] ="मां का नाम";
 $lang['mother_occupation'] ="माँ का पेशा";
