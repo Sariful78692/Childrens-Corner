@@ -4,6 +4,40 @@
     th {
         font-size: 11px;
     }
+    .pending-collections-list.pending-has-action th:last-child,
+    .pending-collections-list.pending-has-action td:last-child {
+        position: sticky;
+        right: 0;
+        z-index: 2;
+        background: #fff;
+        white-space: nowrap;
+    }
+    .pending-collections-list.pending-has-action thead th:last-child {
+        background: #f2f2f2;
+        z-index: 3;
+    }
+    .approval-amount-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .approval-amount-row label {
+        width: 52px;
+        margin: 0;
+        flex: 0 0 52px;
+    }
+    .approval-amount-row #approval_amount {
+        margin: 0;
+        width: 140px;
+        flex: 0 0 140px;
+        min-height: 34px;
+        display: flex;
+        align-items: center;
+        background-color: #f8fafc;
+        border-color: #d2d6de;
+        color: #333;
+        font-weight: 600;
+    }
 </style>
 <div class="content-wrapper" style="min-height: 946px;">
     <section class="content-header">
@@ -109,7 +143,7 @@
                                 </div>
                             <?php } ?>
                             <div class="table-responsive">
-                                <table class="table table-striped table-bordered table-hover pending-collections-list" data-export-title="<?php echo $this->lang->line('pending_fee_collections'); ?>">
+                                <table class="table table-striped table-bordered table-hover pending-collections-list<?php if (!($this->rbac->hasPrivilege('collect_fees', 'can_view') && !$this->rbac->hasPrivilege('superadmin', 'can_view'))) { echo ' pending-has-action'; } ?>" data-export-title="<?php echo $this->lang->line('pending_fee_collections'); ?>">
                                     <thead style="background-color: #f2f2f2;">
                                         <tr>
                                             <?php if ((!($this->rbac->hasPrivilege('collect_fees', 'can_view') && !$this->rbac->hasPrivilege('superadmin', 'can_view'))) || $is_temp_superadmin) { ?>
@@ -202,6 +236,10 @@
                         <label for="approved_date"><?php echo $this->lang->line('approved_date'); ?></label>
                         <input type="date" class="form-control" id="approved_date" name="approved_date" value="<?php echo date('Y-m-d'); ?>" max="<?php echo date('Y-m-d'); ?>" required>
                     </div>
+                    <div class="form-group approval-amount-row">
+                        <label for="approval_amount"><?php echo $this->lang->line('amount'); ?></label>
+                        <div id="approval_amount" class="form-control" role="status">0.00</div>
+                    </div>
                     <div class="form-group">
                         <label for="note"><?php echo $this->lang->line('note'); ?></label>
                         <textarea class="form-control" id="note" name="note"></textarea>
@@ -232,6 +270,7 @@
         var fee_id = $(this).data('fee-id');
         var collection_date = $(this).data('collection-date');
         $('#modal_fee_id').val(fee_id);
+        $('#approval_amount').text($(this).data('amount'));
         if (collection_date) {
             $('#approved_date').val(collection_date).trigger('change');
         }
@@ -254,8 +293,10 @@
         // Bulk approve button click
         $('#bulk_approve_btn').on('click', function() {
             var selected_fees = [];
+            var selected_amount = 0;
             $('.fee_checkbox:checked').each(function() {
                 selected_fees.push($(this).val());
+                selected_amount += parseFloat($(this).closest('tr').find('.approve_fee_btn').data('amount')) || 0;
             });
 
             if (selected_fees.length === 0) {
@@ -267,6 +308,7 @@
                 $('#approved_date').val(searched_date).trigger('change');
             }
             $('#modal_fee_id').val(JSON.stringify(selected_fees)); // Store as JSON string
+            $('#approval_amount').text(selected_amount.toFixed(2));
             $('#approveFeeModal').modal('show');
         });
 
@@ -307,7 +349,11 @@
                 };
             }
 
-            if (confirm('<?php echo $this->lang->line('confirm_approve_fee'); ?>')) {
+            var dateParts = approved_date.split('-');
+            var approvalDateLabel = dateParts.length === 3 ? dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0] : approved_date;
+            var confirmationMessage = '<?php echo $this->lang->line('confirm_approve_fee'); ?>' + '\nApproved Date: ' + approvalDateLabel;
+
+            if (confirm(confirmationMessage)) {
                 $.ajax({
                     url: url,
                     type: 'POST',

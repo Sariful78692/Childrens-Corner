@@ -2008,7 +2008,7 @@ class Studentfee extends Admin_Controller
                     $row[] = $value->collected_by_name;
                 }
                 $collection_date = date('Y-m-d', strtotime($value->collection_date));
-                $row[] = '<button type="button" class="btn btn-success btn-xs approve_fee_btn" data-fee-id="' . $value->id . '" data-collection-date="' . $collection_date . '" data-loading-text="<i class=\'fa fa-circle-o-notch fa-spin\'></i> Processing"><i class="fa fa-check"></i> ' . $this->lang->line('receive') . '</button>';
+                $row[] = '<button type="button" class="btn btn-success btn-xs approve_fee_btn" data-fee-id="' . $value->id . '" data-collection-date="' . $collection_date . '" data-amount="' . htmlspecialchars((string) $value->paid_amount, ENT_QUOTES, 'UTF-8') . '" data-loading-text="<i class=\'fa fa-circle-o-notch fa-spin\'></i> Processing"><i class="fa fa-check"></i> ' . $this->lang->line('receive') . '</button>';
 
                 $dt_data[] = $row;
             }
