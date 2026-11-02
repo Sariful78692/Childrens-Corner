@@ -38,6 +38,22 @@
         color: #333;
         font-weight: 600;
     }
+    .pending-total-amount {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: 12px;
+        vertical-align: middle;
+    }
+    .pending-total-amount .form-control {
+        display: inline-flex;
+        align-items: center;
+        width: 140px;
+        height: 30px;
+        padding: 4px 8px;
+        background: #f8fafc;
+        font-weight: 600;
+    }
 </style>
 <div class="content-wrapper" style="min-height: 946px;">
     <section class="content-header">
@@ -138,6 +154,10 @@
                                     <div class="col-md-12">
                                         <label for="">
                                             <input type="checkbox" id="select_all_fees"> Check All</label>
+                                        <span class="pending-total-amount">
+                                            <strong><?php echo $this->lang->line('amount'); ?></strong>
+                                            <span id="pending_collections_amount" class="form-control" role="status">0.00</span>
+                                        </span>
                                         <button type="button" class="btn btn-info btn-sm pull-right" id="bulk_approve_btn" style="margin-bottom: 10px;"><i class="fa fa-check"></i> <?php echo $this->lang->line('approve_selected'); ?></button>
                                     </div>
                                 </div>
@@ -173,6 +193,12 @@
 
                     <script>
                         $(document).ready(function() {
+                            $(document).on('xhr.dt', '.pending-collections-list', function(e, settings, json) {
+                                if (json && typeof json.amount_total !== 'undefined') {
+                                    window.pendingCollectionsTotalAmount = json.amount_total;
+                                    updatePendingSelectedAmount();
+                                }
+                            });
                             initDatatable('pending-collections-list', 'studentfee/dtpendingcollections');
                         });
                     </script>
@@ -280,13 +306,31 @@
     // Select all checkboxes
     $('#select_all_fees').on('change', function() {
         $('.fee_checkbox').prop('checked', $(this).prop('checked'));
+        updatePendingSelectedAmount();
     });
+
+    function updatePendingSelectedAmount() {
+        var selected_amount = 0;
+        var has_selected_fees = $('.fee_checkbox:checked').length > 0;
+        var currency_symbol = <?php echo json_encode($this->customlib->getSchoolCurrencyFormat()); ?>;
+
+        if (!has_selected_fees) {
+            $('#pending_collections_amount').text(window.pendingCollectionsTotalAmount || '0.00');
+            return;
+        }
+
+        $('.fee_checkbox:checked').each(function() {
+            selected_amount += parseFloat($(this).closest('tr').find('.approve_fee_btn').data('amount')) || 0;
+        });
+        $('#pending_collections_amount').text(currency_symbol + selected_amount.toFixed(2));
+    }
 
     // Individual checkbox change
     $(document).on('change', '.fee_checkbox', function() {
         if (!$(this).prop('checked')) {
             $('#select_all_fees').prop('checked', false);
         }
+        updatePendingSelectedAmount();
     });
 
     $(document).ready(function() {
@@ -303,9 +347,22 @@
                 errorMsg('<?php echo $this->lang->line('no_fees_selected'); ?>'); // Need to add this language line
                 return;
             }
+            var selected_dates = [];
+            $('.fee_checkbox:checked').each(function() {
+                var collection_date = $(this).closest('tr').find('.approve_fee_btn').data('collection-date');
+                if (collection_date && selected_dates.indexOf(collection_date) === -1) {
+                    selected_dates.push(collection_date);
+                }
+            });
+            if (selected_dates.length > 1) {
+                errorMsg('You selected multiple dates. Please select fees from one date at a time.');
+                return;
+            }
             var searched_date = $('#pendingCollectionsFilter [name="date_from"]').val();
-            if (searched_date) {
-                $('#approved_date').val(searched_date).trigger('change');
+            var selected_collection_date = $('.fee_checkbox:checked').first().closest('tr').find('.approve_fee_btn').data('collection-date');
+            var approval_date = searched_date || selected_collection_date;
+            if (approval_date) {
+                $('#approved_date').val(approval_date).trigger('change');
             }
             $('#modal_fee_id').val(JSON.stringify(selected_fees)); // Store as JSON string
             $('#approval_amount').text(selected_amount.toFixed(2));

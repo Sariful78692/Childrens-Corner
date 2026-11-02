@@ -1964,6 +1964,11 @@ class Studentfee extends Admin_Controller
             $collection_by_user_id = $current_user_id;
         }
 
+        $date_from = "";
+        $date_to = "";
+        $class_id = "";
+        $created_by_id = $collection_by_user_id;
+
         if ($this->input->server('REQUEST_METHOD') == 'POST') {
             $date_from = $this->input->post('date_from') ? $this->input->post('date_from') : "";
             $date_to = $this->input->post('date_to') ? $this->input->post('date_to') : "";
@@ -1982,6 +1987,9 @@ class Studentfee extends Admin_Controller
         $m = json_decode($result);
         $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
         $dt_data = array();
+
+        $summary_fees = $this->studentfee_model->getPendingFees($date_from, $date_to, $class_id, '', '', $created_by_id, $collection_by_user_id);
+        $summary_amount = array_sum(array_column($summary_fees, 'paid_amount'));
 
         $total_paid_amount = 0;
 
@@ -2034,6 +2042,7 @@ class Studentfee extends Admin_Controller
             "draw"            => intval($m->draw),
             "recordsTotal"    => intval($m->recordsTotal),
             "recordsFiltered" => intval($m->recordsFiltered),
+            "amount_total"    => $currency_symbol . amountFormat($summary_amount),
             "data"            => $dt_data,
         );
 
