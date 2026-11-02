@@ -54,6 +54,29 @@
         background: #f8fafc;
         font-weight: 600;
     }
+    .pending-collections-controls {
+        padding: 8px 0;
+        background: #fff;
+    }
+    .pending-collections-controls.is-fixed {
+        position: fixed;
+        top: 50px;
+        left: 230px;
+        right: 0;
+        z-index: 1030;
+        padding: 8px 15px;
+        background: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+    }
+    body.sidebar-collapse .pending-collections-controls.is-fixed {
+        left: 50px;
+    }
+    @media (max-width: 767px) {
+        .pending-collections-controls.is-fixed,
+        body.sidebar-collapse .pending-collections-controls.is-fixed {
+            left: 0;
+        }
+    }
 </style>
 <div class="content-wrapper" style="min-height: 946px;">
     <section class="content-header">
@@ -150,7 +173,7 @@
                             </div>
                         <?php } else { ?>
                             <?php if ((!($this->rbac->hasPrivilege('collect_fees', 'can_view') && !$this->rbac->hasPrivilege('superadmin', 'can_view'))) || $is_temp_superadmin) { ?>
-                                <div class="row">
+                                <div class="row pending-collections-controls">
                                     <div class="col-md-12">
                                         <label for="">
                                             <input type="checkbox" id="select_all_fees"> Check All</label>
@@ -193,6 +216,19 @@
 
                     <script>
                         $(document).ready(function() {
+                            var $pendingControls = $('.pending-collections-controls');
+                            var pendingControlsTop = $pendingControls.offset().top;
+                            function updatePendingControlsPosition() {
+                                $pendingControls.toggleClass('is-fixed', $(window).scrollTop() + 60 >= pendingControlsTop);
+                            }
+                            $(window).on('scroll.pendingCollections resize.pendingCollections', function() {
+                                if (!$pendingControls.hasClass('is-fixed')) {
+                                    pendingControlsTop = $pendingControls.offset().top;
+                                }
+                                updatePendingControlsPosition();
+                            });
+                            updatePendingControlsPosition();
+
                             $(document).on('xhr.dt', '.pending-collections-list', function(e, settings, json) {
                                 if (json && typeof json.amount_total !== 'undefined') {
                                     window.pendingCollectionsTotalAmount = json.amount_total;
