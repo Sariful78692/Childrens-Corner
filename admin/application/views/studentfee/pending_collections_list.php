@@ -4,6 +4,15 @@
     th {
         font-size: 11px;
     }
+    .pending-collections-list tbody tr:last-child td {
+        background-color: #e8f3ff !important;
+        color: #1f3b57;
+        font-weight: 700;
+        border-top: 2px solid #8bbce8;
+    }
+    .pending-collections-list.pending-has-action tbody tr:last-child td:last-child {
+        background-color: #e8f3ff !important;
+    }
     .pending-collections-list.pending-has-action th:last-child,
     .pending-collections-list.pending-has-action td:last-child {
         position: sticky;
@@ -178,7 +187,11 @@
                                         <label for="">
                                             <input type="checkbox" id="select_all_fees"> Check All</label>
                                         <span class="pending-total-amount">
-                                            <strong><?php echo $this->lang->line('amount'); ?></strong>
+                                            <strong>Cash</strong>
+                                            <span id="pending_cash_amount" class="form-control" role="status">0.00</span>
+                                            <strong>Bank</strong>
+                                            <span id="pending_bank_amount" class="form-control" role="status">0.00</span>
+                                            <strong>Total Amount</strong>
                                             <span id="pending_collections_amount" class="form-control" role="status">0.00</span>
                                         </span>
                                         <button type="button" class="btn btn-info btn-sm pull-right" id="bulk_approve_btn" style="margin-bottom: 10px;"><i class="fa fa-check"></i> <?php echo $this->lang->line('approve_selected'); ?></button>
@@ -199,7 +212,9 @@
                                             <th>Admission No</th>
                                             <th><?php echo $this->lang->line('class'); ?></th>
                                             <th><?php echo $this->lang->line('fee_type'); ?></th>
-                                            <th><?php echo $this->lang->line('amount'); ?></th>
+                                            <th>Cash</th>
+                                            <th>Bank</th>
+                                            <th>Total Amount</th>
                                             <?php if ((!($this->rbac->hasPrivilege('collect_fees', 'can_view') && !$this->rbac->hasPrivilege('superadmin', 'can_view'))) || $is_temp_superadmin) { ?>
                                                 <th><?php echo $this->lang->line('created_by'); ?></th>
                                             <?php } ?>
@@ -232,6 +247,8 @@
                             $(document).on('xhr.dt', '.pending-collections-list', function(e, settings, json) {
                                 if (json && typeof json.amount_total !== 'undefined') {
                                     window.pendingCollectionsTotalAmount = json.amount_total;
+                                    window.pendingCollectionsCashTotal = json.cash_total || '0.00';
+                                    window.pendingCollectionsBankTotal = json.bank_total || '0.00';
                                     updatePendingSelectedAmount();
                                 }
                             });
@@ -299,8 +316,8 @@
                         <input type="date" class="form-control" id="approved_date" name="approved_date" value="<?php echo date('Y-m-d'); ?>" max="<?php echo date('Y-m-d'); ?>" required>
                     </div>
                     <div class="form-group approval-amount-row">
-                        <label for="approval_amount"><?php echo $this->lang->line('amount'); ?></label>
-                        <div id="approval_amount" class="form-control" role="status">0.00</div>
+                        <label for="approval_amount">Total Amount</label>
+                        <div id="approval_amount" class="form-control" role="status"><?php echo $this->customlib->getSchoolCurrencyFormat(); ?>0.00</div>
                     </div>
                     <div class="form-group">
                         <label for="note"><?php echo $this->lang->line('note'); ?></label>
@@ -318,6 +335,7 @@
 
 <script type="text/javascript">
     var approvalDateMax = '<?php echo date('Y-m-d'); ?>';
+    var approvalCurrencySymbol = <?php echo json_encode($this->customlib->getSchoolCurrencyFormat()); ?>;
 
     // Enforce the date limit even when a date is typed instead of picked.
     $(document).on('input change', '#approved_date', function() {
@@ -332,7 +350,7 @@
         var fee_id = $(this).data('fee-id');
         var collection_date = $(this).data('collection-date');
         $('#modal_fee_id').val(fee_id);
-        $('#approval_amount').text($(this).data('amount'));
+        $('#approval_amount').text(approvalCurrencySymbol + $(this).data('amount'));
         if (collection_date) {
             $('#approved_date').val(collection_date).trigger('change');
         }
@@ -347,18 +365,28 @@
 
     function updatePendingSelectedAmount() {
         var selected_amount = 0;
+        var selected_cash = 0;
+        var selected_bank = 0;
         var has_selected_fees = $('.fee_checkbox:checked').length > 0;
         var currency_symbol = <?php echo json_encode($this->customlib->getSchoolCurrencyFormat()); ?>;
 
         if (!has_selected_fees) {
             $('#pending_collections_amount').text(window.pendingCollectionsTotalAmount || '0.00');
+            $('#pending_cash_amount').text(window.pendingCollectionsCashTotal || '0.00');
+            $('#pending_bank_amount').text(window.pendingCollectionsBankTotal || '0.00');
             return;
         }
 
         $('.fee_checkbox:checked').each(function() {
-            selected_amount += parseFloat($(this).closest('tr').find('.approve_fee_btn').data('amount')) || 0;
+            var $checkbox = $(this);
+            var $row = $checkbox.closest('tr');
+            selected_amount += parseFloat($row.find('.approve_fee_btn').data('amount')) || 0;
+            selected_cash += parseFloat($checkbox.data('cash-amount')) || 0;
+            selected_bank += parseFloat($checkbox.data('bank-amount')) || 0;
         });
         $('#pending_collections_amount').text(currency_symbol + selected_amount.toFixed(2));
+        $('#pending_cash_amount').text(currency_symbol + selected_cash.toFixed(2));
+        $('#pending_bank_amount').text(currency_symbol + selected_bank.toFixed(2));
     }
 
     // Individual checkbox change
@@ -401,7 +429,7 @@
                 $('#approved_date').val(approval_date).trigger('change');
             }
             $('#modal_fee_id').val(JSON.stringify(selected_fees)); // Store as JSON string
-            $('#approval_amount').text(selected_amount.toFixed(2));
+            $('#approval_amount').text(approvalCurrencySymbol + selected_amount.toFixed(2));
             $('#approveFeeModal').modal('show');
         });
 

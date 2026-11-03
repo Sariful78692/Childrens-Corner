@@ -913,7 +913,7 @@ class Studentfee_model extends MY_Model
 
     public function getPendingFees($date_from = '', $date_to = '', $class_id = '', $roll_no = '', $admission_no = '', $created_by_id = '', $collection_by_user_id = null)
     {
-        $this->db->select('sfc.*, students.firstname, students.lastname, students.admission_no, students.roll_no, classes.class, sections.section, feetype.type as fee_type_name, sessions.session as session_name, CONCAT(staff.name, " ", staff.surname) as collected_by_name');
+        $this->db->select('sfc.*, payment_methods.method_type_id as payment_method_type_id, students.firstname, students.lastname, students.admission_no, students.roll_no, classes.class, sections.section, feetype.type as fee_type_name, sessions.session as session_name, CONCAT(staff.name, " ", staff.surname) as collected_by_name');
         $this->db->from('student_fees_collections sfc');
         $this->db->join('students', 'students.id = sfc.student_id');
         $this->db->join('classes', 'classes.id = sfc.class_id');
@@ -921,6 +921,7 @@ class Studentfee_model extends MY_Model
         $this->db->join('sections', 'sections.id = student_session.section_id');
         $this->db->join('feetype', 'feetype.id = sfc.feetype_id');
         $this->db->join('sessions', 'sessions.id = sfc.session_id');
+        $this->db->join('payment_methods', 'payment_methods.id = sfc.payment_method_id', 'left');
         $this->db->join('staff', 'staff.id = sfc.collection_by', 'left'); // Join with staff table
         $this->db->where('sfc.status', 2);
 
@@ -1179,13 +1180,14 @@ class Studentfee_model extends MY_Model
     public function searchPendingFees($date_from = '', $date_to = '', $class_id = '', $created_by_id = '')
     {
         $this->datatables
-            ->select('sfc.id, sfc.payment_hash, sfc.collection_date, students.id as reg_no, students.admission_no, students.firstname, students.lastname, students.roll_no, classes.class, sections.section, feetype.type as fee_type_name, sfc.paid_amount, CONCAT(staff.name, " ", staff.surname) as collected_by_name')
+            ->select('sfc.id, sfc.payment_hash, sfc.collection_date, students.id as reg_no, students.admission_no, students.firstname, students.lastname, students.roll_no, classes.class, sections.section, feetype.type as fee_type_name, sfc.paid_amount, sfc.payment_method_id, payment_methods.method_type_id as payment_method_type_id, CONCAT(staff.name, " ", staff.surname) as collected_by_name')
             ->from('student_fees_collections sfc')
             ->join('students', 'students.id = sfc.student_id')
             ->join('classes', 'classes.id = sfc.class_id')
             ->join('student_session', 'student_session.id = sfc.student_session_id')
             ->join('sections', 'sections.id = student_session.section_id')
             ->join('feetype', 'feetype.id = sfc.feetype_id')
+            ->join('payment_methods', 'payment_methods.id = sfc.payment_method_id', 'left')
             ->join('staff', 'staff.id = sfc.collection_by', 'left')
             ->where('sfc.status', 2)
             ->searchable('sfc.payment_hash,students.admission_no,students.firstname,students.lastname,classes.class,feetype.type')

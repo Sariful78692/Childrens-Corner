@@ -1990,6 +1990,15 @@ class Studentfee extends Admin_Controller
 
         $summary_fees = $this->studentfee_model->getPendingFees($date_from, $date_to, $class_id, '', '', $created_by_id, $collection_by_user_id);
         $summary_amount = array_sum(array_column($summary_fees, 'paid_amount'));
+        $cash_summary_amount = 0;
+        $bank_summary_amount = 0;
+        foreach ($summary_fees as $summary_fee) {
+            if ((int) $summary_fee['payment_method_type_id'] === 1) {
+                $cash_summary_amount += (float) $summary_fee['paid_amount'];
+            } elseif ((int) $summary_fee['payment_method_type_id'] === 2) {
+                $bank_summary_amount += (float) $summary_fee['paid_amount'];
+            }
+        }
 
         $total_paid_amount = 0;
 
@@ -2000,8 +2009,9 @@ class Studentfee extends Admin_Controller
                 $row = array();
 
                 if ((!($this->rbac->hasPrivilege('collect_fees', 'can_view') && !$this->rbac->hasPrivilege('superadmin', 'can_view'))) || $is_temp_superadmin) {
-
-                    $row[] = '<input type="checkbox" class="fee_checkbox" value="' . $value->id . '">';
+                    $cash_amount = (int) $value->payment_method_type_id === 1 ? (float) $value->paid_amount : 0;
+                    $bank_amount = (int) $value->payment_method_type_id === 2 ? (float) $value->paid_amount : 0;
+                    $row[] = '<input type="checkbox" class="fee_checkbox" value="' . $value->id . '" data-cash-amount="' . $cash_amount . '" data-bank-amount="' . $bank_amount . '">';
                 }
 
                 $row[] = $value->payment_hash;
@@ -2011,6 +2021,8 @@ class Studentfee extends Admin_Controller
                 $row[] = $value->admission_no;
                 $row[] = $value->class . ' - ' . $value->section . ' - ' . $value->roll_no;
                 $row[] = $value->fee_type_name;
+                $row[] = (int) $value->payment_method_type_id === 1 ? amountFormat($value->paid_amount) : amountFormat(0);
+                $row[] = (int) $value->payment_method_type_id === 2 ? amountFormat($value->paid_amount) : amountFormat(0);
                 $row[] = amountFormat($value->paid_amount);
                 if ((!($this->rbac->hasPrivilege('collect_fees', 'can_view') && !$this->rbac->hasPrivilege('superadmin', 'can_view'))) || $is_temp_superadmin) {
                     $row[] = $value->collected_by_name;
@@ -2030,9 +2042,13 @@ class Studentfee extends Admin_Controller
             $footer_row[] = "";
             $footer_row[] = "";
             $footer_row[] = "<b>Total</b>";
+            $footer_row[] = $currency_symbol . amountFormat($cash_summary_amount);
+            $footer_row[] = $currency_symbol . amountFormat($bank_summary_amount);
             $footer_row[] = $currency_symbol . amountFormat($total_paid_amount);
-            $footer_row[] = "";
             if ((!($this->rbac->hasPrivilege('collect_fees', 'can_view') && !$this->rbac->hasPrivilege('superadmin', 'can_view'))) || $is_temp_superadmin) {
+                $footer_row[] = "";
+            }
+            if (!($this->rbac->hasPrivilege('collect_fees', 'can_view') && !$this->rbac->hasPrivilege('superadmin', 'can_view'))) {
                 $footer_row[] = "";
             }
             $dt_data[] = $footer_row;
@@ -2043,6 +2059,8 @@ class Studentfee extends Admin_Controller
             "recordsTotal"    => intval($m->recordsTotal),
             "recordsFiltered" => intval($m->recordsFiltered),
             "amount_total"    => $currency_symbol . amountFormat($summary_amount),
+            "cash_total"      => $currency_symbol . amountFormat($cash_summary_amount),
+            "bank_total"      => $currency_symbol . amountFormat($bank_summary_amount),
             "data"            => $dt_data,
         );
 
