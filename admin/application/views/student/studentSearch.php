@@ -2,6 +2,29 @@
 $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 ?>
 <style>
+    .student-list > thead > tr > th,
+    .student-search-fixed-table > thead > tr > th {
+        color: #263238;
+        border-bottom: 2px solid rgba(38, 50, 56, 0.12);
+    }
+    .student-list > thead > tr > th:nth-child(8n + 1), .student-search-fixed-table > thead > tr > th:nth-child(8n + 1) { background-color: #dbeafe; }
+    .student-list > thead > tr > th:nth-child(8n + 2), .student-search-fixed-table > thead > tr > th:nth-child(8n + 2) { background-color: #ede9fe; }
+    .student-list > thead > tr > th:nth-child(8n + 3), .student-search-fixed-table > thead > tr > th:nth-child(8n + 3) { background-color: #fce7f3; }
+    .student-list > thead > tr > th:nth-child(8n + 4), .student-search-fixed-table > thead > tr > th:nth-child(8n + 4) { background-color: #ffedd5; }
+    .student-list > thead > tr > th:nth-child(8n + 5), .student-search-fixed-table > thead > tr > th:nth-child(8n + 5) { background-color: #fef3c7; }
+    .student-list > thead > tr > th:nth-child(8n + 6), .student-search-fixed-table > thead > tr > th:nth-child(8n + 6) { background-color: #dcfce7; }
+    .student-list > thead > tr > th:nth-child(8n + 7), .student-search-fixed-table > thead > tr > th:nth-child(8n + 7) { background-color: #cffafe; }
+    .student-list > thead > tr > th:nth-child(8n + 8), .student-search-fixed-table > thead > tr > th:nth-child(8n + 8) { background-color: #e2e8f0; }
+    .student-search-fixed-header {
+        display: none;
+        position: fixed;
+        z-index: 999;
+        overflow: hidden;
+        background: #fff;
+    }
+    .student-search-fixed-header table { margin: 0; table-layout: fixed; }
+    .student-search-fixed-header th { box-sizing: border-box; }
+
     .btn-xs i {
         padding: 3px 5px;
     }
@@ -128,7 +151,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                         <div class="col-sm-3">
                                             <div class="form-group">
                                                 <label><?php echo $this->lang->line('class'); ?></label>
-                                                <select autofocus="" id="class_id" name="class_id" class="form-control">
+                                                <select id="class_id" name="class_id" class="form-control">
                                                     <option value=""><?php echo $this->lang->line('select'); ?></option>
                                                     <?php foreach ($classlist as $class) {
                                                         echo '<option value="' . $class['id'] . '" ' . (set_value('class_id') == $class['id'] ? 'selected="selected"' : '') . '>' . $class['class'] . '</option>';
@@ -416,6 +439,63 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 
 <script type="text/javascript">
     $(document).ready(function() {
+        var fixedStudentHeader = $('<div class="student-search-fixed-header" aria-hidden="true"><table class="table table-striped table-bordered table-hover student-search-fixed-table"><thead></thead></table></div>').appendTo('body');
+
+        function updateStudentSearchFixedHeader() {
+            var table = $('.student-list').first()[0];
+            if (!table || !table.tHead || !table.tHead.rows.length) {
+                fixedStudentHeader.hide();
+                return;
+            }
+
+            var wrapper = $(table).closest('.table-responsive')[0];
+            var tableRect = table.getBoundingClientRect();
+            var headRect = table.tHead.getBoundingClientRect();
+            var topBar = document.querySelector('.main-header');
+            var stickyTop = topBar ? topBar.getBoundingClientRect().bottom : 0;
+
+            if (headRect.bottom > stickyTop || tableRect.bottom <= stickyTop || tableRect.width === 0) {
+                fixedStudentHeader.hide();
+                return;
+            }
+
+            var sourceCells = table.tHead.rows[0].cells;
+            var cloneHead = fixedStudentHeader.find('thead');
+            cloneHead.empty().append($(table.tHead).children('tr').clone());
+            var cloneCells = cloneHead.find('th');
+            for (var i = 0; i < sourceCells.length; i++) {
+                cloneCells.eq(i).outerWidth(sourceCells[i].getBoundingClientRect().width);
+            }
+
+            var wrapperRect = wrapper ? wrapper.getBoundingClientRect() : tableRect;
+            fixedStudentHeader.css({
+                top: stickyTop + 'px',
+                left: wrapperRect.left + 'px',
+                width: (wrapper ? wrapper.clientWidth : tableRect.width) + 'px',
+                height: headRect.height + 'px'
+            }).show();
+            fixedStudentHeader.find('table').css({
+                width: tableRect.width + 'px',
+                transform: 'translateX(' + (wrapper ? -wrapper.scrollLeft : 0) + 'px)'
+            });
+        }
+
+        var fixedStudentHeaderFrame = null;
+        function scheduleStudentSearchHeaderUpdate() {
+            if (fixedStudentHeaderFrame !== null) {
+                return;
+            }
+            fixedStudentHeaderFrame = window.requestAnimationFrame(function() {
+                fixedStudentHeaderFrame = null;
+                updateStudentSearchFixedHeader();
+            });
+        }
+
+        $(window).on('scroll.studentSearchFixedHeader resize.studentSearchFixedHeader', scheduleStudentSearchHeaderUpdate);
+        $(document).on('draw.dt.studentSearchFixedHeader', '.student-list', scheduleStudentSearchHeaderUpdate);
+        $('.student-list').closest('.table-responsive').on('scroll.studentSearchFixedHeader', scheduleStudentSearchHeaderUpdate);
+        scheduleStudentSearchHeaderUpdate();
+
         setTimeout(function() {
             $(".class_search_form").submit();
         }, 1); // 1000 milliseconds = 1 second
@@ -668,6 +748,9 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 
                             "language": {
                                 processing: '<i class="fa fa-spinner fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span> '
+                            },
+                            "initComplete": function() {
+                                $(this).closest('.dataTables_wrapper').find('.dataTables_filter input').trigger('focus');
                             },
                             "pageLength": 100,
                             "processing": true,
