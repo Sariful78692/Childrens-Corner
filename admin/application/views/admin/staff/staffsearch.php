@@ -233,7 +233,10 @@ if (!empty($staff["location"])) {
                 echo $staff["location"] . ",";
             }
             ?></font><font data-toggle="tooltip" title="<?php echo 'Department'; ?>" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> <?php echo $this->lang->line('processing'); ?>"> <?php echo $staff["department"]; ?></font></p>
-                                                            <p class="staffsub" ><span data-toggle="tooltip" title="<?php echo $this->lang->line('role'); ?>" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Processing"><?php echo $staff["user_type"] ?></span> <span data-toggle="tooltip" title="<?php echo 'Designation'; ?>" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> <?php echo $this->lang->line('processing'); ?>"><?php echo $staff["designation"] ?></span></p>
+                                                            <p class="staffsub">
+                                                                <span data-toggle="tooltip" title="<?php echo $this->lang->line('role'); ?>"><?php echo $this->lang->line('role'); ?>: <?php echo $staff["user_type"] ?></span>
+                                                                <span data-toggle="tooltip" title="<?php echo $this->lang->line('designation'); ?>"><?php echo $this->lang->line('designation'); ?>: <?php echo !empty($staff["designation"]) ? $staff["designation"] : '&mdash;'; ?></span>
+                                                            </p>
                                                         </div>
                                                         <div class="overlay3">
                                                             <div class="stafficons">

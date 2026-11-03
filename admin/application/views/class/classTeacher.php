@@ -67,13 +67,15 @@
 
 
                                     <?php
-                                    foreach ($teacherlist as $tvalue) {
+                                    if (empty($teacherlist)) {
+                                        echo '<p class="text-muted">No active staff members have the Teacher role.</p>';
+                                    } else {
                                         ?>
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" name="teachers[]" value="<?php echo $tvalue['id'] ?>" <?php echo set_checkbox('teachers[]', $tvalue['id']); ?> ><?php echo $tvalue['name'] . " " . $tvalue['surname'] . " (" . $tvalue['employee_id'] . ")"; ?>
-                                            </label>
-                                        </div>
+                                        <select id="class_teacher_ids" name="teachers[]" class="form-control select2" multiple="multiple" data-placeholder="Search and select class teacher(s)">
+                                            <?php foreach ($teacherlist as $tvalue) { ?>
+                                                <option value="<?php echo $tvalue['id']; ?>" <?php echo set_select('teachers[]', $tvalue['id']); ?>><?php echo $tvalue['name'] . " " . $tvalue['surname'] . " (" . $tvalue['employee_id'] . ")"; ?></option>
+                                            <?php } ?>
+                                        </select>
                                         <?php
                                     }
                                     ?>
@@ -195,6 +197,14 @@
 </div><!-- /.content-wrapper -->
 
 <script type="text/javascript">
+    $(function () {
+        $('#class_teacher_ids').select2({
+            width: '100%',
+            placeholder: 'Search and select class teacher(s)',
+            allowClear: true
+        });
+    });
+
     function getSectionByClass(class_id, section_id) {
         if (class_id != "") {
             $('#section_id').html("");

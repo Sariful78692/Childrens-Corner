@@ -232,17 +232,19 @@
                     <script>
                         $(document).ready(function() {
                             var $pendingControls = $('.pending-collections-controls');
-                            var pendingControlsTop = $pendingControls.offset().top;
-                            function updatePendingControlsPosition() {
-                                $pendingControls.toggleClass('is-fixed', $(window).scrollTop() + 60 >= pendingControlsTop);
-                            }
-                            $(window).on('scroll.pendingCollections resize.pendingCollections', function() {
-                                if (!$pendingControls.hasClass('is-fixed')) {
-                                    pendingControlsTop = $pendingControls.offset().top;
+                            if ($pendingControls.length) {
+                                var pendingControlsTop = $pendingControls.offset().top;
+                                function updatePendingControlsPosition() {
+                                    $pendingControls.toggleClass('is-fixed', $(window).scrollTop() + 60 >= pendingControlsTop);
                                 }
+                                $(window).on('scroll.pendingCollections resize.pendingCollections', function() {
+                                    if (!$pendingControls.hasClass('is-fixed')) {
+                                        pendingControlsTop = $pendingControls.offset().top;
+                                    }
+                                    updatePendingControlsPosition();
+                                });
                                 updatePendingControlsPosition();
-                            });
-                            updatePendingControlsPosition();
+                            }
 
                             $(document).on('xhr.dt', '.pending-collections-list', function(e, settings, json) {
                                 if (json && typeof json.amount_total !== 'undefined') {

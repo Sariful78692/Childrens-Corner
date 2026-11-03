@@ -779,6 +779,21 @@ class Staff_model extends MY_Model
         return $query->result_array();
     }
 
+    public function getTeacherStaff()
+    {
+        $this->db->select('staff.*, staff_designation.designation as designation, department.department_name as department');
+        $this->db->from('staff');
+        $this->db->join('staff_roles', 'staff_roles.staff_id = staff.id');
+        $this->db->join('roles', 'roles.id = staff_roles.role_id');
+        $this->db->join('staff_designation', 'staff_designation.id = staff.designation', 'left');
+        $this->db->join('department', 'department.id = staff.department', 'left');
+        $this->db->where("LOWER(roles.name) LIKE '%teacher%'", null, false);
+        $this->db->where('staff.is_active', '1');
+        $this->db->group_by('staff.id');
+
+        return $this->db->get()->result_array();
+    }
+
     public function getStaffByRoles(array $roles)
     {
         $this->db->select('staff.*,staff_designation.designation as designation,staff_roles.role_id, department.department_name as department,roles.name as user_type');

@@ -77,23 +77,15 @@
                                     <?php }
                                     ?> 
 
-                                    <?php
-                                    $i = 0;
-
-                                    foreach ($teacherlist as $tvalue) {
-
-                                        $check = "";
-                                        ?>
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" name="teachers[]" value="<?php echo $tvalue['id'] ?>" <?php echo $check; ?> <?php echo set_checkbox('teachers[]', $tvalue['id'], check_in_array($tvalue['id'], $result)); ?> ><?php echo $tvalue['name'] . " " . $tvalue['surname'] . " (" . $tvalue['employee_id'] . ")"; ?>
-                                            </label>
-                                        </div>
-
-                                        <?php
-                                        $i++;
-                                    }
-                                    ?>
+                                    <?php if (empty($teacherlist)) { ?>
+                                        <p class="text-muted">No active staff members have the Teacher role.</p>
+                                    <?php } else { ?>
+                                        <select id="class_teacher_ids" name="teachers[]" class="form-control select2" multiple="multiple" data-placeholder="Search and select class teacher(s)">
+                                            <?php foreach ($teacherlist as $tvalue) { ?>
+                                                <option value="<?php echo $tvalue['id']; ?>" <?php echo set_select('teachers[]', $tvalue['id'], check_in_array($tvalue['id'], $result)); ?>><?php echo $tvalue['name'] . " " . $tvalue['surname'] . " (" . $tvalue['employee_id'] . ")"; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                    <?php } ?>
 
                                     <span class="text-danger"><?php echo form_error('teachers[]'); ?></span>
                                 </div>
@@ -214,6 +206,14 @@
 </div><!-- /.content-wrapper -->
 
 <script type="text/javascript">
+    $(function () {
+        $('#class_teacher_ids').select2({
+            width: '100%',
+            placeholder: 'Search and select class teacher(s)',
+            allowClear: true
+        });
+    });
+
     function getSectionByClass(class_id, section_id) {
 
         if (class_id != "") {
