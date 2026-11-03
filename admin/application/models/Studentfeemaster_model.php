@@ -899,9 +899,14 @@ class Studentfeemaster_model extends MY_Model
     {
         $this->db->select_sum('paid_amount', 'total_amount');
         $this->db->from('student_fees_collections');
-        $this->db->where('session_id', $this->current_session);
+        // Collection totals are based on when money was received. Include
+        // payments recorded today even when they belong to a prior session.
         $this->db->where('collection_date >=', $start_date);
-        $this->db->where('collection_date <=', $end_date);
+        // collection_date may be a DATETIME. An inclusive comparison against
+        // a date string only includes midnight on the end date, dropping
+        // collections made later that day (including today's dashboard total).
+        $end_date_exclusive = date('Y-m-d', strtotime($end_date . ' +1 day'));
+        $this->db->where('collection_date <', $end_date_exclusive);
         $this->db->where('status', 1);
         $this->db->where('is_refunded', 0);
 

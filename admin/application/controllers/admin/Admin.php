@@ -162,7 +162,10 @@ class Admin extends Admin_Controller
         while ($currentdate <= $end) {
             $cur_date          = date('Y-m-d', $currentdate);
             $month_days[]      = date('d', $currentdate);
-            $coll_amt          = $this->whatever($getDepositeAmount, $cur_date, $cur_date);
+            // Fee collections are stored in student_fees_collections; the
+            // deposit amount_detail list above is legacy and can be empty even
+            // when the dashboard's collection total has receipts for the day.
+            $coll_amt          = $this->studentfeemaster_model->getCollectionAmountBetweenDate($cur_date, $cur_date);
             $tranport_amt      = $this->whatever($student_transport_fee, $cur_date, $cur_date);
             $days_collection[] = convertBaseAmountCurrencyFormat($coll_amt + $tranport_amt);
             $currentdate       = strtotime('+1 day', $currentdate);
