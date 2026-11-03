@@ -101,6 +101,9 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                 <label for="exampleInputEmail1"><?php echo $this->lang->line('section'); ?></label><small class="req"> *</small>
                                                 <select id="section_id" name="section_id" class="form-control">
                                                     <option value=""><?php echo $this->lang->line('select'); ?></option>
+                                                    <?php if (!empty($student['section_id'])) { ?>
+                                                        <option value="<?php echo (int) $student['section_id']; ?>" selected><?php echo htmlspecialchars($student['section'] ?? '', ENT_QUOTES, 'UTF-8'); ?></option>
+                                                    <?php } ?>
                                                 </select>
                                                 <span class="text-danger"><?php echo form_error('section_id'); ?></span>
                                             </div>
@@ -976,7 +979,6 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 
         function getSectionByClass(class_id, section_id, select_control) {
             if (class_id != "") {
-                $('#' + select_control).html("");
                 var base_url = '<?php echo base_url() ?>';
                 var div_data = '<option value=""><?php echo $this->lang->line('select'); ?></option>';
                 $.ajax({
@@ -990,7 +992,14 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                         $('#' + select_control).addClass('dropdownloading');
                     },
                     success: function(data) {
+                        var seenSections = {};
+                        var sectionCount = 0;
                         $.each(data, function(i, obj) {
+                            if (seenSections[obj.section_id]) {
+                                return;
+                            }
+                            seenSections[obj.section_id] = true;
+                            sectionCount++;
                             var sel = "";
                             if (section_id == obj.section_id) {
                                 sel = "selected";
@@ -1000,7 +1009,9 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                                         } */
                             div_data += "<option value=" + obj.section_id + " " + sel + ">" + obj.section + "</option>";
                         });
-                        $('#' + select_control).append(div_data);
+                        if (sectionCount > 0) {
+                            $('#' + select_control).html(div_data);
+                        }
                     },
                     complete: function() {
                         $('#' + select_control).removeClass('dropdownloading');
