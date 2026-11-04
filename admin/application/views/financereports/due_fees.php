@@ -118,7 +118,7 @@ $selected_feetype_ids = is_array($selected_feetype_ids) ? $selected_feetype_ids 
                                 </div>
                                 <div class="box-body">
                                     <div class="table-responsive">
-                                        <table class="table table-striped table-bordered table-hover due-fees-table">
+                                        <table class="table table-striped table-bordered table-hover due-fees-table" data-export-title="Due Fees" data-export-filename="Due Fees <?php echo date('Y'); ?>">
                                         <thead>
                                             <tr>
                                                 <th style="width:10%">Reg No</th>
@@ -148,6 +148,19 @@ $selected_feetype_ids = is_array($selected_feetype_ids) ? $selected_feetype_ids 
     </section>
 </div>
 <script>
+    function initDueFeesDatatable(params) {
+        initDatatable('due-fees-table', 'financereports/dtduefees', params);
+
+        var excelButton = $('.due-fees-table').DataTable().button('.btn-excel');
+        var defaultExcelAction = $.fn.dataTable.ext.buttons.excelHtml5.action;
+        if ($.isFunction(defaultExcelAction)) {
+            excelButton.action(function(event, dataTable, node, config) {
+                config.filename = $('.due-fees-table').data('exportFilename');
+                defaultExcelAction.call(this, event, dataTable, node, config);
+            });
+        }
+    }
+
     $(document).ready(function() {
         $('.due-filter-multi').select2({
             width: '100%',
@@ -160,7 +173,7 @@ $selected_feetype_ids = is_array($selected_feetype_ids) ? $selected_feetype_ids 
             $select.find('option').prop('selected', true).trigger('change');
         });
 
-        initDatatable('due-fees-table', 'financereports/dtduefees', {
+        initDueFeesDatatable({
             session_id: <?php echo json_encode($current_session_id); ?>,
             class_id: [],
             feetype_id: []
@@ -193,7 +206,7 @@ $selected_feetype_ids = is_array($selected_feetype_ids) ? $selected_feetype_ids 
                             $('#error_' + key).html(value);
                         });
                     } else {
-                        initDatatable('due-fees-table', 'financereports/dtduefees', response.params);
+                        initDueFeesDatatable(response.params);
                     }
                 },
                 error: function() { // your error handler
