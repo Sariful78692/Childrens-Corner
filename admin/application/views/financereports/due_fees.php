@@ -3,9 +3,44 @@
     th {
         font-size: 11px;
     }
+
+    .due-filter-select-all {
+        color: #1f4e79;
+        padding: 0 4px;
+    }
+
+    .due-filter-multi + .select2-container .select2-selection--multiple {
+        background-color: #fff;
+        border-color: #c7cdd3;
+        min-height: 34px;
+    }
+
+    .due-fees-select2 .select2-selection__choice {
+        background-color: #2878b8 !important;
+        border-color: #21679f !important;
+        color: #fff !important;
+    }
+
+    .due-fees-select2 .select2-selection__choice__remove {
+        color: #fff !important;
+    }
+
+    .select2-container--default .select2-results__option[aria-selected="true"] {
+        background-color: #e4f1fb;
+        color: #243746;
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #2878b8;
+        color: #fff;
+    }
 </style>
 <?php
 $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
+$selected_class_ids = set_value('class_id', []);
+$selected_class_ids = is_array($selected_class_ids) ? $selected_class_ids : ($selected_class_ids !== '' ? [$selected_class_ids] : []);
+$selected_feetype_ids = set_value('feetype_id', []);
+$selected_feetype_ids = is_array($selected_feetype_ids) ? $selected_feetype_ids : ($selected_feetype_ids !== '' ? [$selected_feetype_ids] : []);
 ?>
 <div class="content-wrapper">
     <!-- Main content -->
@@ -21,11 +56,11 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                 <div class="col-sm-12 col-md-3">
                                     <div class="form-group">
                                         <label><?php echo $this->lang->line('class'); ?></label>
-                                        <select autofocus="" id="class_id" name="class_id" class="form-control">
-                                            <option value=""><?php echo $this->lang->line('select'); ?></option>
+                                        <button type="button" class="btn btn-default btn-xs pull-right due-filter-select-all" data-target="#class_id">Select All</button>
+                                        <select autofocus="" id="class_id" name="class_id[]" class="form-control due-filter-multi" multiple="multiple" data-placeholder="Select Class">
                                             <?php
                                             foreach ($classlist as $class) {
-                                                $selected = (set_value('class_id') == $class['id']) ? "selected=selected" : "";
+                                                $selected = in_array((string) $class['id'], array_map('strval', $selected_class_ids), true) ? "selected=\"selected\"" : "";
 
                                                 echo '<option value="' . $class['id'] . '" ' . $selected . '>' . $class['class'] . '</option>';
 
@@ -39,11 +74,11 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                 <div class="col-sm-12 col-md-3">
                                     <div class="form-group">
                                         <label><?php echo $this->lang->line('fees_type'); ?></label>
-                                        <select id="feetype_id" name="feetype_id[]" class="form-control" multiple="multiple">
-                                            <option value=""><?php echo $this->lang->line('select'); ?></option>
+                                        <button type="button" class="btn btn-default btn-xs pull-right due-filter-select-all" data-target="#feetype_id">Select All</button>
+                                        <select id="feetype_id" name="feetype_id[]" class="form-control due-filter-multi" multiple="multiple" data-placeholder="Select Fee Type">
                                             <?php
                                             foreach ($feetypeList as $feetype) {
-                                                $selected = (is_array(set_value('feetype_id')) && in_array($feetype['id'], set_value('feetype_id'))) ? "selected" : "";
+                                                $selected = in_array((string) $feetype['id'], array_map('strval', $selected_feetype_ids), true) ? "selected=\"selected\"" : "";
                                                 echo '<option value="' . $feetype['id'] . '" ' . $selected . '>' . $feetype['type'] . '</option>';
                                             }
                                             ?>
@@ -114,9 +149,20 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 </div>
 <script>
     $(document).ready(function() {
+        $('.due-filter-multi').select2({
+            width: '100%',
+            allowClear: true,
+            containerCssClass: 'due-fees-select2'
+        });
+
+        $('.due-filter-select-all').on('click', function() {
+            var $select = $($(this).data('target'));
+            $select.find('option').prop('selected', true).trigger('change');
+        });
+
         initDatatable('due-fees-table', 'financereports/dtduefees', {
             session_id: <?php echo json_encode($current_session_id); ?>,
-            class_id: '',
+            class_id: [],
             feetype_id: []
         });
     });

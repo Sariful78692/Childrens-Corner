@@ -477,11 +477,13 @@ class Studentfee_model extends MY_Model
 
     public function getDueFeesReport($class_id = null, $feetype_id = null, $session_id = null)
     {
+        $class_ids = is_array($class_id) ? $class_id : ($class_id !== null && $class_id !== '' ? [$class_id] : []);
         $feetype_ids = is_array($feetype_id) ? $feetype_id : ($feetype_id !== null && $feetype_id !== '' ? [$feetype_id] : []);
         $paid_filters = 'sfm_paid.status = 1';
 
-        if (!empty($class_id)) {
-            $paid_filters .= ' AND sfm_paid.class_id = ' . $this->db->escape($class_id);
+        if (!empty($class_ids)) {
+            $escaped_class_ids = array_map([$this->db, 'escape'], $class_ids);
+            $paid_filters .= ' AND sfm_paid.class_id IN (' . implode(',', $escaped_class_ids) . ')';
         }
         if (!empty($session_id)) {
             $paid_filters .= ' AND sfm_paid.session_id = ' . $this->db->escape($session_id);
@@ -534,8 +536,8 @@ class Studentfee_model extends MY_Model
 
         $this->datatables->where('sfm.status', 1);
 
-        if (!empty($class_id)) {
-            $this->datatables->where('sfm.class_id', $class_id);
+        if (!empty($class_ids)) {
+            $this->datatables->where_in('sfm.class_id', $class_ids);
         }
         if (!empty($feetype_ids)) {
             $this->datatables->where_in('sfm.feetype_id', $feetype_ids);

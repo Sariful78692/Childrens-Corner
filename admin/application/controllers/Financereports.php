@@ -1037,10 +1037,13 @@ class Financereports extends Admin_Controller
 
     public function getdueparam()
     {
-        $class_id = $this->input->post('class_id') ?? '';
+        $class_id = $this->input->post('class_id');
         $feetype_id = $this->input->post('feetype_id');
         $session_id = $this->input->post('session_id') ?? '';
 
+        if (!is_array($class_id)) {
+            $class_id = $class_id !== null && $class_id !== '' ? [$class_id] : [];
+        }
         if (!is_array($feetype_id)) {
             $feetype_id = $feetype_id !== null && $feetype_id !== '' ? [$feetype_id] : [];
         }
@@ -1056,9 +1059,16 @@ class Financereports extends Admin_Controller
 
     public function dtDueFees()
     {
-        $class_id   = $this->input->post('class_id') ?? '';
-        $feetype_id = $this->input->post('feetype_id') ?? '';
+        $class_id   = $this->input->post('class_id');
+        $feetype_id = $this->input->post('feetype_id');
         $session_id = $this->input->post('session_id') ?? '';
+
+        if (!is_array($class_id)) {
+            $class_id = $class_id !== null && $class_id !== '' ? [$class_id] : [];
+        }
+        if (!is_array($feetype_id)) {
+            $feetype_id = $feetype_id !== null && $feetype_id !== '' ? [$feetype_id] : [];
+        }
 
         $result = $this->studentfee_model->getDueFeesReport($class_id, $feetype_id, $session_id);
         $m = json_decode($result);
