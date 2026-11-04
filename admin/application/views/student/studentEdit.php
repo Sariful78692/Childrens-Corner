@@ -1537,9 +1537,5 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
             fetch_fees(is_checked);
         });
 
-        setTimeout(function() {
-            $("#class_id").change();
-        }, 1);
-
     });
 </script>
