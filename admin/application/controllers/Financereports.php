@@ -1028,6 +1028,7 @@ class Financereports extends Admin_Controller
         $data['feetypeList'] = $this->feetype_model->get();
         $data['classlist'] = $this->class_model->get();
         $data['sessionList'] = $this->session_model->getAllSession();
+        $data['current_session_id'] = $this->setting_model->getCurrentSession();
 
         $this->load->view('layout/header', $data);
         $this->load->view('financereports/due_fees', $data);
@@ -1037,8 +1038,12 @@ class Financereports extends Admin_Controller
     public function getdueparam()
     {
         $class_id = $this->input->post('class_id') ?? '';
-        $feetype_id = $this->input->post('feetype_id') ?? '';
+        $feetype_id = $this->input->post('feetype_id');
         $session_id = $this->input->post('session_id') ?? '';
+
+        if (!is_array($feetype_id)) {
+            $feetype_id = $feetype_id !== null && $feetype_id !== '' ? [$feetype_id] : [];
+        }
 
         $params = [
             'class_id' => $class_id,

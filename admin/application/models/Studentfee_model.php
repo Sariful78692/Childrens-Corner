@@ -477,21 +477,25 @@ class Studentfee_model extends MY_Model
 
     public function getDueFeesReport($class_id = null, $feetype_id = null, $session_id = null)
     {
-        $paid_subquery = "(SELECT student_fees_management_id, SUM(paid_amount) as paid_amount FROM student_fees_collections WHERE is_refunded = 0 AND status = 1 GROUP BY student_fees_management_id) paid_sub";
+        $feetype_ids = is_array($feetype_id) ? $feetype_id : ($feetype_id !== null && $feetype_id !== '' ? [$feetype_id] : []);
+        $paid_filters = 'sfm_paid.status = 1';
 
-        $due_fees_subquery = "(SELECT 
-                                        sfm.student_id,
-                                        sfm.class_id,
-                                        sfm.session_id,
-                                        SUM(sfm.discounted_fees) AS total_assigned,
-                                        SUM(IFNULL(paid_sub.paid_amount, 0)) AS total_paid,
-                                        (SUM(sfm.discounted_fees) - SUM(IFNULL(paid_sub.paid_amount, 0))) AS total_due
-                                    FROM student_fees_management sfm
-                                    LEFT JOIN $paid_subquery ON paid_sub.student_fees_management_id = sfm.id
-                                    WHERE sfm.status = 1
-                                    GROUP BY sfm.student_id, sfm.class_id, sfm.session_id
-                                    HAVING total_due > 0
-                                ) as due_summary";
+        if (!empty($class_id)) {
+            $paid_filters .= ' AND sfm_paid.class_id = ' . $this->db->escape($class_id);
+        }
+        if (!empty($session_id)) {
+            $paid_filters .= ' AND sfm_paid.session_id = ' . $this->db->escape($session_id);
+        }
+        if (!empty($feetype_ids)) {
+            $escaped_feetype_ids = array_map([$this->db, 'escape'], $feetype_ids);
+            $paid_filters .= ' AND sfm_paid.feetype_id IN (' . implode(',', $escaped_feetype_ids) . ')';
+        }
+
+        $paid_subquery = "(SELECT sfc.student_fees_management_id, SUM(sfc.paid_amount) as paid_amount
+                           FROM student_fees_collections sfc
+                           INNER JOIN student_fees_management sfm_paid ON sfm_paid.id = sfc.student_fees_management_id
+                           WHERE sfc.is_refunded = 0 AND sfc.status = 1 AND $paid_filters
+                           GROUP BY sfc.student_fees_management_id) paid_sub";
 
         $this->datatables
             ->select('
@@ -510,31 +514,31 @@ class Studentfee_model extends MY_Model
                         NULL
                     ) ORDER BY sfm.id ASC SEPARATOR ", "
                 ) as fee_types,
-                due_summary.total_assigned,
-                due_summary.total_paid,
-                due_summary.total_due,
+                SUM(sfm.discounted_fees) as total_assigned,
+                SUM(IFNULL(paid_sub.paid_amount, 0)) as total_paid,
+                SUM(sfm.discounted_fees - IFNULL(paid_sub.paid_amount, 0)) as total_due,
                 s.id as student_id_link
             ')
             ->searchable('s.id,s.firstname,s.admission_no')
             ->orderable('s.firstname')
             ->from('student_fees_management sfm')
             ->join("$paid_subquery", 'paid_sub.student_fees_management_id = sfm.id', 'left')
-            ->join("$due_fees_subquery", 'sfm.student_id = due_summary.student_id AND sfm.class_id = due_summary.class_id AND sfm.session_id = due_summary.session_id', 'inner')
             ->join('students s', 'sfm.student_id = s.id', 'left')
             ->join('student_session ss', 'ss.student_id = s.id AND ss.session_id = sfm.session_id')
             ->join('classes c', 'sfm.class_id = c.id', 'left')
             ->join('sections', 'sections.id = ss.section_id')
             ->join('sessions ssn', 'sfm.session_id = ssn.id', 'left')
             ->join('feetype ft', 'sfm.feetype_id = ft.id', 'left')
-            ->group_by('sfm.student_id, sfm.class_id, sfm.session_id');
+            ->group_by('sfm.student_id, sfm.class_id, sfm.session_id')
+            ->having('total_due >', 0);
 
         $this->datatables->where('sfm.status', 1);
 
         if (!empty($class_id)) {
             $this->datatables->where('sfm.class_id', $class_id);
         }
-        if (!empty($feetype_id)) {
-            $this->datatables->where_in('sfm.feetype_id', $feetype_id);
+        if (!empty($feetype_ids)) {
+            $this->datatables->where_in('sfm.feetype_id', $feetype_ids);
         }
         if (!empty($session_id)) {
             $this->datatables->where('sfm.session_id', $session_id);

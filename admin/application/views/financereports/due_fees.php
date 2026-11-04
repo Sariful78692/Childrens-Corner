@@ -58,7 +58,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                             <option value=""><?php echo $this->lang->line('select'); ?></option>
                                             <?php
                                             foreach ($sessionList as $session) {
-                                                $is_selected = set_value('session_id') != '' ? (set_value('session_id') == $session['id']) : ($session['id'] == $this->setting_model->getCurrentSession());
+                                                $is_selected = set_value('session_id') != '' ? (set_value('session_id') == $session['id']) : ($session['id'] == $current_session_id);
                                                 $selected = $is_selected ? "selected" : "";
                                                 echo '<option value="' . $session['id'] . '" ' . $selected . '>' . $session['session'] . '</option>';
                                             }
@@ -114,7 +114,11 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
 </div>
 <script>
     $(document).ready(function() {
-        initDatatable('due-fees-table', 'financereports/dtduefees');
+        initDatatable('due-fees-table', 'financereports/dtduefees', {
+            session_id: <?php echo json_encode($current_session_id); ?>,
+            class_id: '',
+            feetype_id: []
+        });
     });
 </script>
 <script type="text/javascript">
