@@ -41,6 +41,12 @@ $selected_class_ids = set_value('class_id', []);
 $selected_class_ids = is_array($selected_class_ids) ? $selected_class_ids : ($selected_class_ids !== '' ? [$selected_class_ids] : []);
 $selected_feetype_ids = set_value('feetype_id', []);
 $selected_feetype_ids = is_array($selected_feetype_ids) ? $selected_feetype_ids : ($selected_feetype_ids !== '' ? [$selected_feetype_ids] : []);
+$session_names = [];
+foreach ($sessionList as $session) {
+    $session_names[(string) $session['id']] = $session['session'];
+}
+$selected_session_id = set_value('session_id') !== '' ? set_value('session_id') : $current_session_id;
+$selected_session_name = $session_names[(string) $selected_session_id] ?? '';
 ?>
 <div class="content-wrapper">
     <!-- Main content -->
@@ -118,7 +124,7 @@ $selected_feetype_ids = is_array($selected_feetype_ids) ? $selected_feetype_ids 
                                 </div>
                                 <div class="box-body">
                                     <div class="table-responsive">
-                                        <table class="table table-striped table-bordered table-hover due-fees-table" data-export-title="Due Fees" data-export-filename="Due Fees <?php echo date('Y'); ?>">
+                                        <table class="table table-striped table-bordered table-hover due-fees-table" data-export-title="Due Fees" data-export-filename="<?php echo htmlspecialchars('Due Fees ' . $selected_session_name, ENT_QUOTES, 'UTF-8'); ?>">
                                         <thead>
                                             <tr>
                                                 <th style="width:10%">Reg No</th>
@@ -151,11 +157,14 @@ $selected_feetype_ids = is_array($selected_feetype_ids) ? $selected_feetype_ids 
     function initDueFeesDatatable(params) {
         initDatatable('due-fees-table', 'financereports/dtduefees', params);
 
-        var excelButton = $('.due-fees-table').DataTable().button('.btn-excel');
+        var table = $('.due-fees-table').DataTable();
+        var excelButton = table.button('.btn-excel');
         var defaultExcelAction = $.fn.dataTable.ext.buttons.excelHtml5.action;
-        if ($.isFunction(defaultExcelAction)) {
+        if ($.isFunction(defaultExcelAction) && excelButton.length) {
+            // Rebind after a table reinitialization and read the live selected session.
             excelButton.action(function(event, dataTable, node, config) {
-                config.filename = $('.due-fees-table').data('exportFilename');
+                var sessionName = $('#session_id option:selected').text().trim();
+                config.filename = 'Due Fees ' + sessionName;
                 defaultExcelAction.call(this, event, dataTable, node, config);
             });
         }
@@ -171,6 +180,11 @@ $selected_feetype_ids = is_array($selected_feetype_ids) ? $selected_feetype_ids 
         $('.due-filter-select-all').on('click', function() {
             var $select = $($(this).data('target'));
             $select.find('option').prop('selected', true).trigger('change');
+        });
+
+        $('#session_id').on('change', function() {
+            var sessionName = $(this).find('option:selected').text().trim();
+            $('.due-fees-table').attr('data-export-filename', 'Due Fees ' + sessionName);
         });
 
         initDueFeesDatatable({
