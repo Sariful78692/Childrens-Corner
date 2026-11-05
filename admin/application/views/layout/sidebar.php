@@ -224,6 +224,15 @@
                                             }
                                         }
 
+                                        // Keep this staff certificate entry grouped under the existing Certificate menu.
+                                        if ($side_list_value->lang_key === 'certificate' && $this->rbac->hasPrivilege('student_certificate', 'can_view')) {
+                                        ?>
+                                            <li class="<?php echo activate_submenu('experiencecertificate', array('index', 'edit', 'print_certificate')); ?>">
+                                                <a href="<?php echo site_url('admin/experiencecertificate'); ?>"><i class="fa fa-angle-double-right"></i>Experience Certificate</a>
+                                            </li>
+                                        <?php
+                                        }
+
                                         ?>
                                     </ul>
 

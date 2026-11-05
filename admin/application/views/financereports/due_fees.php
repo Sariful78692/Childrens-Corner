@@ -4,7 +4,8 @@
         font-size: 11px;
     }
 
-    .due-filter-select-all {
+    .due-filter-select-all,
+    .due-filter-clear {
         color: #1f4e79;
         padding: 0 4px;
     }
@@ -34,6 +35,7 @@
         background-color: #2878b8;
         color: #fff;
     }
+
 </style>
 <?php
 $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
@@ -63,6 +65,7 @@ $selected_session_name = $session_names[(string) $selected_session_id] ?? '';
                                     <div class="form-group">
                                         <label><?php echo $this->lang->line('class'); ?></label>
                                         <button type="button" class="btn btn-default btn-xs pull-right due-filter-select-all" data-target="#class_id">Select All</button>
+                                        <button type="button" class="btn btn-default btn-xs pull-right due-filter-clear" data-target="#class_id">Clear</button>
                                         <select autofocus="" id="class_id" name="class_id[]" class="form-control due-filter-multi" multiple="multiple" data-placeholder="Select Class">
                                             <?php
                                             foreach ($classlist as $class) {
@@ -81,6 +84,7 @@ $selected_session_name = $session_names[(string) $selected_session_id] ?? '';
                                     <div class="form-group">
                                         <label><?php echo $this->lang->line('fees_type'); ?></label>
                                         <button type="button" class="btn btn-default btn-xs pull-right due-filter-select-all" data-target="#feetype_id">Select All</button>
+                                        <button type="button" class="btn btn-default btn-xs pull-right due-filter-clear" data-target="#feetype_id">Clear</button>
                                         <select id="feetype_id" name="feetype_id[]" class="form-control due-filter-multi" multiple="multiple" data-placeholder="Select Fee Type">
                                             <?php
                                             foreach ($feetypeList as $feetype) {
@@ -180,6 +184,11 @@ $selected_session_name = $session_names[(string) $selected_session_id] ?? '';
         $('.due-filter-select-all').on('click', function() {
             var $select = $($(this).data('target'));
             $select.find('option').prop('selected', true).trigger('change');
+        });
+
+        $('.due-filter-clear').on('click', function() {
+            var $select = $($(this).data('target'));
+            $select.find('option').prop('selected', false).trigger('change');
         });
 
         $('#session_id').on('change', function() {
