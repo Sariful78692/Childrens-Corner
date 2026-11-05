@@ -895,7 +895,7 @@ class Studentfeemaster_model extends MY_Model
         return $return_array;
     }
 
-    public function getCollectionAmountBetweenDate($start_date, $end_date)
+    public function getCollectionAmountBetweenDate($start_date, $end_date, $include_unapproved = false)
     {
         $this->db->select_sum('paid_amount', 'total_amount');
         $this->db->from('student_fees_collections');
@@ -907,7 +907,9 @@ class Studentfeemaster_model extends MY_Model
         // collections made later that day (including today's dashboard total).
         $end_date_exclusive = date('Y-m-d', strtotime($end_date . ' +1 day'));
         $this->db->where('collection_date <', $end_date_exclusive);
-        $this->db->where('status', 1);
+        if (!$include_unapproved) {
+            $this->db->where('status', 1);
+        }
         $this->db->where('is_refunded', 0);
 
         $result = $this->db->get()->row();

@@ -79,7 +79,7 @@ class Admin extends Admin_Controller
         $first_day_this_month     = date('Y-m-01');
         $month_collection         = $this->studentfeemaster_model->getCollectionAmountBetweenDate($first_day_this_month, $current_date);
         $month_transport_collection         = $this->whatever($student_transport_fee, $first_day_this_month, $current_date);
-        $today_fee_collection = $this->studentfeemaster_model->getCollectionAmountBetweenDate($current_date, $current_date);
+        $today_fee_collection = $this->studentfeemaster_model->getCollectionAmountBetweenDate($current_date, $current_date, true);
         $today_transport_collection = $this->whatever($student_transport_fee, $current_date, $current_date);
 
         $month_collection_total = $month_collection + $month_transport_collection;
