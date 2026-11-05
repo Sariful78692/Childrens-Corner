@@ -189,8 +189,10 @@
                                         <span class="pending-total-amount">
                                             <strong>Cash</strong>
                                             <span id="pending_cash_amount" class="form-control" role="status">0.00</span>
-                                            <strong>Bank</strong>
-                                            <span id="pending_bank_amount" class="form-control" role="status">0.00</span>
+                                            <strong>Bandhan Bank</strong>
+                                            <span id="pending_bandhan_amount" class="form-control" role="status">0.00</span>
+                                            <strong>Central Bank</strong>
+                                            <span id="pending_central_amount" class="form-control" role="status">0.00</span>
                                             <strong>Total Amount</strong>
                                             <span id="pending_collections_amount" class="form-control" role="status">0.00</span>
                                         </span>
@@ -213,7 +215,8 @@
                                             <th><?php echo $this->lang->line('class'); ?></th>
                                             <th><?php echo $this->lang->line('fee_type'); ?></th>
                                             <th>Cash</th>
-                                            <th>Bank</th>
+                                            <th>Bandhan Bank</th>
+                                            <th>Central Bank</th>
                                             <th>Total Amount</th>
                                             <?php if ((!($this->rbac->hasPrivilege('collect_fees', 'can_view') && !$this->rbac->hasPrivilege('superadmin', 'can_view'))) || $is_temp_superadmin) { ?>
                                                 <th><?php echo $this->lang->line('created_by'); ?></th>
@@ -250,7 +253,8 @@
                                 if (json && typeof json.amount_total !== 'undefined') {
                                     window.pendingCollectionsTotalAmount = json.amount_total;
                                     window.pendingCollectionsCashTotal = json.cash_total || '0.00';
-                                    window.pendingCollectionsBankTotal = json.bank_total || '0.00';
+                                    window.pendingCollectionsBandhanTotal = json.bandhan_total || '0.00';
+                                    window.pendingCollectionsCentralTotal = json.central_total || '0.00';
                                     updatePendingSelectedAmount();
                                 }
                             });
@@ -368,14 +372,16 @@
     function updatePendingSelectedAmount() {
         var selected_amount = 0;
         var selected_cash = 0;
-        var selected_bank = 0;
+        var selected_bandhan = 0;
+        var selected_central = 0;
         var has_selected_fees = $('.fee_checkbox:checked').length > 0;
         var currency_symbol = <?php echo json_encode($this->customlib->getSchoolCurrencyFormat()); ?>;
 
         if (!has_selected_fees) {
             $('#pending_collections_amount').text(window.pendingCollectionsTotalAmount || '0.00');
             $('#pending_cash_amount').text(window.pendingCollectionsCashTotal || '0.00');
-            $('#pending_bank_amount').text(window.pendingCollectionsBankTotal || '0.00');
+            $('#pending_bandhan_amount').text(window.pendingCollectionsBandhanTotal || '0.00');
+            $('#pending_central_amount').text(window.pendingCollectionsCentralTotal || '0.00');
             return;
         }
 
@@ -384,11 +390,13 @@
             var $row = $checkbox.closest('tr');
             selected_amount += parseFloat($row.find('.approve_fee_btn').data('amount')) || 0;
             selected_cash += parseFloat($checkbox.data('cash-amount')) || 0;
-            selected_bank += parseFloat($checkbox.data('bank-amount')) || 0;
+            selected_bandhan += parseFloat($checkbox.data('bandhan-amount')) || 0;
+            selected_central += parseFloat($checkbox.data('central-amount')) || 0;
         });
         $('#pending_collections_amount').text(currency_symbol + selected_amount.toFixed(2));
         $('#pending_cash_amount').text(currency_symbol + selected_cash.toFixed(2));
-        $('#pending_bank_amount').text(currency_symbol + selected_bank.toFixed(2));
+        $('#pending_bandhan_amount').text(currency_symbol + selected_bandhan.toFixed(2));
+        $('#pending_central_amount').text(currency_symbol + selected_central.toFixed(2));
     }
 
     // Individual checkbox change

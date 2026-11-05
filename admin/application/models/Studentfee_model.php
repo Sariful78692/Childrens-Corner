@@ -1186,7 +1186,7 @@ class Studentfee_model extends MY_Model
     public function searchPendingFees($date_from = '', $date_to = '', $class_id = '', $created_by_id = '')
     {
         $this->datatables
-            ->select('sfc.id, sfc.payment_hash, sfc.collection_date, students.id as reg_no, students.admission_no, students.firstname, students.lastname, students.roll_no, classes.class, sections.section, feetype.type as fee_type_name, sfc.paid_amount, sfc.payment_method_id, payment_methods.method_type_id as payment_method_type_id, CONCAT(staff.name, " ", staff.surname) as collected_by_name')
+            ->select('sfc.id, sfc.payment_hash, sfc.collection_date, students.id as reg_no, students.admission_no, students.firstname, students.lastname, students.roll_no, classes.class, sections.section, feetype.type as fee_type_name, sfc.paid_amount, sfc.payment_method_id, payment_methods.method_type_id as payment_method_type_id, payment_methods.title as payment_method_title, CONCAT(staff.name, " ", staff.surname) as collected_by_name')
             ->from('student_fees_collections sfc')
             ->join('students', 'students.id = sfc.student_id')
             ->join('classes', 'classes.id = sfc.class_id')
