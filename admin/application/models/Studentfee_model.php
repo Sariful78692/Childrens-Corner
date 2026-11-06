@@ -919,7 +919,7 @@ class Studentfee_model extends MY_Model
 
     public function getPendingFees($date_from = '', $date_to = '', $class_id = '', $roll_no = '', $admission_no = '', $created_by_id = '', $collection_by_user_id = null)
     {
-        $this->db->select('sfc.*, payment_methods.method_type_id as payment_method_type_id, students.firstname, students.lastname, students.admission_no, students.roll_no, classes.class, sections.section, feetype.type as fee_type_name, sessions.session as session_name, CONCAT(staff.name, " ", staff.surname) as collected_by_name');
+        $this->db->select('sfc.*, payment_methods.method_type_id as payment_method_type_id, payment_methods.title as payment_method_title, students.firstname, students.lastname, students.admission_no, students.roll_no, classes.class, sections.section, feetype.type as fee_type_name, sessions.session as session_name, CONCAT(staff.name, " ", staff.surname) as collected_by_name');
         $this->db->from('student_fees_collections sfc');
         $this->db->join('students', 'students.id = sfc.student_id');
         $this->db->join('classes', 'classes.id = sfc.class_id');

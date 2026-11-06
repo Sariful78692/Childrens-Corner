@@ -826,9 +826,27 @@ class Accounts_model extends MY_Model
         return $this->db->get()->result_array();
     }
 
+    public function get_income_ledger_bank_methods()
+    {
+        return $this->db->select('id, title')
+            ->where_in('method_type_id', array(2, 4))
+            ->order_by('title', 'asc')
+            ->get('payment_methods')
+            ->result_array();
+    }
+
     public function get_income_ledger($date_from, $date_to, $department_id = null, $income_head = null)
     {
         $result = [];
+        $bank_methods = $this->get_income_ledger_bank_methods();
+        $bank_selects = array();
+        foreach ($bank_methods as $bank_method) {
+            $bank_id = (int) $bank_method['id'];
+            $bank_selects[] = 'SUM(CASE WHEN pm.id = ' . $bank_id . ' THEN %s ELSE 0 END) as bank_amount_' . $bank_id;
+        }
+        $bank_selects_sfc = empty($bank_selects) ? '' : ', ' . implode(', ', array_map(function ($select) { return sprintf($select, 'sfc.paid_amount'); }, $bank_selects));
+        $bank_selects_loan = empty($bank_selects) ? '' : ', ' . implode(', ', array_map(function ($select) { return sprintf($select, 'staff_loan_payments.amount'); }, $bank_selects));
+        $bank_selects_income = empty($bank_selects) ? '' : ', ' . implode(', ', array_map(function ($select) { return sprintf($select, 'income.amount'); }, $bank_selects));
 
         // 1. Admission / Re-Admission — grouped by date + head + department
         if (empty($income_head) || $income_head == 'admission_fees' || $income_head == 're_admission') {
@@ -840,7 +858,7 @@ class Accounts_model extends MY_Model
                 SUM(CASE WHEN pm.method_type_id = 1 THEN sfc.paid_amount ELSE 0 END) as cash_amount,
                 SUM(CASE WHEN pm.method_type_id IN(2,4) THEN sfc.paid_amount ELSE 0 END) as bank_amount,
                 ad.name as department_name
-            ', false);
+            ' . $bank_selects_sfc, false);
             $this->db->from('student_fees_collections sfc');
             $this->db->join('student_session ss', 'ss.id = sfc.student_session_id', 'left');
             $this->db->join('payment_methods pm', 'pm.id = sfc.payment_method_id', 'left');
@@ -874,7 +892,7 @@ class Accounts_model extends MY_Model
                 SUM(CASE WHEN pm.method_type_id = 1 THEN sfc.paid_amount ELSE 0 END) as cash_amount,
                 SUM(CASE WHEN pm.method_type_id IN(2,4) THEN sfc.paid_amount ELSE 0 END) as bank_amount,
                 ad.name as department_name
-            ', false);
+            ' . $bank_selects_sfc, false);
             $this->db->from('student_fees_collections sfc');
             $this->db->join('student_session ss', 'ss.id = sfc.student_session_id', 'left');
             $this->db->join('payment_methods pm', 'pm.id = sfc.payment_method_id', 'left');
@@ -902,7 +920,7 @@ class Accounts_model extends MY_Model
                 SUM(CASE WHEN pm.method_type_id = 1 THEN staff_loan_payments.amount ELSE 0 END) as cash_amount,
                 SUM(CASE WHEN pm.method_type_id IN(2,4) THEN staff_loan_payments.amount ELSE 0 END) as bank_amount,
                 ad.name as department_name
-            ', false);
+            ' . $bank_selects_loan, false);
             $this->db->from('staff_loan_payments');
             $this->db->join('payment_methods pm', 'pm.id = staff_loan_payments.payment_method_id', 'left');
             $this->db->join('staff_loans sl', 'sl.id = staff_loan_payments.staff_loan_id', 'left');
@@ -928,7 +946,7 @@ class Accounts_model extends MY_Model
                 SUM(CASE WHEN pm.method_type_id = 1 THEN income.amount ELSE 0 END) as cash_amount,
                 SUM(CASE WHEN pm.method_type_id IN(2,4) THEN income.amount ELSE 0 END) as bank_amount,
                 ad.name as department_name
-            ', false);
+            ' . $bank_selects_income, false);
             $this->db->from('income');
             $this->db->join('payment_methods pm', 'pm.id = income.payment_method_id', 'left');
             $this->db->join('income_head ih', 'ih.id = income.income_head_id', 'left');

@@ -65,7 +65,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                             <th>Particulars</th>
                             <th>Type</th>
                             <th>Cash</th>
-                            <th>Bank</th>
+                            <?php foreach ($bank_methods as $bank_method) { ?><th><?php echo html_escape($bank_method['title']); ?></th><?php } ?>
                             <th>Total</th>
                         </tr>
                     </thead>
@@ -73,12 +73,16 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                         <?php
                         $total_cash = 0;
                         $total_bank = 0;
+                        $bank_totals = array();
+                        foreach ($bank_methods as $bank_method) { $bank_totals[$bank_method['id']] = 0; }
                         $grand_total = 0;
 
                         if (!empty($head_data)) {
                             $current_date = null;
                             $date_cash = 0;
                             $date_bank = 0;
+                            $date_bank_totals = array();
+                            foreach ($bank_methods as $bank_method) { $date_bank_totals[$bank_method['id']] = 0; }
                             $date_total = 0;
 
                             foreach ($head_data as $entry) {
@@ -92,18 +96,25 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                     <tr style="background-color: #efefef; font-weight: bold;">
                                         <td colspan="4" class="text-right">Total for <?php echo $current_date ?>:</td>
                                         <td><?php echo number_format($date_cash, 2) ?></td>
-                                        <td><?php echo number_format($date_bank, 2) ?></td>
+                                        <?php foreach ($bank_methods as $bank_method) { ?><td><?php echo number_format($date_bank_totals[$bank_method['id']], 2) ?></td><?php } ?>
                                         <td><?php echo number_format($date_total, 2) ?></td>
                                     </tr>
                                 <?php
                                     $date_cash = 0;
                                     $date_bank = 0;
+                                    foreach ($bank_methods as $bank_method) { $date_bank_totals[$bank_method['id']] = 0; }
                                     $date_total = 0;
                                 }
 
                                 $current_date = $this_date;
                                 $date_cash += $entry['cash_amount'];
                                 $date_bank += $entry['bank_amount'];
+                                foreach ($bank_methods as $bank_method) {
+                                    $bank_id = $bank_method['id'];
+                                    $bank_amount = (float) ($entry['bank_amount_' . $bank_id] ?? 0);
+                                    $date_bank_totals[$bank_id] += $bank_amount;
+                                    $bank_totals[$bank_id] += $bank_amount;
+                                }
                                 $date_total += $entry['total_amount'];
 
                                 $total_cash += $entry['cash_amount'];
@@ -116,7 +127,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                     <td>To <span class="custom_bold"><?php echo $entry['particulars'] ?></span></td>
                                     <td>Credit</td>
                                     <td><?php echo number_format($entry['cash_amount'], 2) ?></td>
-                                    <td><?php echo number_format($entry['bank_amount'], 2) ?></td>
+                                    <?php foreach ($bank_methods as $bank_method) { ?><td><?php echo number_format($entry['bank_amount_' . $bank_method['id']] ?? 0, 2) ?></td><?php } ?>
                                     <td><?php echo number_format($entry['total_amount'], 2) ?></td>
                                 </tr>
                             <?php
@@ -127,14 +138,14 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                                 <tr style="background-color: #efefef; font-weight: bold;">
                                     <td colspan="4" class="text-right">Total for <?php echo $current_date ?>:</td>
                                     <td><?php echo number_format($date_cash, 2) ?></td>
-                                    <td><?php echo number_format($date_bank, 2) ?></td>
+                                    <?php foreach ($bank_methods as $bank_method) { ?><td><?php echo number_format($date_bank_totals[$bank_method['id']], 2) ?></td><?php } ?>
                                     <td><?php echo number_format($date_total, 2) ?></td>
                                 </tr>
                         <?php
                             }
                         } else { ?>
                             <tr>
-                                <td colspan="7" class="text-center">No income ledger entries found for the selected period.</td>
+                                <td colspan="<?php echo 6 + count($bank_methods); ?>" class="text-center">No income ledger entries found for the selected period.</td>
                             </tr>
                         <?php } ?>
                     </tbody>
@@ -152,7 +163,7 @@ $currency_symbol = $this->customlib->getSchoolCurrencyFormat();
                             <tr style="background: #efefef; font-weight: bold;">
                                 <td width="40%" class="text-right">By Closing Balance:</td>
                                 <td width="20%"><?php echo number_format($total_cash, 2) ?></td>
-                                <td width="20%"><?php echo number_format($total_bank, 2) ?></td>
+                                <?php foreach ($bank_methods as $bank_method) { ?><td><?php echo number_format($bank_totals[$bank_method['id']], 2) ?></td><?php } ?>
                                 <td width="20%"><?php echo number_format($grand_total, 2) ?></td>
                             </tr>
                         </table>

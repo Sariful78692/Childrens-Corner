@@ -1185,6 +1185,7 @@ class Accounts extends Admin_Controller
         // Load model and fetch head-wise data
         $this->load->model('accounts_model');
         $head_data = $this->accounts_model->get_income_ledger($date_from, $date_to, $department_id, $income_head);
+        $data['bank_methods'] = $this->accounts_model->get_income_ledger_bank_methods();
 
         // Sort data by transaction_date
         usort($head_data, function($a, $b) {
@@ -1226,6 +1227,7 @@ class Accounts extends Admin_Controller
         // Load model and fetch head-wise data
         $this->load->model('accounts_model');
         $head_data = $this->accounts_model->get_income_ledger($date_from, $date_to, $department_id, $income_head);
+        $data['bank_methods'] = $this->accounts_model->get_income_ledger_bank_methods();
 
         // Sort data by transaction_date
         usort($head_data, function($a, $b) {

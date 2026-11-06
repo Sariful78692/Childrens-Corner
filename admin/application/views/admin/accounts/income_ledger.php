@@ -2,6 +2,19 @@
     .custom_bold {
         font-weight: bold;
     }
+    .income-ledger-sticky-header {
+        display: none;
+        position: fixed;
+        top: 50px;
+        z-index: 1031;
+        overflow: hidden;
+        background: #f2f2f2;
+        pointer-events: none;
+    }
+    .income-ledger-sticky-header table {
+        margin: 0;
+        table-layout: fixed;
+    }
 </style>
 <div class="content-wrapper">
     <section class="content">
@@ -76,7 +89,7 @@
 
                     <div class="col-md-12">
                         <div class="table-responsive">
-                            <table class="table table-striped table-bordered">
+                            <table class="table table-striped table-bordered income-ledger-table">
                                 <thead>
                                     <tr>
                                         <th>Date</th>
@@ -84,7 +97,7 @@
                                         <th>Particulars</th>
                                         <th>Type</th>
                                         <th>Cash</th>
-                                        <th>Bank</th>
+                                        <?php foreach ($bank_methods as $bank_method) { ?><th><?= html_escape($bank_method['title']) ?></th><?php } ?>
                                         <th>Total</th>
                                     </tr>
                                 </thead>
@@ -92,12 +105,16 @@
                                     <?php
                                     $total_cash = 0;
                                     $total_bank = 0;
+                                    $bank_totals = array();
+                                    foreach ($bank_methods as $bank_method) { $bank_totals[$bank_method['id']] = 0; }
                                     $grand_total = 0;
 
                                     if (!empty($head_data)) {
                                         $current_date = null;
                                         $date_cash = 0;
                                         $date_bank = 0;
+                                        $date_bank_totals = array();
+                                        foreach ($bank_methods as $bank_method) { $date_bank_totals[$bank_method['id']] = 0; }
                                         $date_total = 0;
 
                                         foreach ($head_data as $entry) {
@@ -111,18 +128,25 @@
                                                 <tr style="background-color: #efefef; font-weight: bold;">
                                                     <td colspan="4" class="text-right">Total for <?= $current_date ?>:</td>
                                                     <td><?= number_format($date_cash, 2) ?></td>
-                                                    <td><?= number_format($date_bank, 2) ?></td>
+                                                    <?php foreach ($bank_methods as $bank_method) { ?><td><?= number_format($date_bank_totals[$bank_method['id']], 2) ?></td><?php } ?>
                                                     <td><?= number_format($date_total, 2) ?></td>
                                                 </tr>
                                             <?php
                                                 $date_cash = 0;
                                                 $date_bank = 0;
+                                                foreach ($bank_methods as $bank_method) { $date_bank_totals[$bank_method['id']] = 0; }
                                                 $date_total = 0;
                                             }
 
                                             $current_date = $this_date;
                                             $date_cash += $entry['cash_amount'];
                                             $date_bank += $entry['bank_amount'];
+                                            foreach ($bank_methods as $bank_method) {
+                                                $bank_id = $bank_method['id'];
+                                                $bank_amount = (float) ($entry['bank_amount_' . $bank_id] ?? 0);
+                                                $date_bank_totals[$bank_id] += $bank_amount;
+                                                $bank_totals[$bank_id] += $bank_amount;
+                                            }
                                             $date_total += $entry['total_amount'];
 
                                             $total_cash += $entry['cash_amount'];
@@ -135,7 +159,7 @@
                                                 <td>To <span class="custom_bold"><?= htmlspecialchars($entry['head']) ?></span></td>
                                                 <td>Credit</td>
                                                 <td><?= number_format($entry['cash_amount'], 2) ?></td>
-                                                <td><?= number_format($entry['bank_amount'], 2) ?></td>
+                                                <?php foreach ($bank_methods as $bank_method) { $bank_id = $bank_method['id']; ?><td><?= number_format($entry['bank_amount_' . $bank_id] ?? 0, 2) ?></td><?php } ?>
                                                 <td><?= number_format($entry['total_amount'], 2) ?></td>
                                             </tr>
                                         <?php
@@ -146,33 +170,73 @@
                                             <tr style="background-color: #efefef; font-weight: bold;">
                                                 <td colspan="4" class="text-right">Total for <?= $current_date ?>:</td>
                                                 <td><?= number_format($date_cash, 2) ?></td>
-                                                <td><?= number_format($date_bank, 2) ?></td>
+                                                <?php foreach ($bank_methods as $bank_method) { ?><td><?= number_format($date_bank_totals[$bank_method['id']], 2) ?></td><?php } ?>
                                                 <td><?= number_format($date_total, 2) ?></td>
                                             </tr>
                                         <?php
                                         }
                                     } else { ?>
                                         <tr>
-                                            <td colspan="7" class="text-center">No ledger entries found for the selected period.</td>
+                                            <td colspan="<?= 6 + count($bank_methods) ?>" class="text-center">No ledger entries found for the selected period.</td>
                                         </tr>
                                     <?php } ?>
                                 </tbody>
+                                <tfoot>
+                                    <tr style="background: #efefef; font-weight: bold;">
+                                        <td colspan="4" class="text-right">By Closing Balance:</td>
+                                        <td><?= number_format($total_cash, 2) ?></td>
+                                        <?php foreach ($bank_methods as $bank_method) { ?><td><?= number_format($bank_totals[$bank_method['id']], 2) ?></td><?php } ?>
+                                        <td><?= number_format($grand_total, 2) ?></td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
-                    </div>
+                        <script>
+                            $(function() {
+                                var $table = $('.income-ledger-table');
+                                var $scrollContainer = $table.closest('.table-responsive');
+                                if (!$table.length || !$table.find('thead').length) return;
 
-                    <!-- Final Summary Table for Ledger -->
-                    <div class="col-md-12" style="margin-top: 10px;">
-                        <div class="pull-right" style="width: 50%;">
-                             <table class="table table-bordered">
-                                <tr style="background: #efefef; font-weight: bold;">
-                                    <td width="50%" class="text-right">By Closing Balance:</td>
-                                    <td width="16.6%"><?= number_format($total_cash, 2) ?></td>
-                                    <td width="16.6%"><?= number_format($total_bank, 2) ?></td>
-                                    <td width="16.6%"><?= number_format($grand_total, 2) ?></td>
-                                </tr>
-                             </table>
-                        </div>
+                                var $stickyHeader = $('<div class="income-ledger-sticky-header" aria-hidden="true"><table class="table table-striped table-bordered"><thead></thead></table></div>');
+                                var $stickyTable = $stickyHeader.find('table');
+                                $stickyTable.find('thead').html($table.find('thead').html());
+                                $('body').append($stickyHeader);
+
+                                function updateStickyHeader() {
+                                    var tableRect = $table[0].getBoundingClientRect();
+                                    var wrapperRect = $scrollContainer[0].getBoundingClientRect();
+                                    var headerHeight = $table.find('thead')[0].getBoundingClientRect().height;
+                                    var stickyTop = 50;
+                                    var shouldStick = tableRect.top < stickyTop && tableRect.bottom > stickyTop + headerHeight;
+
+                                    if (!shouldStick) {
+                                        $stickyHeader.hide();
+                                        $table.find('thead').css('visibility', '');
+                                        return;
+                                    }
+
+                                    var tableWidth = $table[0].getBoundingClientRect().width;
+                                    $stickyHeader.css({
+                                        display: 'block',
+                                        left: wrapperRect.left,
+                                        width: $scrollContainer[0].clientWidth,
+                                        height: headerHeight
+                                    });
+                                    $stickyTable.css({
+                                        width: tableWidth,
+                                        transform: 'translateX(-' + $scrollContainer[0].scrollLeft + 'px)'
+                                    });
+                                    $table.find('thead th').each(function(index) {
+                                        $stickyTable.find('thead th').eq(index).css('width', $(this).outerWidth());
+                                    });
+                                    $table.find('thead').css('visibility', 'hidden');
+                                }
+
+                                $(window).on('scroll.incomeLedgerSticky resize.incomeLedgerSticky', updateStickyHeader);
+                                $scrollContainer.on('scroll.incomeLedgerSticky', updateStickyHeader);
+                                updateStickyHeader();
+                            });
+                        </script>
                     </div>
 
                 </div>
