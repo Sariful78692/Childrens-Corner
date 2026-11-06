@@ -584,7 +584,7 @@ class Studentfee_model extends MY_Model
             ses.session as session_name,
             sfm.student_session_id,
             s.id as student_id,
-            CONCAT(s.firstname, " ", IFNULL(s.middlename, ""), " ", s.lastname) as student_name,
+            TRIM(CONCAT_WS(" ", NULLIF(TRIM(s.firstname), ""), NULLIF(TRIM(s.middlename), ""), NULLIF(TRIM(s.lastname), ""))) as student_name,
             ss.roll_no,
             sec.id as section_id,
             sec.section,
