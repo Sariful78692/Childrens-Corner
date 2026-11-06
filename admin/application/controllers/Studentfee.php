@@ -2006,12 +2006,12 @@ class Studentfee extends Admin_Controller
             }
         }
 
-        $total_paid_amount = 0;
+        // The DataTables result is paginated, so summing its rows reports only
+        // the current page. Use the complete filtered pending set for totals.
+        $total_paid_amount = $summary_amount;
 
         if (!empty($m->data)) {
             foreach ($m->data as $key => $value) {
-                $total_paid_amount += $value->paid_amount;
-
                 $row = array();
 
                 if ((!($this->rbac->hasPrivilege('collect_fees', 'can_view') && !$this->rbac->hasPrivilege('superadmin', 'can_view'))) || $is_temp_superadmin) {

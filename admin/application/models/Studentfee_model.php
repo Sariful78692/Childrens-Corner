@@ -923,7 +923,10 @@ class Studentfee_model extends MY_Model
         $this->db->from('student_fees_collections sfc');
         $this->db->join('students', 'students.id = sfc.student_id');
         $this->db->join('classes', 'classes.id = sfc.class_id');
-        $this->db->join('student_session', 'student_session.student_id = students.id AND student_session.session_id = sfc.session_id');
+        // Match the specific enrollment recorded on the collection. Joining by
+        // student + session can duplicate a payment if the student has multiple
+        // enrollment rows for that session, inflating pending collection totals.
+        $this->db->join('student_session', 'student_session.id = sfc.student_session_id');
         $this->db->join('sections', 'sections.id = student_session.section_id');
         $this->db->join('feetype', 'feetype.id = sfc.feetype_id');
         $this->db->join('sessions', 'sessions.id = sfc.session_id');
